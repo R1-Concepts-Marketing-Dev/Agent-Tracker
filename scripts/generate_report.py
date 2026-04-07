@@ -48,8 +48,25 @@ def _fetch_csv(gid: str) -> list[dict]:
             "description": row.get("Description", "").strip(),
         }
         if agent["name"]:
+            agent["stage"] = _normalize_stage(agent["stage"])
             agents.append(agent)
     return agents
+
+
+def _normalize_stage(raw: str) -> str:
+    """
+    Map any stage value from the sheet to one of three canonical labels:
+      Completed | In Progress | Planned
+    Unrecognised values fall back to 'Planned'.
+    """
+    s = raw.strip().lower()
+    if s in {"completed", "done", "complete", "finished", "live", "deployed",
+             "shipped", "launched", "production"}:
+        return "Completed"
+    if s in {"in progress", "in-progress", "inprogress", "wip", "active",
+             "building", "in development", "in dev", "started", "ongoing"}:
+        return "In Progress"
+    return "Planned"   # covers "planned", "backlog", "todo", blank, etc.
 
 
 def fetch_sheet_data() -> list[dict]:
@@ -133,7 +150,7 @@ Agents whose stage changed this week:
 Write a 3–5 sentence summary that:
 1. Gives a quick overall status of the pipeline
 2. Calls out newly added agents (if any)
-3. Calls out any stage changes — especially agents that moved to "In Progress" or "Done"
+3. Calls out any stage changes — especially agents that moved to "In Progress" or "Completed"
 4. Uses an upbeat, professional tone suitable for an internal team email
 
 No bullet points. Plain paragraph prose only."""
@@ -169,7 +186,7 @@ DEFAULT_NODE_BG = "#374151"
 
 # Stage card styles  (text-color, card-bg, border-color, label)
 STAGE_CARD: dict[str, tuple[str, str, str, str]] = {
-    "Done":        ("#3fb950", "#0d2119", "#238636", "Done"),
+    "Completed":   ("#3fb950", "#0d2119", "#238636", "Completed"),
     "In Progress": ("#e3b341", "#1c1500", "#d29922", "In Progress"),
     "Planned":     ("#58a6ff", "#0f1729", "#388bfd", "Planned"),
 }
@@ -485,7 +502,7 @@ def _legend_row() -> str:
     items = [
         ("#0d1f36", "#1f3358", "Trigger / Schedule"),
         ("#161b22", "#30363d", "Data Source / Output"),
-        ("#0d2119", "#238636", "Done"),
+        ("#0d2119", "#238636", "Completed"),
         ("#1c1500", "#d29922", "In Progress"),
         ("#0f1729", "#388bfd", "Planned"),
     ]
@@ -512,7 +529,7 @@ def build_email_html(
     summary: str,
     week_str: str,
 ) -> str:
-    done_agents      = [a for a in agents if a["stage"] == "Done"]
+    done_agents      = [a for a in agents if a["stage"] == "Completed"]
     inprog_agents    = [a for a in agents if a["stage"] == "In Progress"]
     planned_agents   = [a for a in agents if a["stage"] == "Planned"]
 
@@ -574,7 +591,7 @@ def build_email_html(
                 border-radius:7px;padding:14px 10px;text-align:center;">
                 <div style="font-size:26px;font-weight:800;color:#3fb950;">{done_count}</div>
                 <div style="font-size:9px;font-weight:700;color:#3fb950;
-                  text-transform:uppercase;letter-spacing:1px;">Done</div>
+                  text-transform:uppercase;letter-spacing:1px;">Completed</div>
               </td></tr>
             </table>
           </td>
@@ -648,7 +665,7 @@ def build_email_html(
         {_col_header_row()}
 
         <!-- DONE agents (full rows with sources + outputs) -->
-        {_section_header("&#9646; Live Agents", "#3fb950") if done_agents else ""}
+        {_section_header("&#9646; Completed", "#3fb950") if done_agents else ""}
         {done_rows}
 
         <!-- IN PROGRESS agents -->
