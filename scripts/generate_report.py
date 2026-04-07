@@ -9,7 +9,6 @@ import os
 import json
 import csv
 import io
-import zipfile
 import smtplib
 import datetime
 import urllib.request
@@ -23,11 +22,21 @@ ANTHROPIC_API_KEY  = os.environ["ANTHROPIC_API_KEY"]
 GMAIL_ADDRESS      = os.environ["GMAIL_ADDRESS"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 RECIPIENT_EMAIL    = os.environ.get("RECIPIENT_EMAIL", os.environ["GMAIL_ADDRESS"])
+# Comma-separated list of tab GIDs, e.g. "0,1234567890,9876543210"
+# Find each GID by clicking the tab in Google Sheets — it appears in the URL as #gid=XXXXX
+SHEET_GIDS         = os.environ.get("SHEET_GIDS", "0")
 SNAPSHOT_FILE      = "data/agent_snapshot.json"
 
 # ── Google Sheets ───────────────────────────────────────────────────────────────
-def _parse_csv_rows(content: str) -> list[dict]:
-    """Parse a single CSV string into agent dicts, skipping rows with no name."""
+def _fetch_csv(gid: str) -> list[dict]:
+    """Fetch a single sheet tab by GID and parse it into agent dicts."""
+    url = (
+        f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
+        f"/export?format=csv&gid={gid.strip()}"
+    )
+    with urllib.request.urlopen(url) as resp:
+        content = resp.read().decode("utf-8")
+
     reader = csv.DictReader(io.StringIO(content))
     agents = []
     for row in reader:
@@ -42,27 +51,16 @@ def _parse_csv_rows(content: str) -> list[dict]:
             agents.append(agent)
     return agents
 
+
 def fetch_sheet_data() -> list[dict]:
-    """
-    Download ALL tabs from the spreadsheet by exporting as a ZIP.
-    Each sheet becomes its own CSV inside the archive.
-    Sheet must be publicly viewable (Anyone with the link → Viewer).
-    """
-    url = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=zip"
-    with urllib.request.urlopen(url) as resp:
-        zip_bytes = resp.read()
-
+    """Fetch every tab listed in SHEET_GIDS and combine into one agent list."""
+    gids = [g.strip() for g in SHEET_GIDS.split(",") if g.strip()]
+    print(f"   Fetching {len(gids)} tab(s) — GIDs: {gids}")
     agents = []
-    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
-        csv_files = sorted(f for f in zf.namelist() if f.endswith(".csv"))
-        print(f"   Found {len(csv_files)} sheet(s): {csv_files}")
-        for csv_file in csv_files:
-            with zf.open(csv_file) as f:
-                content = f.read().decode("utf-8")
-            sheet_agents = _parse_csv_rows(content)
-            print(f"   {csv_file}: {len(sheet_agents)} agent(s)")
-            agents.extend(sheet_agents)
-
+    for gid in gids:
+        tab_agents = _fetch_csv(gid)
+        print(f"   GID {gid}: {len(tab_agents)} agent(s)")
+        agents.extend(tab_agents)
     return agents
 
 # ── Snapshot (change detection) ────────────────────────────────────────────────
