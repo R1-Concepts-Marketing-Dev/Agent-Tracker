@@ -1,0 +1,63 @@
+name: Weekly Agent Pipeline Report
+
+on:
+  # Every Monday at 9:00 AM Eastern (14:00 UTC)
+  schedule:
+    - cron: '0 14 * * 1'
+
+  # Allow manual trigger from the Actions tab for testing
+  workflow_dispatch:
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+
+    # Needed so the action can commit the updated snapshot back to the repo
+    permissions:
+      contents: write
+
+    steps:
+      # 1. Check out the repository (with write token so we can push the snapshot)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Set up Python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3. Cache pip dependencies
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-anthropic
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # 4. Install dependencies
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      # 5. Run the report generator
+      - name: Generate and send weekly report
+        env:
+          GOOGLE_SHEET_ID:    ${{ secrets.GOOGLE_SHEET_ID }}
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_ADDRESS:      ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL:    ${{ secrets.RECIPIENT_EMAIL }}
+        run: python scripts/generate_report.py
+
+      # 6. Commit the updated agent snapshot so next week's run can diff against it
+      - name: Commit updated snapshot
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/agent_snapshot.json
+          # Only commit if there are actual changes
+          git diff --staged --quiet || git commit -m "chore: update agent snapshot [skip ci]"
+          git push
