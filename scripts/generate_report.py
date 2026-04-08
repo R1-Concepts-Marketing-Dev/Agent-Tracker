@@ -1,8 +1,7 @@
 """
 Agent Pipeline Weekly Report Generator
 Reads from Google Sheets, summarizes with Claude, sends via Gmail SMTP.
-Email is formatted as a dark-themed 4-column flowchart:
-  Trigger / Schedule → Data Sources → AI Agents → Outputs
+Email uses a dark card-based design grouped by stage.
 """
 
 import os
@@ -22,21 +21,28 @@ ANTHROPIC_API_KEY  = os.environ["ANTHROPIC_API_KEY"]
 GMAIL_ADDRESS      = os.environ["GMAIL_ADDRESS"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 RECIPIENT_EMAIL    = os.environ.get("RECIPIENT_EMAIL", os.environ["GMAIL_ADDRESS"])
-# Comma-separated list of tab GIDs, e.g. "0,1234567890,9876543210"
-# Find each GID by clicking the tab in Google Sheets — it appears in the URL as #gid=XXXXX
 SHEET_GIDS         = os.environ.get("SHEET_GIDS", "0")
 SNAPSHOT_FILE      = "data/agent_snapshot.json"
 
 # ── Google Sheets ───────────────────────────────────────────────────────────────
+def _normalize_stage(raw: str) -> str:
+    s = raw.strip().lower()
+    if s in {"completed", "done", "complete", "finished", "live", "deployed",
+             "shipped", "launched", "production"}:
+        return "Completed"
+    if s in {"in progress", "in-progress", "inprogress", "wip", "active",
+             "building", "in development", "in dev", "started", "ongoing"}:
+        return "In Progress"
+    return "Planned"
+
+
 def _fetch_csv(gid: str) -> list[dict]:
-    """Fetch a single sheet tab by GID and parse it into agent dicts."""
     url = (
         f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
         f"/export?format=csv&gid={gid.strip()}"
     )
     with urllib.request.urlopen(url) as resp:
         content = resp.read().decode("utf-8")
-
     reader = csv.DictReader(io.StringIO(content))
     agents = []
     for row in reader:
@@ -53,24 +59,7 @@ def _fetch_csv(gid: str) -> list[dict]:
     return agents
 
 
-def _normalize_stage(raw: str) -> str:
-    """
-    Map any stage value from the sheet to one of three canonical labels:
-      Completed | In Progress | Planned
-    Unrecognised values fall back to 'Planned'.
-    """
-    s = raw.strip().lower()
-    if s in {"completed", "done", "complete", "finished", "live", "deployed",
-             "shipped", "launched", "production"}:
-        return "Completed"
-    if s in {"in progress", "in-progress", "inprogress", "wip", "active",
-             "building", "in development", "in dev", "started", "ongoing"}:
-        return "In Progress"
-    return "Planned"   # covers "planned", "backlog", "todo", blank, etc.
-
-
 def fetch_sheet_data() -> list[dict]:
-    """Fetch every tab listed in SHEET_GIDS and combine into one agent list."""
     gids = [g.strip() for g in SHEET_GIDS.split(",") if g.strip()]
     print(f"   Fetching {len(gids)} tab(s) — GIDs: {gids}")
     agents = []
@@ -80,7 +69,7 @@ def fetch_sheet_data() -> list[dict]:
         agents.extend(tab_agents)
     return agents
 
-# ── Snapshot (change detection) ────────────────────────────────────────────────
+# ── Snapshot ───────────────────────────────────────────────────────────────────
 def load_snapshot() -> list[dict]:
     if os.path.exists(SNAPSHOT_FILE):
         with open(SNAPSHOT_FILE) as f:
@@ -95,12 +84,6 @@ def save_snapshot(agents: list[dict]) -> None:
 def detect_changes(
     current: list[dict], previous: list[dict]
 ) -> tuple[list[dict], list[dict]]:
-    """
-    Returns
-    -------
-    new_rows      : agents not in previous snapshot
-    stage_changes : agents whose Stage of Completion changed (gain 'previous_stage' key)
-    """
     prev_map = {a["name"]: a["stage"] for a in previous}
     new_rows: list[dict] = []
     stage_changes: list[dict] = []
@@ -112,7 +95,7 @@ def detect_changes(
             stage_changes.append({**agent, "previous_stage": prev_map[name]})
     return new_rows, stage_changes
 
-# ── Claude Summary ──────────────────────────────────────────────────────────────
+# ── Claude Summary ─────────────────────────────────────────────────────────────
 def generate_summary(
     agents: list[dict],
     new_rows: list[dict],
@@ -147,10 +130,10 @@ New agents added this week:
 Agents whose stage changed this week:
 {change_lines}
 
-Write a 3–5 sentence summary that:
+Write a 3-5 sentence summary that:
 1. Gives a quick overall status of the pipeline
 2. Calls out newly added agents (if any)
-3. Calls out any stage changes — especially agents that moved to "In Progress" or "Completed"
+3. Calls out any stage changes, especially agents that moved to "In Progress" or "Completed"
 4. Uses an upbeat, professional tone suitable for an internal team email
 
 No bullet points. Plain paragraph prose only."""
@@ -163,14 +146,12 @@ No bullet points. Plain paragraph prose only."""
     return msg.content[0].text.strip()
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  FLOWCHART EMAIL BUILDER
-#  Dark theme, 4-column table layout (email-client compatible)
+#  EMAIL BUILDER — Dark card design, grouped by stage
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Node brand colours
 NODE_COLORS: dict[str, str] = {
     "meta":       "#1877F2",
-    "tiktok":     "#010101",
+    "tiktok":     "#111111",
     "google ads": "#4285F4",
     "google":     "#4285F4",
     "hubspot":    "#FF7A59",
@@ -181,293 +162,245 @@ NODE_COLORS: dict[str, str] = {
     "slack":      "#4A154B",
     "microsoft":  "#00A4EF",
     "teams":      "#6264A7",
+    "sheet":      "#34A853",
 }
-DEFAULT_NODE_BG = "#374151"
+DEFAULT_NODE_COLOR = "#4B5563"
 
-# Stage card styles  (text-color, card-bg, border-color, label)
-STAGE_CARD: dict[str, tuple[str, str, str, str]] = {
-    "Completed":   ("#3fb950", "#0d2119", "#238636", "Completed"),
-    "In Progress": ("#e3b341", "#1c1500", "#d29922", "In Progress"),
-    "Planned":     ("#58a6ff", "#0f1729", "#388bfd", "Planned"),
+# Stage styles: (text, bg, border)
+STAGE: dict[str, tuple[str, str, str]] = {
+    "Completed":   ("#3fb950", "#0d2119", "#238636"),
+    "In Progress": ("#e3b341", "#1c1500", "#d29922"),
+    "Planned":     ("#58a6ff", "#0f1729", "#388bfd"),
 }
-DEFAULT_CARD = ("#c9d1d9", "#161b22", "#30363d", "Unknown")
+DEFAULT_STAGE = ("#c9d1d9", "#161b22", "#30363d")
+
+# Left-border gradient per stage
+CARD_BORDER: dict[str, str] = {
+    "Completed":   "#3fb950",
+    "In Progress": "#e3b341",
+    "Planned":     "#58a6ff",
+}
+
+# Section rule colours: (title/count color, line color, count bg, count border)
+SECTION_STYLE: dict[str, tuple[str, str, str, str]] = {
+    "Completed":   ("#3fb950", "#196130", "#0d2119", "#238636"),
+    "In Progress": ("#e3b341", "#5a3e00", "#1c1500", "#d29922"),
+    "Planned":     ("#58a6ff", "#1a3a6e", "#0f1729", "#388bfd"),
+}
 
 
-def _node_bg(name: str) -> str:
+def _node_color(name: str) -> str:
     nl = name.lower()
     for key, color in NODE_COLORS.items():
         if key in nl:
             return color
-    return DEFAULT_NODE_BG
+    return DEFAULT_NODE_COLOR
 
 
-def parse_connections(raw: str) -> tuple[list[str], list[str]]:
-    """
-    'Meta +TikTok +Google Ads -> Claude -> Gmail'
-    Returns (sources, outputs) — Claude node is stripped from the middle.
-    sources = everything before the first ->
-    outputs = everything after the last ->
-    """
+def _parse_connections(raw: str) -> list[str]:
+    """Return a flat ordered list of node names from the connections string."""
     if not raw:
-        return [], []
-    parts = [p.strip() for p in raw.split("->")]
-    sources = [n.strip() for n in parts[0].split("+") if n.strip()]
-    outputs: list[str] = []
-    if len(parts) > 1:
-        last = parts[-1]
-        # skip if last segment is just "Claude"
-        if last.lower() != "claude":
-            outputs = [n.strip() for n in last.split("+") if n.strip()]
-    return sources, outputs
+        return []
+    nodes: list[str] = []
+    for part in raw.split("->"):
+        for node in part.split("+"):
+            n = node.strip()
+            if n:
+                nodes.append(n)
+    return nodes
 
 
-def _td(content: str, width: str = "", valign: str = "top", extra: str = "") -> str:
-    w = f'width="{width}"' if width else ""
-    return f'<td {w} valign="{valign}" {extra}>{content}</td>'
+def _flow_chips(connections: str) -> str:
+    """Render the connection string as inline colored chips with arrows."""
+    nodes = _parse_connections(connections)
+    if not nodes:
+        return (
+            '<span style="font-size:11px;color:#4d5561;font-style:italic;">'
+            'Not yet configured</span>'
+        )
+
+    parts: list[str] = []
+    for i, node in enumerate(nodes):
+        color = _node_color(node)
+        chip = (
+            f'<span style="display:inline-block;vertical-align:middle;">'
+            f'<table cellpadding="0" cellspacing="0" style="display:inline-table;">'
+            f'<tr>'
+            f'<td style="background:{color};width:7px;height:7px;border-radius:50%;'
+            f'font-size:1px;">&nbsp;</td>'
+            f'<td style="padding-left:5px;font-size:11px;font-weight:600;'
+            f'color:#c9d1d9;white-space:nowrap;">{node}</td>'
+            f'</tr></table></span>'
+        )
+        if i > 0:
+            arrow = (
+                '<span style="display:inline-block;vertical-align:middle;'
+                'color:#4d5561;font-size:12px;margin:0 5px;">&#8594;</span>'
+            )
+            parts.append(arrow)
+        parts.append(chip)
+
+    return "".join(parts)
 
 
-def _arrow_td() -> str:
-    """Narrow arrow cell between columns."""
+def _stage_pill(stage: str) -> str:
+    color, bg, border = STAGE.get(stage, DEFAULT_STAGE)
     return (
-        '<td width="24" valign="middle" align="center" '
-        'style="color:#4d5561;font-size:16px;padding:0 2px;">&#8594;</td>'
+        f'<span style="font-size:10px;font-weight:700;padding:3px 10px;'
+        f'background:{bg};color:{color};border:1px solid {border};'
+        f'border-radius:20px;white-space:nowrap;">{stage}</span>'
     )
 
 
-def _trigger_card(frequency: str) -> str:
-    freq = frequency or "Schedule TBD"
+def _agent_card(agent: dict) -> str:
+    """Render a single agent as a dark card with left accent border."""
+    accent = CARD_BORDER.get(agent["stage"], "#30363d")
+    color, bg, border = STAGE.get(agent["stage"], DEFAULT_STAGE)
+    freq = agent["frequency"] or "Schedule TBD"
+    desc = agent["description"]
+    has_connections = bool(agent["connections"])
+    flow_opacity = "1" if has_connections else "0.4"
+
     return f"""
-    <table width="100%" cellpadding="0" cellspacing="0">
+    <table width="100%" cellpadding="0" cellspacing="0"
+      style="background:#0d1117;border:1px solid #21262d;border-radius:12px;
+        border-left:3px solid {accent};overflow:hidden;">
       <tr>
-        <td style="background:#0d1f36;border:1px solid #1f3358;border-radius:7px;
-          padding:12px 14px;">
-          <div style="font-size:11px;font-weight:700;color:#79c0ff;margin-bottom:4px;">
-            &#9881;&#65039; GitHub Actions Cron
+        <td style="padding:18px 20px;">
+
+          <!-- Name + description -->
+          <div style="font-size:14px;font-weight:700;color:#e6edf3;
+            margin-bottom:5px;">{agent["name"]}</div>
+          <div style="font-size:11px;color:#8b949e;line-height:1.55;
+            margin-bottom:14px;">{desc or "&nbsp;"}</div>
+
+          <!-- Divider -->
+          <div style="height:1px;background:#161b22;margin-bottom:14px;"></div>
+
+          <!-- Connection flow -->
+          <div style="opacity:{flow_opacity};margin-bottom:14px;line-height:2;">
+            {_flow_chips(agent["connections"])}
           </div>
-          <div style="font-size:11px;color:#8b949e;">{freq}</div>
-          <div style="font-size:10px;color:#6e7681;margin-top:3px;">
-            Manual dispatch override
-          </div>
+
+          <!-- Divider -->
+          <div style="height:1px;background:#161b22;margin-bottom:12px;"></div>
+
+          <!-- Footer: frequency left, stage right -->
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="font-size:10px;color:#6e7681;">&#128337; {freq}</td>
+              <td align="right">{_stage_pill(agent["stage"])}</td>
+            </tr>
+          </table>
+
         </td>
       </tr>
     </table>"""
 
 
-def _source_nodes(sources: list[str]) -> str:
-    if not sources:
-        return '<div style="font-size:10px;color:#4d5561;font-style:italic;">—</div>'
-    rows = ""
-    for s in sources:
-        bg = _node_bg(s)
-        rows += (
-            f'<tr><td style="padding-bottom:5px;">'
-            f'<table cellpadding="0" cellspacing="0"><tr>'
-            f'<td style="background:{bg};width:8px;height:8px;border-radius:50%;'
-            f'font-size:1px;">&nbsp;</td>'
-            f'<td style="padding-left:7px;font-size:11px;font-weight:600;'
-            f'color:#c9d1d9;white-space:nowrap;">{s}</td>'
-            f'</tr></table>'
-            f'</td></tr>'
+def _section_block(stage: str, agents: list[dict]) -> str:
+    """Render a section header + 2-column card grid for one stage."""
+    if not agents:
+        return ""
+
+    color, line_color, count_bg, count_border = SECTION_STYLE[stage]
+    count = len(agents)
+
+    # Section header: line — STAGE  N  — line
+    header = f"""
+    <table width="100%" cellpadding="0" cellspacing="0"
+      style="margin-bottom:16px;">
+      <tr>
+        <td style="border-bottom:1px solid {line_color};width:40%;font-size:1px;">&nbsp;</td>
+        <td style="padding:0 12px;white-space:nowrap;text-align:center;">
+          <span style="font-size:9px;font-weight:700;letter-spacing:2px;
+            text-transform:uppercase;color:{color};">{stage.upper()}</span>
+          &nbsp;
+          <span style="font-size:10px;font-weight:700;padding:1px 8px;
+            background:{count_bg};color:{color};border:1px solid {count_border};
+            border-radius:20px;">{count}</span>
+        </td>
+        <td style="border-bottom:1px solid {line_color};width:40%;font-size:1px;">&nbsp;</td>
+      </tr>
+    </table>"""
+
+    # 2-column card grid using a table
+    # Pair up agents
+    rows_html = ""
+    pairs = [agents[i:i+2] for i in range(0, len(agents), 2)]
+    for pair in pairs:
+        left  = _agent_card(pair[0])
+        right = _agent_card(pair[1]) if len(pair) > 1 else ""
+        right_td = (
+            f'<td width="50%" valign="top" style="padding-left:6px;">{right}</td>'
+            if right else
+            '<td width="50%" valign="top" style="padding-left:6px;"></td>'
         )
-    return (
-        f'<table width="100%" cellpadding="0" cellspacing="0">'
-        f'<tr><td style="background:#161b22;border:1px solid #30363d;'
-        f'border-radius:7px;padding:12px 14px;">'
-        f'<table cellpadding="0" cellspacing="0">{rows}</table>'
-        f'</td></tr></table>'
-    )
+        rows_html += f"""
+        <tr>
+          <td width="50%" valign="top" style="padding-right:6px;padding-bottom:12px;">
+            {left}
+          </td>
+          {right_td.replace("padding-bottom:12px;", "")}
+        </tr>"""
+
+    grid = f"""
+    <table width="100%" cellpadding="0" cellspacing="0"
+      style="margin-bottom:32px;">
+      {rows_html}
+    </table>"""
+
+    return header + grid
 
 
-def _agent_card(agent: dict) -> str:
-    color, bg, border, label = STAGE_CARD.get(agent["stage"], DEFAULT_CARD)
-    desc = agent["description"]
-    desc_html = (
-        f'<div style="font-size:11px;color:#8b949e;margin-top:6px;line-height:1.5;">'
-        f'{desc[:120] + "…" if len(desc) > 120 else desc}</div>'
-        if desc else ""
-    )
-    return (
-        f'<table width="100%" cellpadding="0" cellspacing="0">'
-        f'<tr><td style="background:{bg};border:1px solid {border};'
-        f'border-radius:7px;padding:13px 15px;">'
-        f'<div style="font-size:9px;font-weight:700;letter-spacing:1px;'
-        f'text-transform:uppercase;color:{color};margin-bottom:4px;">{label}</div>'
-        f'<div style="font-size:12px;font-weight:700;color:#e6edf3;">{agent["name"]}</div>'
-        f'{desc_html}'
-        f'</td></tr></table>'
-    )
-
-
-def _output_nodes(outputs: list[str]) -> str:
-    if not outputs:
-        return '<div style="font-size:10px;color:#4d5561;font-style:italic;">—</div>'
-    rows = ""
-    for o in outputs:
-        bg = _node_bg(o)
-        rows += (
-            f'<tr><td style="padding-bottom:5px;">'
-            f'<table cellpadding="0" cellspacing="0" width="100%"><tr>'
-            f'<td style="background:{bg};width:8px;height:8px;border-radius:50%;'
-            f'font-size:1px;white-space:nowrap;">&nbsp;</td>'
-            f'<td style="padding-left:7px;font-size:11px;font-weight:600;'
-            f'color:#c9d1d9;">{o}</td>'
-            f'</tr></table>'
-            f'</td></tr>'
-        )
-    return (
-        f'<table width="100%" cellpadding="0" cellspacing="0">'
-        f'<tr><td style="background:#161b22;border:1px solid #30363d;'
-        f'border-radius:7px;padding:12px 14px;">'
-        f'<table cellpadding="0" cellspacing="0">{rows}</table>'
-        f'</td></tr></table>'
-    )
-
-
-def _full_agent_row(agent: dict) -> str:
-    sources, outputs = parse_connections(agent["connections"])
-    return f"""
-    <tr>
-      <td width="190" valign="top" style="padding:0 0 18px 0;">
-        {_trigger_card(agent["frequency"])}
-      </td>
-      {_arrow_td()}
-      <td width="160" valign="top" style="padding:0 0 18px 0;">
-        {_source_nodes(sources)}
-      </td>
-      {_arrow_td()}
-      <td valign="top" style="padding:0 0 18px 0;">
-        {_agent_card(agent)}
-      </td>
-      {_arrow_td()}
-      <td width="160" valign="top" style="padding:0 0 18px 0;">
-        {_output_nodes(outputs)}
-      </td>
-    </tr>
-    <tr>
-      <td colspan="7"
-        style="padding:0 0 18px 0;border-bottom:1px solid #21262d;font-size:1px;">
-        &nbsp;
-      </td>
-    </tr>
-    <tr><td colspan="7" style="height:18px;"></td></tr>"""
-
-
-def _compact_agent_row(agent: dict) -> str:
-    """Used for In Progress / Planned agents that have no connections data."""
-    color, bg, border, label = STAGE_CARD.get(agent["stage"], DEFAULT_CARD)
-    sources, outputs = parse_connections(agent["connections"])
-    desc = agent["description"]
-    desc_html = (
-        f'<div style="font-size:11px;color:#8b949e;margin-top:4px;">'
-        f'{desc[:100] + "…" if len(desc) > 100 else desc}</div>'
-        if desc else (
-            '<div style="font-size:10px;color:#4d5561;font-style:italic;margin-top:4px;">'
-            'In development — details coming soon</div>'
-        )
-    )
-    trigger_opacity = "0.4" if not agent["frequency"] else "1"
-    src_opacity = "0.3" if not sources else "1"
-    out_opacity = "0.3" if not outputs else "1"
-
-    return f"""
-    <tr>
-      <td width="190" valign="top" style="padding:0 0 14px 0;opacity:{trigger_opacity};">
-        {_trigger_card(agent["frequency"])}
-      </td>
-      {_arrow_td()}
-      <td width="160" valign="top" style="padding:0 0 14px 0;opacity:{src_opacity};">
-        {_source_nodes(sources) if sources else _source_nodes([])}
-      </td>
-      {_arrow_td()}
-      <td valign="top" style="padding:0 0 14px 0;">
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="background:{bg};border:1px solid {border};
-              border-radius:7px;padding:13px 15px;">
-              <div style="font-size:9px;font-weight:700;letter-spacing:1px;
-                text-transform:uppercase;color:{color};margin-bottom:4px;">{label}</div>
-              <div style="font-size:12px;font-weight:700;color:#e6edf3;">{agent["name"]}</div>
-              {desc_html}
-            </td>
-          </tr>
-        </table>
-      </td>
-      {_arrow_td()}
-      <td width="160" valign="top" style="padding:0 0 14px 0;opacity:{out_opacity};">
-        {_output_nodes(outputs) if outputs else _output_nodes([])}
-      </td>
-    </tr>"""
-
-
-def _col_header_row() -> str:
-    labels = ["TRIGGER / SCHEDULE", "DATA SOURCES", "AI AGENTS", "OUTPUTS"]
-    cols = ""
-    for i, lbl in enumerate(labels):
-        if i > 0:
-            cols += '<td width="24"></td>'  # spacer for arrow col
-        cols += (
-            f'<td style="font-size:9px;font-weight:700;letter-spacing:2px;'
-            f'text-transform:uppercase;color:#6e7681;padding-bottom:14px;">{lbl}</td>'
-        )
-    return f'<tr>{cols}</tr>'
-
-
-def _section_header(title: str, color: str = "#6e7681") -> str:
-    return (
-        f'<tr><td colspan="7" style="padding:8px 0 14px;">'
-        f'<div style="font-size:9px;font-weight:700;letter-spacing:2px;'
-        f'text-transform:uppercase;color:{color};border-bottom:1px solid #21262d;'
-        f'padding-bottom:8px;">{title}</div>'
-        f'</td></tr>'
-    )
-
-
-def _this_week_banner(new_rows: list[dict], stage_changes: list[dict]) -> str:
+def _this_week_block(new_rows: list[dict], stage_changes: list[dict]) -> str:
     if not new_rows and not stage_changes:
         return ""
 
-    rows_html = ""
-    for a in new_rows:
-        color, bg, border, _ = STAGE_CARD.get(a["stage"], DEFAULT_CARD)
-        rows_html += (
-            f'<tr style="border-bottom:1px solid #1c2128;">'
-            f'<td style="padding:8px 12px;font-size:12px;font-weight:600;'
-            f'color:#e6edf3;">{a["name"]}</td>'
-            f'<td style="padding:8px 12px;">'
-            f'<span style="font-size:10px;font-weight:700;padding:2px 8px;'
-            f'background:{bg};color:{color};border:1px solid {border};'
-            f'border-radius:20px;">NEW</span></td>'
-            f'<td style="padding:8px 12px;font-size:11px;color:#8b949e;">'
-            f'{a["description"] or "—"}</td>'
-            f'</tr>'
-        )
-    for a in stage_changes:
-        pc, pb, pe, _ = STAGE_CARD.get(a["previous_stage"], DEFAULT_CARD)
-        nc, nb, ne, _ = STAGE_CARD.get(a["stage"], DEFAULT_CARD)
-        rows_html += (
-            f'<tr style="border-bottom:1px solid #1c2128;">'
-            f'<td style="padding:8px 12px;font-size:12px;font-weight:600;'
-            f'color:#e6edf3;">{a["name"]}</td>'
-            f'<td style="padding:8px 12px;white-space:nowrap;">'
-            f'<span style="font-size:10px;font-weight:700;padding:2px 7px;'
-            f'background:{pb};color:{pc};border:1px solid {pe};border-radius:20px;">'
-            f'{a["previous_stage"]}</span>'
-            f'<span style="color:#6e7681;font-size:12px;margin:0 5px;">&#8594;</span>'
-            f'<span style="font-size:10px;font-weight:700;padding:2px 7px;'
-            f'background:{nb};color:{nc};border:1px solid {ne};border-radius:20px;">'
-            f'{a["stage"]}</span></td>'
-            f'<td style="padding:8px 12px;font-size:11px;color:#8b949e;">'
-            f'{a["description"] or "—"}</td>'
-            f'</tr>'
-        )
-
     count = len(new_rows) + len(stage_changes)
+    rows_html = ""
+
+    for a in new_rows:
+        color, bg, border = STAGE.get(a["stage"], DEFAULT_STAGE)
+        rows_html += f"""
+        <tr style="border-top:1px solid #122a1a;">
+          <td style="padding:8px 16px;font-size:12px;font-weight:600;
+            color:#e6edf3;">{a["name"]}</td>
+          <td style="padding:8px 16px;white-space:nowrap;">
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;
+              background:{bg};color:{color};border:1px solid {border};
+              border-radius:20px;">NEW</span>
+          </td>
+          <td style="padding:8px 16px;font-size:11px;color:#6e7681;">
+            {a["description"] or "—"}</td>
+        </tr>"""
+
+    for a in stage_changes:
+        pc, pb, pe = STAGE.get(a["previous_stage"], DEFAULT_STAGE)
+        nc, nb, ne = STAGE.get(a["stage"], DEFAULT_STAGE)
+        rows_html += f"""
+        <tr style="border-top:1px solid #122a1a;">
+          <td style="padding:8px 16px;font-size:12px;font-weight:600;
+            color:#e6edf3;">{a["name"]}</td>
+          <td style="padding:8px 16px;white-space:nowrap;">
+            <span style="font-size:10px;font-weight:700;padding:2px 7px;
+              background:{pb};color:{pc};border:1px solid {pe};
+              border-radius:20px;">{a["previous_stage"]}</span>
+            <span style="color:#4d5561;font-size:11px;margin:0 4px;">&#8594;</span>
+            <span style="font-size:10px;font-weight:700;padding:2px 7px;
+              background:{nb};color:{nc};border:1px solid {ne};
+              border-radius:20px;">{a["stage"]}</span>
+          </td>
+          <td style="padding:8px 16px;font-size:11px;color:#6e7681;">
+            {a["description"] or "—"}</td>
+        </tr>"""
+
     return f"""
     <table width="100%" cellpadding="0" cellspacing="0"
-      style="margin-bottom:28px;background:#0d2119;border:1px solid #238636;
-        border-radius:8px;overflow:hidden;">
+      style="background:#0a1e12;border:1px solid #196130;border-radius:12px;
+        overflow:hidden;margin-bottom:16px;">
       <tr>
-        <td style="padding:12px 16px;border-bottom:1px solid #1c4a2a;">
+        <td style="padding:12px 16px;border-bottom:1px solid #122a1a;">
           <span style="font-size:13px;font-weight:700;color:#3fb950;">
             &#10024; This Week
           </span>
@@ -480,46 +413,19 @@ def _this_week_banner(new_rows: list[dict], stage_changes: list[dict]) -> str:
       <tr>
         <td>
           <table width="100%" cellpadding="0" cellspacing="0">
-            <tr style="background:#0a1e12;">
-              <th style="padding:8px 12px;text-align:left;font-size:10px;
-                font-weight:700;color:#6e7681;letter-spacing:1px;
-                text-transform:uppercase;">Agent</th>
-              <th style="padding:8px 12px;text-align:left;font-size:10px;
-                font-weight:700;color:#6e7681;letter-spacing:1px;
-                text-transform:uppercase;">Update</th>
-              <th style="padding:8px 12px;text-align:left;font-size:10px;
-                font-weight:700;color:#6e7681;letter-spacing:1px;
-                text-transform:uppercase;">Description</th>
+            <tr style="background:#071610;">
+              <th style="padding:7px 16px;text-align:left;font-size:9px;font-weight:700;
+                color:#6e7681;letter-spacing:1px;text-transform:uppercase;">Agent</th>
+              <th style="padding:7px 16px;text-align:left;font-size:9px;font-weight:700;
+                color:#6e7681;letter-spacing:1px;text-transform:uppercase;">Update</th>
+              <th style="padding:7px 16px;text-align:left;font-size:9px;font-weight:700;
+                color:#6e7681;letter-spacing:1px;text-transform:uppercase;">Description</th>
             </tr>
             {rows_html}
           </table>
         </td>
       </tr>
     </table>"""
-
-
-def _legend_row() -> str:
-    items = [
-        ("#0d1f36", "#1f3358", "Trigger / Schedule"),
-        ("#161b22", "#30363d", "Data Source / Output"),
-        ("#0d2119", "#238636", "Completed"),
-        ("#1c1500", "#d29922", "In Progress"),
-        ("#0f1729", "#388bfd", "Planned"),
-    ]
-    cells = ""
-    for bg, border, label in items:
-        cells += (
-            f'<td style="padding-right:20px;white-space:nowrap;">'
-            f'<table cellpadding="0" cellspacing="0"><tr>'
-            f'<td style="background:{bg};border:1px solid {border};width:12px;'
-            f'height:12px;border-radius:3px;font-size:1px;">&nbsp;&nbsp;&nbsp;</td>'
-            f'<td style="padding-left:7px;font-size:10px;color:#6e7681;">{label}</td>'
-            f'</tr></table></td>'
-        )
-    return (
-        f'<table cellpadding="0" cellspacing="0" style="margin-top:32px;">'
-        f'<tr>{cells}</tr></table>'
-    )
 
 
 def build_email_html(
@@ -529,30 +435,38 @@ def build_email_html(
     summary: str,
     week_str: str,
 ) -> str:
-    done_agents      = [a for a in agents if a["stage"] == "Completed"]
-    inprog_agents    = [a for a in agents if a["stage"] == "In Progress"]
-    planned_agents   = [a for a in agents if a["stage"] == "Planned"]
+    completed  = [a for a in agents if a["stage"] == "Completed"]
+    in_progress = [a for a in agents if a["stage"] == "In Progress"]
+    planned    = [a for a in agents if a["stage"] == "Planned"]
 
-    done_count    = len(done_agents)
-    inprog_count  = len(inprog_agents)
-    planned_count = len(planned_agents)
-    total_count   = len(agents)
+    sections = (
+        _section_block("Completed",   completed)
+        + _section_block("In Progress", in_progress)
+        + _section_block("Planned",     planned)
+    )
 
-    # ── Flowchart rows ────────────────────────────────────────────────────────
-    done_rows = ""
-    for a in done_agents:
-        done_rows += _full_agent_row(a)
+    this_week = _this_week_block(new_rows, stage_changes)
 
-    inprog_rows = ""
-    for a in inprog_agents:
-        inprog_rows += _compact_agent_row(a)
+    def _stat(num, label, bg, border, color):
+        return (
+            f'<td style="padding-right:8px;">'
+            f'<table cellpadding="0" cellspacing="0">'
+            f'<tr><td style="background:{bg};border:1px solid {border};'
+            f'border-radius:8px;padding:10px 16px;text-align:center;min-width:72px;">'
+            f'<div style="font-size:22px;font-weight:800;color:{color};">{num}</div>'
+            f'<div style="font-size:9px;font-weight:700;color:{color};'
+            f'text-transform:uppercase;letter-spacing:1px;margin-top:2px;">{label}</div>'
+            f'</td></tr></table></td>'
+        )
 
-    planned_rows = ""
-    for a in planned_agents:
-        planned_rows += _compact_agent_row(a)
-
-    this_week_html = _this_week_banner(new_rows, stage_changes)
-    legend_html    = _legend_row()
+    stats_html = (
+        '<table cellpadding="0" cellspacing="0"><tr>'
+        + _stat(len(completed),   "Completed",   "#0d2119", "#238636", "#3fb950")
+        + _stat(len(in_progress), "In Progress", "#1c1500", "#d29922", "#e3b341")
+        + _stat(len(planned),     "Planned",     "#0f1729", "#388bfd", "#58a6ff")
+        + _stat(len(agents),      "Total",       "#161b22", "#30363d", "#e6edf3")
+        + '</tr></table>'
+    )
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -561,87 +475,46 @@ def build_email_html(
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Agent Pipeline Report</title>
 </head>
-<body style="margin:0;padding:0;background:#0d1117;">
+<body style="margin:0;padding:0;background:#080c12;">
 <table width="100%" cellpadding="0" cellspacing="0"
-  style="background:#0d1117;padding:32px 20px 56px;">
+  style="background:#080c12;padding:40px 20px 64px;">
 <tr><td align="center">
-<table width="760" cellpadding="0" cellspacing="0" style="max-width:760px;width:100%;">
+<table width="900" cellpadding="0" cellspacing="0" style="max-width:900px;width:100%;">
 
-  <!-- ── PAGE HEADER ── -->
+  <!-- ── HEADER ── -->
   <tr>
-    <td style="padding-bottom:28px;text-align:center;">
-      <div style="font-size:20px;font-weight:800;color:#e6edf3;
-        letter-spacing:1px;text-transform:uppercase;">
-        &#129302; R1 Concepts — Agent Pipeline Report
-      </div>
-      <div style="margin-top:6px;font-size:12px;color:#6e7681;letter-spacing:0.5px;">
-        Week of {week_str}
-      </div>
-    </td>
-  </tr>
-
-  <!-- ── STATS BAR ── -->
-  <tr>
-    <td style="padding-bottom:24px;">
+    <td style="padding-bottom:32px;border-bottom:1px solid #161b22;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td width="25%" style="padding-right:10px;">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr><td style="background:#0d2119;border:1px solid #238636;
-                border-radius:7px;padding:14px 10px;text-align:center;">
-                <div style="font-size:26px;font-weight:800;color:#3fb950;">{done_count}</div>
-                <div style="font-size:9px;font-weight:700;color:#3fb950;
-                  text-transform:uppercase;letter-spacing:1px;">Completed</div>
-              </td></tr>
-            </table>
+          <td valign="bottom">
+            <div style="font-size:20px;font-weight:800;color:#e6edf3;
+              letter-spacing:-0.5px;">&#129302; Agent Pipeline Report</div>
+            <div style="font-size:12px;color:#6e7681;margin-top:4px;">
+              R1 Concepts &bull; Week of {week_str}
+            </div>
           </td>
-          <td width="25%" style="padding-right:10px;">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr><td style="background:#1c1500;border:1px solid #d29922;
-                border-radius:7px;padding:14px 10px;text-align:center;">
-                <div style="font-size:26px;font-weight:800;color:#e3b341;">{inprog_count}</div>
-                <div style="font-size:9px;font-weight:700;color:#e3b341;
-                  text-transform:uppercase;letter-spacing:1px;">In&nbsp;Progress</div>
-              </td></tr>
-            </table>
-          </td>
-          <td width="25%" style="padding-right:10px;">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr><td style="background:#0f1729;border:1px solid #388bfd;
-                border-radius:7px;padding:14px 10px;text-align:center;">
-                <div style="font-size:26px;font-weight:800;color:#58a6ff;">{planned_count}</div>
-                <div style="font-size:9px;font-weight:700;color:#58a6ff;
-                  text-transform:uppercase;letter-spacing:1px;">Planned</div>
-              </td></tr>
-            </table>
-          </td>
-          <td width="25%">
-            <table width="100%" cellpadding="0" cellspacing="0">
-              <tr><td style="background:#161b22;border:1px solid #30363d;
-                border-radius:7px;padding:14px 10px;text-align:center;">
-                <div style="font-size:26px;font-weight:800;color:#c9d1d9;">{total_count}</div>
-                <div style="font-size:9px;font-weight:700;color:#6e7681;
-                  text-transform:uppercase;letter-spacing:1px;">Total</div>
-              </td></tr>
-            </table>
+          <td align="right" valign="bottom">
+            {stats_html}
           </td>
         </tr>
       </table>
     </td>
   </tr>
 
-  <!-- ── AI SUMMARY ── -->
+  <tr><td style="height:28px;"></td></tr>
+
+  <!-- ── SUMMARY ── -->
   <tr>
-    <td style="padding-bottom:24px;">
+    <td style="padding-bottom:16px;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="background:#1a1040;border:1px solid #6e40c9;
-            border-radius:8px;padding:16px 20px;">
-            <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;
+          <td style="background:#130d2a;border:1px solid #3b2d6e;
+            border-left:3px solid #a371f7;border-radius:12px;padding:18px 22px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
               text-transform:uppercase;color:#a371f7;margin-bottom:8px;">
               &#128203; Weekly Summary
             </div>
-            <div style="font-size:13px;line-height:1.7;color:#c9d1d9;">
+            <div style="font-size:13px;line-height:1.75;color:#c9d1d9;">
               {summary}
             </div>
           </td>
@@ -650,48 +523,24 @@ def build_email_html(
     </td>
   </tr>
 
-  <!-- ── THIS WEEK BANNER ── -->
+  <!-- ── THIS WEEK ── -->
   <tr>
-    <td style="padding-bottom:4px;">
-      {this_week_html}
+    <td style="padding-bottom:32px;">
+      {this_week}
     </td>
   </tr>
 
-  <!-- ── FLOWCHART ── -->
+  <!-- ── SECTIONS ── -->
   <tr>
     <td>
-      <table width="100%" cellpadding="0" cellspacing="0">
-
-        {_col_header_row()}
-
-        <!-- DONE agents (full rows with sources + outputs) -->
-        {_section_header("&#9646; Completed", "#3fb950") if done_agents else ""}
-        {done_rows}
-
-        <!-- IN PROGRESS agents -->
-        {_section_header("&#9646; In Progress", "#e3b341") if inprog_agents else ""}
-        {inprog_rows}
-        {"<tr><td colspan='7' style='height:10px;'></td></tr>" if inprog_agents else ""}
-
-        <!-- PLANNED agents -->
-        {_section_header("&#9646; Planned", "#58a6ff") if planned_agents else ""}
-        {planned_rows}
-
-      </table>
-    </td>
-  </tr>
-
-  <!-- ── LEGEND ── -->
-  <tr>
-    <td>
-      {legend_html}
+      {sections}
     </td>
   </tr>
 
   <!-- ── FOOTER ── -->
   <tr>
-    <td style="padding-top:32px;text-align:center;font-size:10px;
-      color:#30363d;letter-spacing:0.5px;">
+    <td style="padding-top:16px;border-top:1px solid #161b22;
+      text-align:center;font-size:10px;color:#21262d;letter-spacing:0.5px;">
       Auto-generated by Agent Tracker &bull; R1 Concepts &bull; Every Monday 9&nbsp;AM
     </td>
   </tr>
@@ -703,7 +552,7 @@ def build_email_html(
 </html>"""
 
 
-# ── Email sending ───────────────────────────────────────────────────────────────
+# ── Email sending ──────────────────────────────────────────────────────────────
 def send_email(html: str, week_str: str) -> None:
     recipients = [r.strip() for r in RECIPIENT_EMAIL.split(",") if r.strip()]
     msg = MIMEMultipart("alternative")
@@ -717,7 +566,7 @@ def send_email(html: str, week_str: str) -> None:
     print(f"✅ Email sent to: {', '.join(recipients)}")
 
 
-# ── Main ────────────────────────────────────────────────────────────────────────
+# ── Main ───────────────────────────────────────────────────────────────────────
 def main() -> None:
     week_str = datetime.datetime.now().strftime("%B %d, %Y")
 
@@ -731,16 +580,16 @@ def main() -> None:
     print("🔍 Detecting changes vs last week...")
     new_rows, stage_changes = detect_changes(agents, previous)
     if new_rows:
-        print(f"   New agents: {[a['name'] for a in new_rows]}")
+        print(f"   New: {[a['name'] for a in new_rows]}")
     if stage_changes:
-        print(f"   Stage changes: {[a['name'] + ' (' + a['previous_stage'] + '→' + a['stage'] + ')' for a in stage_changes]}")
+        print(f"   Stage changes: {[a['name']+' ('+a['previous_stage']+'→'+a['stage']+')' for a in stage_changes]}")
     if not new_rows and not stage_changes:
-        print("   No changes detected this week")
+        print("   No changes this week")
 
     print("🤖 Generating Claude summary...")
     summary = generate_summary(agents, new_rows, stage_changes)
 
-    print("🏗️  Building flowchart email...")
+    print("🏗️  Building email...")
     html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
 
     print("📧 Sending email...")
