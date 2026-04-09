@@ -462,32 +462,23 @@ def build_email_html(
     in_progress = [a for a in agents if a["stage"] == "In Progress"]
     planned     = [a for a in agents if a["stage"] == "Planned"]
 
-    sections = (
-        _section_block("Completed",   completed)
-        + _section_block("In Progress", in_progress)
-        + _section_block("Planned",     planned)
-    )
-
-    this_week = _this_week_block(new_rows, stage_changes)
-
-    def _stat(num, label, bg, border, color):
+    def _stat(num, label, top_color, bg_color, text_color):
         return (
-            f'<td style="padding-right:8px;">'
-            f'<table cellpadding="0" cellspacing="0">'
-            f'<tr><td style="background:{bg};border:1px solid {border};'
-            f'border-radius:8px;padding:10px 16px;text-align:center;min-width:72px;">'
-            f'<div style="font-size:22px;font-weight:800;color:{color};">{num}</div>'
-            f'<div style="font-size:9px;font-weight:700;color:{color};'
+            f'<td width="25%" style="padding:0 4px;">'
+            f'<div style="background:{bg_color};border-top:3px solid {top_color};'
+            f'border-radius:8px 8px 0 0;padding:14px 12px;text-align:center;">'
+            f'<div style="font-size:26px;font-weight:800;color:{top_color};">{num}</div>'
+            f'<div style="font-size:9px;font-weight:700;color:{text_color};'
             f'text-transform:uppercase;letter-spacing:1px;margin-top:2px;">{label}</div>'
-            f'</td></tr></table></td>'
+            f'</div></td>'
         )
 
     stats_html = (
-        '<table cellpadding="0" cellspacing="0"><tr>'
-        + _stat(len(completed),   "Completed",   "#0d2119", "#238636", "#3fb950")
-        + _stat(len(in_progress), "In Progress", "#1c1500", "#d29922", "#e3b341")
-        + _stat(len(planned),     "Planned",     "#0f1729", "#388bfd", "#58a6ff")
-        + _stat(len(agents),      "Total",       "#161b22", "#30363d", "#e6edf3")
+        '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+        + _stat(len(completed),   "Completed",   "#3fb950", "rgba(63,185,80,0.15)",   "rgba(63,185,80,0.7)")
+        + _stat(len(in_progress), "In Progress", "#e3b341", "rgba(227,179,65,0.15)",  "rgba(227,179,65,0.7)")
+        + _stat(len(planned),     "Planned",     "#58a6ff", "rgba(88,166,255,0.15)",  "rgba(88,166,255,0.7)")
+        + _stat(len(agents),      "Total",       "rgba(255,255,255,0.2)", "rgba(255,255,255,0.08)", "rgba(255,255,255,0.3)")
         + '</tr></table>'
     )
 
@@ -498,66 +489,80 @@ def build_email_html(
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Agent Pipeline Report</title>
 </head>
-<body style="margin:0;padding:0;background:#080c12;">
+<body style="margin:0;padding:0;background:#f0f2f5;">
 <table width="100%" cellpadding="0" cellspacing="0"
-  style="background:#080c12;padding:40px 20px 64px;">
+  style="background:#f0f2f5;padding:40px 20px 64px;">
 <tr><td align="center">
-<table width="700" cellpadding="0" cellspacing="0" style="max-width:700px;width:100%;">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-  <!-- ── HEADER ── -->
+  <!-- ── HERO HEADER ── -->
   <tr>
-    <td style="padding-bottom:32px;border-bottom:1px solid #161b22;">
+    <td style="background:#1a1040;border-radius:16px 16px 0 0;padding:36px 36px 0;">
+
+      <!-- Top label -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+        color:rgba(255,255,255,0.4);margin-bottom:12px;">R1 Concepts &nbsp;&middot;&nbsp; Weekly Update</div>
+
+      <!-- Title row -->
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td valign="bottom">
-            <div style="font-size:20px;font-weight:800;color:#e6edf3;
-              letter-spacing:-0.5px;">&#129302; Agent Pipeline Report</div>
-            <div style="font-size:12px;color:#6e7681;margin-top:4px;">
-              R1 Concepts &bull; Week of {week_str}
+          <td>
+            <div style="font-size:28px;font-weight:800;color:#fff;line-height:1.1;
+              letter-spacing:-0.5px;">Agent Pipeline<br>
+              <span style="color:#a78bfa;">Report</span>
+            </div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:8px;">
+              Week of {week_str}
             </div>
           </td>
-          <td align="right" valign="bottom">
-            {stats_html}
+          <td align="right" valign="top">
+            <div style="font-size:48px;opacity:0.12;line-height:1;">&#129302;</div>
           </td>
         </tr>
       </table>
+
+      <!-- Stats strip -->
+      <div style="margin-top:28px;">
+        {stats_html}
+      </div>
     </td>
   </tr>
 
-  <tr><td style="height:28px;"></td></tr>
-
-  <!-- ── SUMMARY ── -->
+  <!-- ── WHITE BODY ── -->
   <tr>
-    <td style="padding-bottom:24px;">
-      <table width="100%" cellpadding="0" cellspacing="0">
+    <td style="background:#ffffff;padding:32px 36px 36px;border-radius:0 0 16px 16px;">
+
+      <!-- Summary label -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+        color:#a78bfa;margin-bottom:10px;">&#128203; Weekly Summary</div>
+
+      <!-- Summary text -->
+      <div style="font-size:14px;line-height:1.8;color:#374151;margin-bottom:28px;
+        border-left:3px solid #ede9fe;padding-left:16px;">
+        {summary}
+      </div>
+
+      <!-- View Full Report Button -->
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
         <tr>
-          <td style="background:#130d2a;border:1px solid #3b2d6e;
-            border-left:3px solid #a371f7;border-radius:12px;padding:18px 22px;">
-            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
-              text-transform:uppercase;color:#a371f7;margin-bottom:8px;">
-              &#128203; Weekly Summary
-            </div>
-            <div style="font-size:13px;line-height:1.75;color:#c9d1d9;">
-              {summary}
-            </div>
+          <td align="center">
+            <a href="https://ben-westreich.github.io/Agent-Tracker/"
+              style="display:inline-block;background:#1a1040;
+                color:#fff;font-size:13px;font-weight:700;text-decoration:none;
+                padding:14px 40px;border-radius:50px;letter-spacing:0.3px;
+                border:2px solid #a78bfa;">
+              View Full Report &nbsp;&#8594;
+            </a>
           </td>
         </tr>
       </table>
-    </td>
-  </tr>
 
-  <!-- ── THIS WEEK ── -->
-  <tr>
-    <td style="padding-bottom:32px;">
-      {this_week}
-    </td>
-  </tr>
+      <!-- Footer -->
+      <div style="height:1px;background:#f3f4f6;margin-bottom:20px;"></div>
+      <div style="text-align:center;font-size:10px;color:#9ca3af;letter-spacing:0.5px;">
+        Auto-generated by Agent Tracker &bull; R1 Concepts &bull; Every Monday 9&nbsp;AM
+      </div>
 
-  <!-- ── FOOTER ── -->
-  <tr>
-    <td style="padding-top:16px;border-top:1px solid #161b22;
-      text-align:center;font-size:10px;color:#21262d;letter-spacing:0.5px;">
-      Auto-generated by Agent Tracker &bull; R1 Concepts &bull; Every Monday 9&nbsp;AM
     </td>
   </tr>
 
