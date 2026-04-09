@@ -291,20 +291,14 @@ def _agent_card(agent: dict) -> str:
     flow_opacity = "1" if has_connections else "0.4"
     is_new = _is_recent(agent.get("date_added", ""))
     is_stage_updated = _is_recent(agent.get("stage_updated", "")) and not is_new
+    just_completed = agent["stage"] == "Completed" and (is_new or is_stage_updated)
 
     new_badge = ""
-    if is_new:
+    if just_completed:
         new_badge = (
-            '<span style="font-size:9px;font-weight:700;padding:2px 7px;'
-            'background:#14532d;color:#3fb950;border:1px solid #238636;'
-            'border-radius:20px;margin-left:8px;vertical-align:middle;">NEW</span>'
-        )
-    elif is_stage_updated:
-        nc, nb, ne = STAGE.get(agent["stage"], DEFAULT_STAGE)
-        new_badge = (
-            f'<span style="font-size:9px;font-weight:700;padding:2px 7px;'
-            f'background:{nb};color:{nc};border:1px solid {ne};'
-            f'border-radius:20px;margin-left:8px;vertical-align:middle;">UPDATED</span>'
+            '<span style="font-size:9px;font-weight:700;padding:2px 8px;'
+            'background:#0d1b2e;color:#38bdf8;border:1px solid #0ea5e9;'
+            'border-radius:20px;margin-left:8px;vertical-align:middle;">&#10003; Published</span>'
         )
 
     return f"""
