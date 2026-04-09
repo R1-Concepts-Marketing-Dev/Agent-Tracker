@@ -504,16 +504,19 @@ def build_email_html(
 <tr><td align="center">
 <table width="900" cellpadding="0" cellspacing="0" style="max-width:900px;width:100%;">
 
-  <!-- ── HEADER ── -->
+  <!-- ── HEADER (clickable → full report) ── -->
   <tr>
     <td style="padding-bottom:32px;border-bottom:1px solid #161b22;">
+      <a href="https://ben-westreich.github.io/Agent-Tracker/"
+        style="display:block;text-decoration:none;cursor:pointer;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td valign="bottom">
             <div style="font-size:20px;font-weight:800;color:#e6edf3;
               letter-spacing:-0.5px;">&#129302; Agent Pipeline Report</div>
             <div style="font-size:12px;color:#6e7681;margin-top:4px;">
-              R1 Concepts &bull; Week of {week_str}
+              R1 Concepts &bull; Week of {week_str} &bull;
+              <span style="color:#58a6ff;">View full report &#8599;</span>
             </div>
           </td>
           <td align="right" valign="bottom">
@@ -521,14 +524,17 @@ def build_email_html(
           </td>
         </tr>
       </table>
+      </a>
     </td>
   </tr>
 
   <tr><td style="height:28px;"></td></tr>
 
-  <!-- ── SUMMARY ── -->
+  <!-- ── SUMMARY (clickable → full report) ── -->
   <tr>
     <td style="padding-bottom:16px;">
+      <a href="https://ben-westreich.github.io/Agent-Tracker/"
+        style="display:block;text-decoration:none;">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="background:#130d2a;border:1px solid #3b2d6e;
@@ -543,6 +549,7 @@ def build_email_html(
           </td>
         </tr>
       </table>
+      </a>
     </td>
   </tr>
 
