@@ -385,38 +385,39 @@ def _this_week_block(new_rows: list[dict], stage_changes: list[dict]) -> str:
     if not new_rows and not stage_changes:
         return ""
 
-    count = len(new_rows) + len(stage_changes)
-    rows_html = ""
-
-    for a in new_rows:
-        color, bg, border = STAGE.get(a["stage"], DEFAULT_STAGE)
-        rows_html += f"""
-        <tr style="border-top:1px solid #122a1a;">
-          <td style="padding:8px 16px;font-size:12px;font-weight:600;
-            color:#e6edf3;">{a["name"]}</td>
-          <td style="padding:8px 16px;white-space:nowrap;">
-            <span style="font-size:10px;font-weight:700;padding:2px 8px;
-              background:{bg};color:{color};border:1px solid {border};
-              border-radius:20px;">NEW</span>
-          </td>
-          <td style="padding:8px 16px;font-size:11px;color:#6e7681;">
-            {a["description"] or "—"}</td>
-        </tr>"""
-
+    # Stage changes get full detail rows; new agents collapse to a summary line
+    stage_rows_html = ""
     for a in stage_changes:
         nc, nb, ne = STAGE.get(a["stage"], DEFAULT_STAGE)
-        rows_html += f"""
+        stage_rows_html += f"""
         <tr style="border-top:1px solid #122a1a;">
           <td style="padding:8px 16px;font-size:12px;font-weight:600;
             color:#e6edf3;">{a["name"]}</td>
           <td style="padding:8px 16px;white-space:nowrap;">
             <span style="font-size:10px;font-weight:700;padding:2px 7px;
               background:{nb};color:{nc};border:1px solid {ne};
-              border-radius:20px;">STAGE UPDATE &#8594; {a["stage"]}</span>
+              border-radius:20px;">&#8594; {a["stage"]}</span>
           </td>
           <td style="padding:8px 16px;font-size:11px;color:#6e7681;">
             {a["description"] or "—"}</td>
         </tr>"""
+
+    # Compact summary row for new agents
+    new_summary_row = ""
+    if new_rows:
+        new_summary_row = f"""
+        <tr style="border-top:1px solid #122a1a;">
+          <td colspan="3" style="padding:10px 16px;">
+            <span style="font-size:11px;font-weight:700;color:#3fb950;">
+              &#43; {len(new_rows)} new agent{"s" if len(new_rows) != 1 else ""} added
+            </span>
+            <span style="font-size:11px;color:#4d5561;margin-left:8px;">
+              {", ".join(a["name"] for a in new_rows[:5])}{"…" if len(new_rows) > 5 else ""}
+            </span>
+          </td>
+        </tr>"""
+
+    total = len(new_rows) + len(stage_changes)
 
     return f"""
     <table width="100%" cellpadding="0" cellspacing="0"
@@ -429,22 +430,22 @@ def _this_week_block(new_rows: list[dict], stage_changes: list[dict]) -> str:
           </span>
           <span style="margin-left:8px;font-size:10px;font-weight:700;
             background:#14532d;color:#3fb950;padding:2px 9px;border-radius:20px;">
-            {count} update{"s" if count != 1 else ""}
+            {total} update{"s" if total != 1 else ""}
           </span>
         </td>
       </tr>
       <tr>
         <td>
           <table width="100%" cellpadding="0" cellspacing="0">
-            <tr style="background:#071610;">
+            {new_summary_row}
+            {f'''<tr style="background:#071610;">
               <th style="padding:7px 16px;text-align:left;font-size:9px;font-weight:700;
                 color:#6e7681;letter-spacing:1px;text-transform:uppercase;">Agent</th>
               <th style="padding:7px 16px;text-align:left;font-size:9px;font-weight:700;
-                color:#6e7681;letter-spacing:1px;text-transform:uppercase;">Update</th>
+                color:#6e7681;letter-spacing:1px;text-transform:uppercase;">Stage Change</th>
               <th style="padding:7px 16px;text-align:left;font-size:9px;font-weight:700;
                 color:#6e7681;letter-spacing:1px;text-transform:uppercase;">Description</th>
-            </tr>
-            {rows_html}
+            </tr>{stage_rows_html}''' if stage_changes else ""}
           </table>
         </td>
       </tr>
