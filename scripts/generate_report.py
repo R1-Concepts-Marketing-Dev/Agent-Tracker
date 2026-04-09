@@ -2,10 +2,14 @@
 Agent Pipeline Weekly Report Generator
 Reads from Google Sheets, summarizes with Claude, sends via Gmail SMTP.
 Email uses a dark card-based design grouped by stage.
+
+Change detection is date-based:
+  - "New this week"      = Date Added column is within the last 7 days
+  - "Stage change"       = Stage Updated column is within the last 7 days
+  (No snapshot file needed — safe to test repeatedly.)
 """
 
 import os
-import json
 import csv
 import io
 import smtplib
@@ -22,7 +26,9 @@ GMAIL_ADDRESS      = os.environ["GMAIL_ADDRESS"]
 GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 RECIPIENT_EMAIL    = os.environ.get("RECIPIENT_EMAIL", os.environ["GMAIL_ADDRESS"])
 SHEET_GIDS         = os.environ.get("SHEET_GIDS", "0")
-SNAPSHOT_FILE      = "data/agent_snapshot.json"
+
+# How many days back counts as "this week"
+LOOKBACK_DAYS = 7
 
 # ── Google Sheets ───────────────────────────────────────────────────────────────
 def _normalize_stage(raw: str) -> str:
@@ -36,6 +42,29 @@ def _normalize_stage(raw: str) -> str:
     return "Planned"
 
 
+def _parse_date(raw: str) -> datetime.date | None:
+    """Try common date formats. Returns None if blank or unparseable."""
+    raw = raw.strip()
+    if not raw:
+        return None
+    for fmt in ("%Y-%m-%d", "%m/%d/%Y", "%m/%d/%y", "%d/%m/%Y",
+                "%B %d, %Y", "%b %d, %Y", "%d-%b-%Y"):
+        try:
+            return datetime.datetime.strptime(raw, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def _is_recent(date_str: str) -> bool:
+    """Return True if the date is within the last LOOKBACK_DAYS days."""
+    d = _parse_date(date_str)
+    if d is None:
+        return False
+    cutoff = datetime.date.today() - datetime.timedelta(days=LOOKBACK_DAYS)
+    return d >= cutoff
+
+
 def _fetch_csv(gid: str) -> list[dict]:
     url = (
         f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
@@ -47,11 +76,13 @@ def _fetch_csv(gid: str) -> list[dict]:
     agents = []
     for row in reader:
         agent = {
-            "name":        row.get("Name", "").strip(),
-            "stage":       row.get("Stage of Completion", "").strip(),
-            "frequency":   row.get("Frequency", "").strip(),
-            "connections": row.get("Connections", "").strip(),
-            "description": row.get("Description", "").strip(),
+            "name":          row.get("Name", "").strip(),
+            "stage":         row.get("Stage of Completion", "").strip(),
+            "frequency":     row.get("Frequency", "").strip(),
+            "connections":   row.get("Connections", "").strip(),
+            "description":   row.get("Description", "").strip(),
+            "date_added":    row.get("Date Added", "").strip(),
+            "stage_updated": row.get("Stage Updated", "").strip(),
         }
         if agent["name"]:
             agent["stage"] = _normalize_stage(agent["stage"])
@@ -69,31 +100,29 @@ def fetch_sheet_data() -> list[dict]:
         agents.extend(tab_agents)
     return agents
 
-# ── Snapshot ───────────────────────────────────────────────────────────────────
-def load_snapshot() -> list[dict]:
-    if os.path.exists(SNAPSHOT_FILE):
-        with open(SNAPSHOT_FILE) as f:
-            return json.load(f)
-    return []
 
-def save_snapshot(agents: list[dict]) -> None:
-    os.makedirs(os.path.dirname(SNAPSHOT_FILE), exist_ok=True)
-    with open(SNAPSHOT_FILE, "w") as f:
-        json.dump(agents, f, indent=2)
-
-def detect_changes(
-    current: list[dict], previous: list[dict]
-) -> tuple[list[dict], list[dict]]:
-    prev_map = {a["name"]: a["stage"] for a in previous}
+# ── Date-based change detection ────────────────────────────────────────────────
+def detect_changes(agents: list[dict]) -> tuple[list[dict], list[dict]]:
+    """
+    new_rows      = agents whose Date Added is within last LOOKBACK_DAYS days
+    stage_changes = agents whose Stage Updated is within last LOOKBACK_DAYS days
+                    (and Stage Updated != Date Added, i.e. it's a real change)
+    """
     new_rows: list[dict] = []
     stage_changes: list[dict] = []
-    for agent in current:
-        name = agent["name"]
-        if name not in prev_map:
+
+    for agent in agents:
+        added   = agent["date_added"]
+        updated = agent["stage_updated"]
+
+        if _is_recent(added):
             new_rows.append(agent)
-        elif agent["stage"] != prev_map[name]:
-            stage_changes.append({**agent, "previous_stage": prev_map[name]})
+        elif _is_recent(updated):
+            # Stage changed this week but agent isn't brand-new
+            stage_changes.append(agent)
+
     return new_rows, stage_changes
+
 
 # ── Claude Summary ─────────────────────────────────────────────────────────────
 def generate_summary(
@@ -114,7 +143,7 @@ def generate_summary(
     )
     change_lines = (
         "\n".join(
-            f"- {a['name']}: moved from {a['previous_stage']} → {a['stage']}"
+            f"- {a['name']}: stage updated to {a['stage']}"
             for a in stage_changes
         )
         if stage_changes else "None"
@@ -144,6 +173,7 @@ No bullet points. Plain paragraph prose only."""
         messages=[{"role": "user", "content": prompt}],
     )
     return msg.content[0].text.strip()
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  EMAIL BUILDER — Dark card design, grouped by stage
@@ -255,7 +285,6 @@ def _stage_pill(stage: str) -> str:
 def _agent_card(agent: dict) -> str:
     """Render a single agent as a dark card with left accent border."""
     accent = CARD_BORDER.get(agent["stage"], "#30363d")
-    color, bg, border = STAGE.get(agent["stage"], DEFAULT_STAGE)
     freq = agent["frequency"] or "Schedule TBD"
     desc = agent["description"]
     has_connections = bool(agent["connections"])
@@ -324,8 +353,7 @@ def _section_block(stage: str, agents: list[dict]) -> str:
       </tr>
     </table>"""
 
-    # 2-column card grid using a table
-    # Pair up agents
+    # 2-column card grid
     rows_html = ""
     pairs = [agents[i:i+2] for i in range(0, len(agents), 2)]
     for pair in pairs:
@@ -341,7 +369,7 @@ def _section_block(stage: str, agents: list[dict]) -> str:
           <td width="50%" valign="top" style="padding-right:6px;padding-bottom:12px;">
             {left}
           </td>
-          {right_td.replace("padding-bottom:12px;", "")}
+          {right_td}
         </tr>"""
 
     grid = f"""
@@ -376,7 +404,6 @@ def _this_week_block(new_rows: list[dict], stage_changes: list[dict]) -> str:
         </tr>"""
 
     for a in stage_changes:
-        pc, pb, pe = STAGE.get(a["previous_stage"], DEFAULT_STAGE)
         nc, nb, ne = STAGE.get(a["stage"], DEFAULT_STAGE)
         rows_html += f"""
         <tr style="border-top:1px solid #122a1a;">
@@ -384,12 +411,8 @@ def _this_week_block(new_rows: list[dict], stage_changes: list[dict]) -> str:
             color:#e6edf3;">{a["name"]}</td>
           <td style="padding:8px 16px;white-space:nowrap;">
             <span style="font-size:10px;font-weight:700;padding:2px 7px;
-              background:{pb};color:{pc};border:1px solid {pe};
-              border-radius:20px;">{a["previous_stage"]}</span>
-            <span style="color:#4d5561;font-size:11px;margin:0 4px;">&#8594;</span>
-            <span style="font-size:10px;font-weight:700;padding:2px 7px;
               background:{nb};color:{nc};border:1px solid {ne};
-              border-radius:20px;">{a["stage"]}</span>
+              border-radius:20px;">STAGE UPDATE &#8594; {a["stage"]}</span>
           </td>
           <td style="padding:8px 16px;font-size:11px;color:#6e7681;">
             {a["description"] or "—"}</td>
@@ -435,9 +458,9 @@ def build_email_html(
     summary: str,
     week_str: str,
 ) -> str:
-    completed  = [a for a in agents if a["stage"] == "Completed"]
+    completed   = [a for a in agents if a["stage"] == "Completed"]
     in_progress = [a for a in agents if a["stage"] == "In Progress"]
-    planned    = [a for a in agents if a["stage"] == "Planned"]
+    planned     = [a for a in agents if a["stage"] == "Planned"]
 
     sections = (
         _section_block("Completed",   completed)
@@ -574,15 +597,12 @@ def main() -> None:
     agents = fetch_sheet_data()
     print(f"   Found {len(agents)} agents")
 
-    print("📂 Loading previous snapshot...")
-    previous = load_snapshot()
-
-    print("🔍 Detecting changes vs last week...")
-    new_rows, stage_changes = detect_changes(agents, previous)
+    print(f"🔍 Detecting changes (last {LOOKBACK_DAYS} days)...")
+    new_rows, stage_changes = detect_changes(agents)
     if new_rows:
         print(f"   New: {[a['name'] for a in new_rows]}")
     if stage_changes:
-        print(f"   Stage changes: {[a['name']+' ('+a['previous_stage']+'→'+a['stage']+')' for a in stage_changes]}")
+        print(f"   Stage updates: {[a['name'] for a in stage_changes]}")
     if not new_rows and not stage_changes:
         print("   No changes this week")
 
@@ -594,9 +614,6 @@ def main() -> None:
 
     print("📧 Sending email...")
     send_email(html, week_str)
-
-    print("💾 Saving snapshot...")
-    save_snapshot(agents)
 
     print("✅ Done!")
 
