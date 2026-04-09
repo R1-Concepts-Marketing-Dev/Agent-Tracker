@@ -289,6 +289,23 @@ def _agent_card(agent: dict) -> str:
     desc = agent["description"]
     has_connections = bool(agent["connections"])
     flow_opacity = "1" if has_connections else "0.4"
+    is_new = _is_recent(agent.get("date_added", ""))
+    is_stage_updated = _is_recent(agent.get("stage_updated", "")) and not is_new
+
+    new_badge = ""
+    if is_new:
+        new_badge = (
+            '<span style="font-size:9px;font-weight:700;padding:2px 7px;'
+            'background:#14532d;color:#3fb950;border:1px solid #238636;'
+            'border-radius:20px;margin-left:8px;vertical-align:middle;">NEW</span>'
+        )
+    elif is_stage_updated:
+        nc, nb, ne = STAGE.get(agent["stage"], DEFAULT_STAGE)
+        new_badge = (
+            f'<span style="font-size:9px;font-weight:700;padding:2px 7px;'
+            f'background:{nb};color:{nc};border:1px solid {ne};'
+            f'border-radius:20px;margin-left:8px;vertical-align:middle;">UPDATED</span>'
+        )
 
     return f"""
     <table width="100%" cellpadding="0" cellspacing="0"
@@ -297,9 +314,9 @@ def _agent_card(agent: dict) -> str:
       <tr>
         <td style="padding:18px 20px;">
 
-          <!-- Name + description -->
+          <!-- Name + badge -->
           <div style="font-size:14px;font-weight:700;color:#e6edf3;
-            margin-bottom:5px;">{agent["name"]}</div>
+            margin-bottom:5px;">{agent["name"]}{new_badge}</div>
           <div style="font-size:11px;color:#8b949e;line-height:1.55;
             margin-bottom:14px;">{desc or "&nbsp;"}</div>
 
@@ -663,8 +680,6 @@ def build_full_report_html(
       </table>
     </td>
   </tr>
-
-  <tr><td style="padding-bottom:32px;">{this_week}</td></tr>
 
   <tr><td>{sections}</td></tr>
 
