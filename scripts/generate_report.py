@@ -560,6 +560,18 @@ def build_email_html(
     </td>
   </tr>
 
+  <!-- ── VIEW FULL REPORT BUTTON ── -->
+  <tr>
+    <td style="padding-top:24px;padding-bottom:8px;text-align:center;">
+      <a href="https://ben-westreich.github.io/Agent-Tracker/"
+        style="display:inline-block;padding:12px 32px;background:#1f2937;
+          color:#e6edf3;font-size:13px;font-weight:600;text-decoration:none;
+          border:1px solid #30363d;border-radius:8px;letter-spacing:0.3px;">
+        &#128196; View Full Report
+      </a>
+    </td>
+  </tr>
+
   <!-- ── FOOTER ── -->
   <tr>
     <td style="padding-top:16px;border-top:1px solid #161b22;
@@ -611,6 +623,11 @@ def main() -> None:
 
     print("🏗️  Building email...")
     html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
+
+    print("💾 Saving HTML report to docs/index.html...")
+    os.makedirs("docs", exist_ok=True)
+    with open("docs/index.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
     print("📧 Sending email...")
     send_email(html, week_str)
