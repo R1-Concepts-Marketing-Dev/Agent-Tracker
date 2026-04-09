@@ -12,16 +12,10 @@ jobs:
   send-report:
     runs-on: ubuntu-latest
 
-    # Needed so the action can commit the updated snapshot back to the repo
-    permissions:
-      contents: write
-
     steps:
-      # 1. Check out the repository (with write token so we can push the snapshot)
+      # 1. Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       # 2. Set up Python
       - name: Set up Python 3.11
@@ -40,7 +34,7 @@ jobs:
 
       # 4. Install dependencies
       - name: Install dependencies
-        run: pip install -r scripts/requirements.txt
+        run: pip install -r agent-tracker-workflow/scripts/requirements.txt
 
       # 5. Run the report generator
       - name: Generate and send weekly report
@@ -51,14 +45,4 @@ jobs:
           GMAIL_ADDRESS:      ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           RECIPIENT_EMAIL:    ${{ secrets.RECIPIENT_EMAIL }}
-        run: python scripts/generate_report.py
-
-      # 6. Commit the updated agent snapshot so next week's run can diff against it
-      - name: Commit updated snapshot
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add data/agent_snapshot.json
-          # Only commit if there are actual changes
-          git diff --staged --quiet || git commit -m "chore: update agent snapshot [skip ci]"
-          git push
+        run: python agent-tracker-workflow/scripts/generate_report.py
