@@ -148,9 +148,20 @@ def generate_summary(
         )
         if stage_changes else "None"
     )
+    completed_count   = sum(1 for a in agents if a["stage"] == "Completed")
+    in_progress_count = sum(1 for a in agents if a["stage"] == "In Progress")
+    planned_count     = sum(1 for a in agents if a["stage"] == "Planned")
+    total_count       = len(agents)
+
     prompt = f"""You are writing a concise weekly update email about AI automation agents for a marketing team.
 
-Current agent pipeline:
+Pipeline counts (use these exact numbers — do not recount from the list):
+- Total agents: {total_count}
+- Completed: {completed_count}
+- In Progress: {in_progress_count}
+- Planned: {planned_count}
+
+Full agent list:
 {agent_lines}
 
 New agents added this week:
@@ -160,7 +171,7 @@ Agents whose stage changed this week:
 {change_lines}
 
 Write a 3-5 sentence summary that:
-1. Gives a quick overall status of the pipeline
+1. Gives a quick overall status using the exact pipeline counts above
 2. Calls out newly added agents (if any)
 3. Calls out any stage changes, especially agents that moved to "In Progress" or "Completed"
 4. Uses an upbeat, professional tone suitable for an internal team email
