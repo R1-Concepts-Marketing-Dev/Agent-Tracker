@@ -81,8 +81,8 @@ def _fetch_csv(gid: str) -> list[dict]:
             "frequency":     row.get("Frequency", "").strip(),
             "connections":   row.get("Connections", "").strip(),
             "description":   row.get("Description", "").strip(),
-            "date_added":    row.get("Date Added", "").strip(),
-            "stage_updated": row.get("Stage Updated", "").strip(),
+            "date_added":      row.get("Date Added", "").strip(),
+            "stage_updated":   row.get("Date Completed", "").strip(),
         }
         if agent["name"]:
             agent["stage"] = _normalize_stage(agent["stage"])
