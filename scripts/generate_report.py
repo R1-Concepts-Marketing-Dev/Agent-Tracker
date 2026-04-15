@@ -1245,57 +1245,108 @@ def send_email(html: str, week_str: str) -> None:
     print(f"✅ Email sent to: {', '.join(recipients)}")
 
 
+# ── Workflow cache (save/load so refresh runs don't need Claude) ───────────────
+WORKFLOW_CACHE_PATH = "docs/workflow_cache.json"
+
+def save_workflow_cache(workflow_map: dict) -> None:
+    os.makedirs("docs", exist_ok=True)
+    with open(WORKFLOW_CACHE_PATH, "w", encoding="utf-8") as f:
+        json.dump(workflow_map, f, indent=2)
+    print(f"   💾 Workflow cache saved ({len(workflow_map)} agents)")
+
+def load_workflow_cache() -> dict:
+    if os.path.exists(WORKFLOW_CACHE_PATH):
+        with open(WORKFLOW_CACHE_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        print(f"   📂 Loaded workflow cache ({len(data)} agents)")
+        return data
+    print("   ⚠️  No workflow cache found — pages will show placeholder workflow")
+    return {}
+
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 def main() -> None:
+    # REFRESH_ONLY=true  → rebuild pages only, no Claude calls, no email
+    refresh_only = os.environ.get("REFRESH_ONLY", "false").lower() == "true"
     week_str = datetime.datetime.now().strftime("%B %d, %Y")
 
     print("📥 Fetching Google Sheet data...")
     agents = fetch_sheet_data()
     print(f"   Found {len(agents)} agents")
 
-    print("🎨 Expanding platform color map...")
-    expand_node_colors_with_claude(agents)
+    if refresh_only:
+        # ── Refresh mode: no Claude, no email ──────────────────────────────
+        print("🔄 Refresh-only mode — skipping Claude calls and email")
 
-    print(f"🔍 Detecting changes (last {LOOKBACK_DAYS} days)...")
-    new_rows, stage_changes = detect_changes(agents)
-    if new_rows:
-        print(f"   New: {[a['name'] for a in new_rows]}")
-    if stage_changes:
-        print(f"   Stage updates: {[a['name'] for a in stage_changes]}")
-    if not new_rows and not stage_changes:
-        print("   No changes this week")
+        print("📂 Loading cached workflow steps...")
+        workflow_map = load_workflow_cache()
 
-    print("🤖 Generating Claude summary...")
-    summary = generate_summary(agents, new_rows, stage_changes)
+        print("🏗️  Building full report (GitHub Pages)...")
+        new_rows, stage_changes = detect_changes(agents)
+        full_html = build_full_report_html(agents, new_rows, stage_changes, "", week_str, workflow_map)
 
-    print("🤖 Generating workflow steps for full report...")
-    workflow_map = generate_workflow_steps(agents)
-    print(f"   Generated workflows for {len(workflow_map)} agent(s)")
+        print("💾 Saving full report to docs/index.html...")
+        os.makedirs("docs", exist_ok=True)
+        with open("docs/index.html", "w", encoding="utf-8") as f:
+            f.write(full_html)
 
-    print("🏗️  Building email (simplified)...")
-    email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
+        print("📄 Building individual agent pages...")
+        os.makedirs("docs/agents", exist_ok=True)
+        for agent in agents:
+            slug      = _slugify(agent["name"])
+            steps     = workflow_map.get(agent["name"], [])
+            page_html = build_agent_page_html(agent, steps, week_str)
+            with open(f"docs/agents/{slug}.html", "w", encoding="utf-8") as f:
+                f.write(page_html)
+        print(f"   ✅ Refreshed {len(agents)} agent page(s)")
 
-    print("🏗️  Building full report (GitHub Pages)...")
-    full_html = build_full_report_html(agents, new_rows, stage_changes, summary, week_str, workflow_map)
+    else:
+        # ── Full weekly mode: Claude + email ───────────────────────────────
+        print("🎨 Expanding platform color map...")
+        expand_node_colors_with_claude(agents)
 
-    print("💾 Saving full report to docs/index.html...")
-    os.makedirs("docs", exist_ok=True)
-    with open("docs/index.html", "w", encoding="utf-8") as f:
-        f.write(full_html)
+        print(f"🔍 Detecting changes (last {LOOKBACK_DAYS} days)...")
+        new_rows, stage_changes = detect_changes(agents)
+        if new_rows:
+            print(f"   New: {[a['name'] for a in new_rows]}")
+        if stage_changes:
+            print(f"   Stage updates: {[a['name'] for a in stage_changes]}")
+        if not new_rows and not stage_changes:
+            print("   No changes this week")
 
-    print("📄 Building individual agent pages...")
-    os.makedirs("docs/agents", exist_ok=True)
-    for agent in agents:
-        slug      = _slugify(agent["name"])
-        steps     = workflow_map.get(agent["name"], [])
-        page_html = build_agent_page_html(agent, steps, week_str)
-        page_path = f"docs/agents/{slug}.html"
-        with open(page_path, "w", encoding="utf-8") as f:
-            f.write(page_html)
-    print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
+        print("🤖 Generating Claude summary...")
+        summary = generate_summary(agents, new_rows, stage_changes)
 
-    print("📧 Sending email...")
-    send_email(email_html, week_str)
+        print("🤖 Generating workflow steps for full report...")
+        workflow_map = generate_workflow_steps(agents)
+        print(f"   Generated workflows for {len(workflow_map)} agent(s)")
+
+        print("💾 Saving workflow cache for refresh runs...")
+        save_workflow_cache(workflow_map)
+
+        print("🏗️  Building email (simplified)...")
+        email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
+
+        print("🏗️  Building full report (GitHub Pages)...")
+        full_html = build_full_report_html(agents, new_rows, stage_changes, summary, week_str, workflow_map)
+
+        print("💾 Saving full report to docs/index.html...")
+        os.makedirs("docs", exist_ok=True)
+        with open("docs/index.html", "w", encoding="utf-8") as f:
+            f.write(full_html)
+
+        print("📄 Building individual agent pages...")
+        os.makedirs("docs/agents", exist_ok=True)
+        for agent in agents:
+            slug      = _slugify(agent["name"])
+            steps     = workflow_map.get(agent["name"], [])
+            page_html = build_agent_page_html(agent, steps, week_str)
+            with open(f"docs/agents/{slug}.html", "w", encoding="utf-8") as f:
+                f.write(page_html)
+        print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
+
+        print("📧 Sending email...")
+        send_email(email_html, week_str)
 
     print("✅ Done!")
 
