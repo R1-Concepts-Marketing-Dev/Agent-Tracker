@@ -398,6 +398,16 @@ Platforms:
         print(f"   ⚠️  Claude color expansion failed ({e}) — falling back to default gray")
 
 
+def _slugify(name: str) -> str:
+    """Convert agent name to a URL-safe slug. e.g. 'Weekly Checkup Bot' -> 'weekly-checkup-bot'"""
+    import re
+    slug = name.lower().strip()
+    slug = re.sub(r"[^\w\s-]", "", slug)   # remove special chars
+    slug = re.sub(r"[\s_]+", "-", slug)     # spaces/underscores -> hyphens
+    slug = re.sub(r"-+", "-", slug)         # collapse multiple hyphens
+    return slug.strip("-")
+
+
 def _parse_connections(raw: str) -> list[str]:
     """Return a flat ordered list of node names from the connections string."""
     if not raw:
@@ -1004,6 +1014,223 @@ def build_full_report_html(
 </html>"""
 
 
+# ── Individual Agent Page Builder ─────────────────────────────────────────────
+def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
+    """Build a standalone HTML page for a single agent."""
+    slug        = _slugify(agent["name"])
+    accent      = CARD_BORDER.get(agent["stage"], "#30363d")
+    freq        = agent["frequency"] or "Schedule TBD"
+    desc        = agent["description"] or "No description provided."
+    connections = _parse_connections(agent["connections"])
+
+    stage       = agent["stage"]
+    s_color, s_bg, s_border = STAGE.get(stage, DEFAULT_STAGE)
+    stage_dot_map = {"Completed": "#3fb950", "In Progress": "#e3b341", "Planned": "#58a6ff"}
+    stage_dot = stage_dot_map.get(stage, "#8b949e")
+
+    date_added     = agent.get("date_added", "") or "—"
+    date_completed = agent.get("stage_updated", "") or "—"
+
+    # ── Horizontal workflow track ──
+    if steps:
+        step_cards = ""
+        for i, step in enumerate(steps):
+            platform  = step.get("platform", "Unknown")
+            action    = step.get("action", "")
+            dot_color = _node_color(platform)
+            num       = i + 1
+
+            step_cards += f"""
+            <div style="display:flex;align-items:center;gap:0;flex-shrink:0;">
+              <div style="background:#1c2128;border:1px solid #30363d;border-radius:10px;
+                padding:20px 16px;text-align:center;width:140px;position:relative;">
+                <!-- Step number badge -->
+                <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+                  width:20px;height:20px;border-radius:50%;background:#0d1117;
+                  border:1px solid #30363d;display:flex;align-items:center;justify-content:center;
+                  font-size:10px;font-weight:700;color:#8b949e;">{num}</div>
+                <!-- Colored dot -->
+                <div style="width:36px;height:36px;border-radius:50%;
+                  background:{dot_color}22;border:2px solid {dot_color}55;
+                  display:flex;align-items:center;justify-content:center;
+                  margin:0 auto 10px;">
+                  <div style="width:12px;height:12px;border-radius:50%;
+                    background:{dot_color};"></div>
+                </div>
+                <div style="font-size:12px;font-weight:700;color:#f0f6fc;
+                  margin-bottom:8px;line-height:1.3;">{platform}</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">{action}</div>
+              </div>
+              {"<!-- arrow --><div style='color:#30363d;padding:0 8px;font-size:22px;'>&#8594;</div>" if i < len(steps) - 1 else ""}
+            </div>"""
+
+        workflow_html = f"""
+        <div style="overflow-x:auto;padding-bottom:8px;">
+          <div style="display:flex;align-items:flex-start;min-width:max-content;gap:0;">
+            {step_cards}
+          </div>
+        </div>"""
+    else:
+        workflow_html = """
+        <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
+          padding:24px;text-align:center;">
+          <span style="font-size:12px;color:#4d5561;font-style:italic;">
+            Workflow not yet configured
+          </span>
+        </div>"""
+
+    # ── Connections chips ──
+    if connections:
+        chips = ""
+        for i, node in enumerate(connections):
+            color = _node_color(node)
+            if i > 0:
+                chips += '<span style="color:#30363d;font-size:16px;padding:0 4px;">&#8594;</span>'
+            chips += (
+                f'<span style="display:inline-flex;align-items:center;gap:6px;'
+                f'background:#1c2128;border:1px solid #30363d;border-radius:20px;'
+                f'padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;">'
+                f'<span style="width:8px;height:8px;border-radius:50%;'
+                f'background:{color};display:inline-block;"></span>{node}</span>'
+            )
+        connections_html = f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">{chips}</div>'
+    else:
+        connections_html = '<span style="font-size:12px;color:#4d5561;font-style:italic;">None configured</span>'
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{agent["name"]} — R1 Agent Tracker</title>
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{ background: #0d1117; color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh; }}
+    .topnav {{ background: #161b22; border-bottom: 1px solid #21262d;
+      padding: 0 32px; height: 52px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100; }}
+    .back-btn {{ display: flex; align-items: center; gap: 6px; color: #8b949e;
+      text-decoration: none; font-size: 13px; font-weight: 500; transition: color .15s; }}
+    .back-btn:hover {{ color: #c9d1d9; }}
+    .r1-logo {{ font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      color: #DC2626; text-transform: uppercase; }}
+    .content {{ max-width: 900px; margin: 0 auto; padding: 36px 32px 64px;
+      display: flex; flex-direction: column; gap: 24px; }}
+    .card {{ background: #161b22; border: 1px solid #21262d; border-radius: 12px; overflow: hidden; }}
+    .card-header {{ padding: 13px 20px; border-bottom: 1px solid #21262d; }}
+    .card-label {{ font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #8b949e; }}
+    .card-body {{ padding: 20px; }}
+    .stats-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }}
+    .stat-tile {{ background: #161b22; border: 1px solid #21262d;
+      border-radius: 10px; padding: 18px 20px; }}
+    .stat-label {{ font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #8b949e; margin-bottom: 8px; }}
+    .stat-value {{ font-size: 15px; font-weight: 600; color: #f0f6fc; }}
+    .footer {{ text-align: center; padding: 24px; font-size: 11px; color: #30363d;
+      border-top: 1px solid #161b22; letter-spacing: 0.5px; }}
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="topnav">
+  <div style="display:flex;align-items:center;gap:20px;">
+    <a href="../../index.html" class="back-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M7.78 12.53a.75.75 0 01-1.06 0L2.47 8.28a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L4.81 7h7.44a.75.75 0 010 1.5H4.81l2.97 2.97a.75.75 0 010 1.06z"/>
+      </svg>
+      Dashboard
+    </a>
+    <div style="width:1px;height:18px;background:#30363d;"></div>
+    <span style="font-size:13px;color:#8b949e;">
+      Agent Tracker &rsaquo; <strong style="color:#c9d1d9;">{agent["name"]}</strong>
+    </span>
+  </div>
+  <div class="r1-logo">R1 Concepts</div>
+</nav>
+
+<!-- Hero -->
+<div style="background:linear-gradient(160deg,#1a1040 0%,#0d1117 60%);
+  border-bottom:1px solid #21262d;border-left:4px solid {accent};">
+  <div style="max-width:900px;margin:0 auto;padding:44px 32px 36px;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;
+      gap:16px;margin-bottom:12px;">
+      <h1 style="font-size:28px;font-weight:700;color:#f0f6fc;line-height:1.2;">
+        {agent["name"]}
+      </h1>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;
+        border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;
+        white-space:nowrap;flex-shrink:0;
+        background:{s_bg};border:1px solid {s_border};color:{s_color};">
+        <span style="width:7px;height:7px;border-radius:50%;
+          background:{stage_dot};display:inline-block;"></span>
+        {stage}
+      </span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:20px;font-size:13px;color:#8b949e;">
+      <span>&#128337; {freq}</span>
+      <span>&#128197; Added {date_added}</span>
+      {"<span>&#10003; Completed " + date_completed + "</span>" if date_completed != "—" else ""}
+    </div>
+  </div>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+  <!-- Description -->
+  <div class="card">
+    <div class="card-header"><div class="card-label">📋 &nbsp;Description</div></div>
+    <div class="card-body">
+      <p style="font-size:15px;line-height:1.8;color:#c9d1d9;">{desc}</p>
+    </div>
+  </div>
+
+  <!-- Workflow -->
+  <div class="card">
+    <div class="card-header"><div class="card-label">⚙️ &nbsp;Workflow</div></div>
+    <div class="card-body">
+      {workflow_html}
+    </div>
+  </div>
+
+  <!-- Connections -->
+  <div class="card">
+    <div class="card-header"><div class="card-label">🔗 &nbsp;Connections</div></div>
+    <div class="card-body">
+      {connections_html}
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-tile">
+      <div class="stat-label">Stage</div>
+      <div class="stat-value" style="color:{s_color};">{stage}</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Frequency</div>
+      <div class="stat-value">{freq}</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Platforms</div>
+      <div class="stat-value">{len(connections)} connected</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Auto-generated by Agent Tracker &bull; R1 Concepts &bull; Every Friday 12 PM PST
+</div>
+
+</body>
+</html>"""
+
+
 # ── Email sending ──────────────────────────────────────────────────────────────
 def send_email(html: str, week_str: str) -> None:
     recipients = [r.strip() for r in RECIPIENT_EMAIL.split(",") if r.strip()]
@@ -1055,6 +1282,17 @@ def main() -> None:
     os.makedirs("docs", exist_ok=True)
     with open("docs/index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
+
+    print("📄 Building individual agent pages...")
+    os.makedirs("docs/agents", exist_ok=True)
+    for agent in agents:
+        slug      = _slugify(agent["name"])
+        steps     = workflow_map.get(agent["name"], [])
+        page_html = build_agent_page_html(agent, steps, week_str)
+        page_path = f"docs/agents/{slug}.html"
+        with open(page_path, "w", encoding="utf-8") as f:
+            f.write(page_html)
+    print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
 
     print("📧 Sending email...")
     send_email(email_html, week_str)
