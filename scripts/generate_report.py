@@ -253,19 +253,52 @@ Agents:
 # ══════════════════════════════════════════════════════════════════════════════
 
 NODE_COLORS: dict[str, str] = {
-    "meta":       "#1877F2",
-    "tiktok":     "#111111",
-    "google ads": "#4285F4",
-    "google":     "#4285F4",
-    "hubspot":    "#FF7A59",
-    "gmail":      "#EA4335",
-    "claude":     "#7C3AED",
-    "amazon":     "#FF9900",
-    "asana":      "#F06A6A",
-    "slack":      "#4A154B",
-    "microsoft":  "#00A4EF",
-    "teams":      "#6264A7",
-    "sheet":      "#34A853",
+    # Google ecosystem
+    "google ads":  "#4285F4",
+    "google":      "#4285F4",
+    "gmail":       "#EA4335",
+    "sheet":       "#34A853",
+    "drive":       "#34A853",
+    # Meta / Social
+    "meta":        "#1877F2",
+    "facebook":    "#1877F2",
+    "instagram":   "#E1306C",
+    "tiktok":      "#010101",
+    "youtube":     "#FF0000",
+    "linkedin":    "#0A66C2",
+    "twitter":     "#1DA1F2",
+    "x.com":       "#1DA1F2",
+    # CRM / Marketing
+    "hubspot":     "#FF7A59",
+    "salesforce":  "#00A1E0",
+    "klaviyo":     "#FFD100",
+    "mailchimp":   "#FFE01B",
+    # AI
+    "claude":      "#7C3AED",
+    "anthropic":   "#7C3AED",
+    "openai":      "#10A37F",
+    "chatgpt":     "#10A37F",
+    # Communication
+    "slack":       "#4A154B",
+    "teams":       "#6264A7",
+    "microsoft":   "#00A4EF",
+    "twilio":      "#F22F46",
+    # E-commerce / Ops
+    "amazon":      "#FF9900",
+    "shopify":     "#96BF48",
+    "stripe":      "#635BFF",
+    "zapier":      "#FF4A00",
+    "make":        "#6D00CC",
+    # Project management
+    "asana":       "#F06A6A",
+    "notion":      "#FFFFFF",
+    "jira":        "#0052CC",
+    "airtable":    "#18BFFF",
+    # R1 Concepts specific
+    "r1":          "#DC2626",
+    "dfc":         "#2563EB",
+    "website":     "#64748B",
+    "api":         "#64748B",
 }
 DEFAULT_NODE_COLOR = "#4B5563"
 
@@ -298,6 +331,71 @@ def _node_color(name: str) -> str:
         if key in nl:
             return color
     return DEFAULT_NODE_COLOR
+
+
+def _extract_platform_names(agents: list[dict]) -> list[str]:
+    """Pull every individual platform name from all agent connection strings."""
+    names = set()
+    for agent in agents:
+        raw = agent.get("connections", "").strip()
+        if not raw:
+            continue
+        # Connections are comma-separated (e.g. "HubSpot, Gmail, Google Sheets")
+        for part in raw.split(","):
+            part = part.strip()
+            if part:
+                names.add(part)
+    return list(names)
+
+
+def expand_node_colors_with_claude(agents: list[dict]) -> None:
+    """
+    Finds platform names in the agents' connections that don't match any
+    existing NODE_COLORS keyword, then asks Claude (one batched call) to
+    assign official brand hex colors for them. Updates NODE_COLORS in place.
+    """
+    all_names = _extract_platform_names(agents)
+    unknown = [n for n in all_names if _node_color(n) == DEFAULT_NODE_COLOR]
+
+    if not unknown:
+        print("   All platform colors already mapped — skipping Claude color expansion")
+        return
+
+    print(f"   Asking Claude to assign colors for {len(unknown)} unknown platform(s): {unknown}")
+
+    prompt = f"""For each platform/tool/service name below, return its official brand hex color code.
+If you're confident in the brand color, use it. If unsure, pick a visually distinct color that suits the platform's category.
+
+Return ONLY a valid JSON object — no explanation, no markdown, no code fences.
+Keys = platform name exactly as given, Values = hex color string (e.g. "#FF5733").
+
+Platforms:
+{json.dumps(unknown, indent=2)}"""
+
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    try:
+        msg = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=1000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = msg.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = "\n".join(raw.split("\n")[1:])
+        if raw.endswith("```"):
+            raw = "\n".join(raw.split("\n")[:-1])
+
+        color_map: dict[str, str] = json.loads(raw.strip())
+        added = 0
+        for name, color in color_map.items():
+            key = name.lower()
+            # Only add if not already covered (don't overwrite known entries)
+            if all(key not in existing for existing in NODE_COLORS):
+                NODE_COLORS[key] = color
+                added += 1
+        print(f"   ✅ Added {added} new color(s) to NODE_COLORS")
+    except Exception as e:
+        print(f"   ⚠️  Claude color expansion failed ({e}) — falling back to default gray")
 
 
 def _parse_connections(raw: str) -> list[str]:
@@ -927,6 +1025,9 @@ def main() -> None:
     print("📥 Fetching Google Sheet data...")
     agents = fetch_sheet_data()
     print(f"   Found {len(agents)} agents")
+
+    print("🎨 Expanding platform color map...")
+    expand_node_colors_with_claude(agents)
 
     print(f"🔍 Detecting changes (last {LOOKBACK_DAYS} days)...")
     new_rows, stage_changes = detect_changes(agents)
