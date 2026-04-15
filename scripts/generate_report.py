@@ -12,6 +12,7 @@ Change detection is date-based:
 import os
 import csv
 import io
+import json
 import smtplib
 import datetime
 import urllib.request
@@ -184,6 +185,67 @@ No bullet points. Plain paragraph prose only."""
         messages=[{"role": "user", "content": prompt}],
     )
     return msg.content[0].text.strip()
+
+
+# ── Claude Workflow Steps ──────────────────────────────────────────────────────
+def generate_workflow_steps(agents: list[dict]) -> dict[str, list[dict]]:
+    """
+    Ask Claude to generate step-by-step workflow descriptions for each agent.
+    Returns a dict: { agent_name: [ {platform, action}, ... ] }
+    Agents with no connections get an empty list.
+    """
+    # Only process agents that have connections defined
+    agents_with_connections = [a for a in agents if a["connections"].strip()]
+    if not agents_with_connections:
+        return {}
+
+    agent_blocks = "\n\n".join(
+        f'Agent: {a["name"]}\n'
+        f'Description: {a["description"] or "No description provided"}\n'
+        f'Connections: {a["connections"]}'
+        for a in agents_with_connections
+    )
+
+    prompt = f"""You are analyzing AI automation agents. For each agent below, generate a step-by-step workflow that explains what the agent actually does at each connection point.
+
+Rules:
+- Each step must have a "platform" (the tool/service name, short) and an "action" (what it does at that step, 1 sentence max, plain English)
+- Derive the steps logically from the description and connections — make them specific and meaningful
+- Keep platform names short (e.g. "HubSpot CRM", "Claude AI", "Gmail", "Google Sheets")
+- 2–4 steps per agent maximum
+- Return ONLY valid JSON — no explanation, no markdown, no code fences
+
+Return format:
+{{
+  "Agent Name": [
+    {{"platform": "Platform Name", "action": "What it does here"}},
+    ...
+  ],
+  ...
+}}
+
+Agents:
+{agent_blocks}"""
+
+    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    msg = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=4000,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    raw = msg.content[0].text.strip()
+
+    # Strip markdown code fences if present
+    if raw.startswith("```"):
+        raw = "\n".join(raw.split("\n")[1:])
+    if raw.endswith("```"):
+        raw = "\n".join(raw.split("\n")[:-1])
+
+    try:
+        return json.loads(raw.strip())
+    except json.JSONDecodeError:
+        print("⚠️  Could not parse workflow JSON, skipping workflow steps")
+        return {}
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -596,25 +658,167 @@ def build_email_html(
 </html>"""
 
 
+def _full_report_card(agent: dict, steps: list[dict]) -> str:
+    """Render a full report card with numbered workflow steps."""
+    accent = CARD_BORDER.get(agent["stage"], "#30363d")
+    freq   = agent["frequency"] or "Schedule TBD"
+    desc   = agent["description"]
+
+    is_new          = _is_recent(agent.get("date_added", ""))
+    is_stage_updated = _is_recent(agent.get("stage_updated", "")) and not is_new
+    just_completed  = agent["stage"] == "Completed" and (is_new or is_stage_updated)
+
+    published_badge = ""
+    if just_completed:
+        published_badge = (
+            ' <span style="font-size:9px;font-weight:700;padding:2px 8px;'
+            'background:#0d1b2e;color:#38bdf8;border:1px solid #0ea5e9;'
+            'border-radius:20px;vertical-align:middle;">&#10003; Published</span>'
+        )
+
+    color, bg, border = STAGE.get(agent["stage"], DEFAULT_STAGE)
+    stage_pill = (
+        f'<span style="font-size:10px;font-weight:700;padding:3px 10px;'
+        f'background:{bg};color:{color};border:1px solid {border};'
+        f'border-radius:20px;white-space:nowrap;">{agent["stage"]}</span>'
+    )
+
+    # Build workflow steps HTML
+    if steps:
+        steps_html = ""
+        for i, step in enumerate(steps):
+            platform = step.get("platform", "")
+            action   = step.get("action", "")
+            dot_color = _node_color(platform)
+            is_last  = i == len(steps) - 1
+            connector = "" if is_last else (
+                '<div style="margin-left:11px;width:1px;height:20px;'
+                'background:#21262d;"></div>'
+            )
+            steps_html += f"""
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                <div style="width:22px;height:22px;border-radius:50%;
+                  background:#1c2128;border:1px solid #30363d;
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:9px;font-weight:700;color:#6e7681;">{i+1}</div>
+                {connector}
+              </div>
+              <div style="padding-top:3px;{'padding-bottom:16px;' if not is_last else ''}">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                  <div style="width:7px;height:7px;border-radius:50%;
+                    background:{dot_color};flex-shrink:0;"></div>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">{platform}</span>
+                </div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">{action}</div>
+              </div>
+            </div>"""
+
+        workflow_section = f"""
+        <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
+          text-transform:uppercase;color:#4d5561;margin-bottom:12px;">Workflow</div>
+        {steps_html}"""
+    else:
+        workflow_section = """
+        <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
+          text-transform:uppercase;color:#4d5561;margin-bottom:10px;">Workflow</div>
+        <div style="background:#0f1117;border:1px dashed #21262d;border-radius:8px;
+          padding:12px;text-align:center;">
+          <span style="font-size:10px;color:#4d5561;font-style:italic;">
+            Not yet configured
+          </span>
+        </div>"""
+
+    return f"""
+    <div style="background:#0d1117;border:1px solid #21262d;border-radius:12px;
+      border-left:3px solid {accent};overflow:hidden;margin-bottom:12px;">
+      <div style="padding:18px 20px 14px;">
+
+        <!-- Name + badge -->
+        <div style="font-size:14px;font-weight:700;color:#e6edf3;margin-bottom:5px;">
+          {agent["name"]}{published_badge}
+        </div>
+        <div style="font-size:11px;color:#8b949e;line-height:1.55;margin-bottom:14px;">
+          {desc or "&nbsp;"}
+        </div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:#161b22;margin-bottom:14px;"></div>
+
+        <!-- Workflow steps -->
+        {workflow_section}
+
+        <!-- Divider -->
+        <div style="height:1px;background:#161b22;margin:14px 0 12px;"></div>
+
+        <!-- Footer -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:10px;color:#6e7681;">&#128337; {freq}</span>
+          {stage_pill}
+        </div>
+
+      </div>
+    </div>"""
+
+
+def _full_report_section(stage: str, agents: list[dict], workflow_map: dict) -> str:
+    """Render a section with full report cards in a 2-column grid."""
+    if not agents:
+        return ""
+
+    color, line_color, count_bg, count_border = SECTION_STYLE[stage]
+    count = len(agents)
+
+    header = f"""
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="flex:1;height:1px;background:{line_color};"></div>
+      <span style="font-size:9px;font-weight:700;letter-spacing:2px;
+        text-transform:uppercase;color:{color};">{stage.upper()}</span>
+      <span style="font-size:10px;font-weight:700;padding:1px 8px;
+        background:{count_bg};color:{color};border:1px solid {count_border};
+        border-radius:20px;">{count}</span>
+      <div style="flex:1;height:1px;background:{line_color};"></div>
+    </div>"""
+
+    pairs = [agents[i:i+2] for i in range(0, len(agents), 2)]
+    grid_rows = ""
+    for pair in pairs:
+        left_steps  = workflow_map.get(pair[0]["name"], [])
+        left_card   = _full_report_card(pair[0], left_steps)
+        right_card  = ""
+        if len(pair) > 1:
+            right_steps = workflow_map.get(pair[1]["name"], [])
+            right_card  = _full_report_card(pair[1], right_steps)
+
+        grid_rows += f"""
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>{left_card}</div>
+          <div>{right_card}</div>
+        </div>"""
+
+    return header + f'<div style="margin-bottom:32px;">{grid_rows}</div>'
+
+
 def build_full_report_html(
     agents: list[dict],
     new_rows: list[dict],
     stage_changes: list[dict],
     summary: str,
     week_str: str,
+    workflow_map: dict = None,
 ) -> str:
     """Full card-based report for GitHub Pages."""
+    if workflow_map is None:
+        workflow_map = {}
     completed   = [a for a in agents if a["stage"] == "Completed"]
     in_progress = [a for a in agents if a["stage"] == "In Progress"]
     planned     = [a for a in agents if a["stage"] == "Planned"]
 
     sections = (
-        _section_block("Completed",   completed)
-        + _section_block("In Progress", in_progress)
-        + _section_block("Planned",     planned)
+        _full_report_section("Completed",   completed,   workflow_map)
+        + _full_report_section("In Progress", in_progress, workflow_map)
+        + _full_report_section("Planned",     planned,     workflow_map)
     )
-
-    this_week = _this_week_block(new_rows, stage_changes)
 
     def _stat(num, label, bg, border, color):
         return (
@@ -736,11 +940,15 @@ def main() -> None:
     print("🤖 Generating Claude summary...")
     summary = generate_summary(agents, new_rows, stage_changes)
 
+    print("🤖 Generating workflow steps for full report...")
+    workflow_map = generate_workflow_steps(agents)
+    print(f"   Generated workflows for {len(workflow_map)} agent(s)")
+
     print("🏗️  Building email (simplified)...")
     email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
 
     print("🏗️  Building full report (GitHub Pages)...")
-    full_html = build_full_report_html(agents, new_rows, stage_changes, summary, week_str)
+    full_html = build_full_report_html(agents, new_rows, stage_changes, summary, week_str, workflow_map)
 
     print("💾 Saving full report to docs/index.html...")
     os.makedirs("docs", exist_ok=True)
