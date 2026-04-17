@@ -209,16 +209,28 @@ def generate_workflow_steps(agents: list[dict]) -> dict[str, list[dict]]:
     prompt = f"""You are analyzing AI automation agents. For each agent below, generate a step-by-step workflow that explains what the agent actually does at each connection point.
 
 Rules:
-- Each step must have a "platform" (the tool/service name, short) and an "action" (what it does at that step, 1 sentence max, plain English)
-- Derive the steps logically from the description and connections — make them specific and meaningful
-- Keep platform names short (e.g. "HubSpot CRM", "Claude AI", "Gmail", "Google Sheets")
+- Each step must have: platform, role, action, impact, dataLabel, chips
+- "platform": short tool/service name (e.g. "HubSpot CRM", "Claude AI", "Gmail")
+- "role": very short category label (e.g. "Ad Platform", "AI Model", "Email", "CRM", "Spreadsheet")
+- "action": what it does at this step, 1 sentence, plain English
+- "impact": business value or time saved at this step, 1-2 sentences, outcome-focused (no "without this step..." framing — lead with the positive result)
+- "dataLabel": describes the type of data at this step (e.g. "Data collected", "Analysis produced", "Email contains", "Records updated")
+- "chips": array of 3-6 short data-point labels that describe what specifically flows through this step (e.g. ["Spend", "ROAS", "CTR"] for an ad platform step)
+- Derive all fields logically from the description and connections — make them specific and meaningful
 - 2–4 steps per agent maximum
 - Return ONLY valid JSON — no explanation, no markdown, no code fences
 
 Return format:
 {{
   "Agent Name": [
-    {{"platform": "Platform Name", "action": "What it does here"}},
+    {{
+      "platform": "Platform Name",
+      "role": "Short Category",
+      "action": "What it does at this step.",
+      "impact": "Outcome-focused business value.",
+      "dataLabel": "Data collected",
+      "chips": ["Label1", "Label2", "Label3"]
+    }},
     ...
   ],
   ...
@@ -331,6 +343,18 @@ def _node_color(name: str) -> str:
         if key in nl:
             return color
     return DEFAULT_NODE_COLOR
+
+
+def _hex_to_rgba(hex_color: str, alpha: float) -> str:
+    """Convert #RRGGBB hex to rgba(r,g,b,alpha) string."""
+    h = hex_color.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    try:
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    except (ValueError, IndexError):
+        return f"rgba(75,85,99,{alpha})"
+    return f"rgba({r},{g},{b},{alpha})"
 
 
 def _extract_platform_names(agents: list[dict]) -> list[str]:
@@ -1016,86 +1040,205 @@ def build_full_report_html(
 
 # ── Individual Agent Page Builder ─────────────────────────────────────────────
 def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
-    """Build a standalone HTML page for a single agent."""
-    slug        = _slugify(agent["name"])
-    accent      = CARD_BORDER.get(agent["stage"], "#30363d")
-    freq        = agent["frequency"] or "Schedule TBD"
-    desc        = agent["description"] or "No description provided."
-    connections = _parse_connections(agent["connections"])
-
-    stage       = agent["stage"]
+    """Build a standalone HTML page for a single agent with v4 animated workflow."""
+    accent         = CARD_BORDER.get(agent["stage"], "#30363d")
+    freq           = agent["frequency"] or "Schedule TBD"
+    desc           = agent["description"] or "No description provided."
+    connections    = _parse_connections(agent["connections"])
+    stage          = agent["stage"]
     s_color, s_bg, s_border = STAGE.get(stage, DEFAULT_STAGE)
-    stage_dot_map = {"Completed": "#3fb950", "In Progress": "#e3b341", "Planned": "#58a6ff"}
-    stage_dot = stage_dot_map.get(stage, "#8b949e")
+    stage_dot_map  = {"Completed": "#3fb950", "In Progress": "#e3b341", "Planned": "#58a6ff"}
+    stage_dot      = stage_dot_map.get(stage, "#8b949e")
+    platform_count = len(connections)
 
-    date_added     = agent.get("date_added", "") or "—"
-    date_completed = agent.get("stage_updated", "") or "—"
+    # ── Enrich steps with computed color + field defaults ──────────────────────
+    steps_data = []
+    for step in steps:
+        platform = step.get("platform", "Unknown")
+        color    = _node_color(platform)
+        steps_data.append({
+            "name":      platform,
+            "role":      step.get("role", ""),
+            "color":     color,
+            "text":      step.get("action", ""),
+            "impact":    step.get("impact", ""),
+            "dataLabel": step.get("dataLabel", "Data collected"),
+            "chips":     step.get("chips", []),
+        })
 
-    # ── Horizontal workflow track ──
-    if steps:
-        step_cards = ""
-        for i, step in enumerate(steps):
-            platform  = step.get("platform", "Unknown")
-            action    = step.get("action", "")
-            dot_color = _node_color(platform)
-            num       = i + 1
+    steps_json = json.dumps(steps_data, ensure_ascii=False)
+    n          = len(steps_data)
 
-            step_cards += f"""
-            <div style="display:flex;align-items:center;gap:0;flex-shrink:0;">
-              <div style="background:#1c2128;border:1px solid #30363d;border-radius:10px;
-                padding:20px 16px;text-align:center;width:140px;position:relative;">
-                <!-- Step number badge -->
-                <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);
-                  width:20px;height:20px;border-radius:50%;background:#0d1117;
-                  border:1px solid #30363d;display:flex;align-items:center;justify-content:center;
-                  font-size:10px;font-weight:700;color:#8b949e;">{num}</div>
-                <!-- Colored dot -->
-                <div style="width:36px;height:36px;border-radius:50%;
-                  background:{dot_color}22;border:2px solid {dot_color}55;
-                  display:flex;align-items:center;justify-content:center;
-                  margin:0 auto 10px;">
-                  <div style="width:12px;height:12px;border-radius:50%;
-                    background:{dot_color};"></div>
+    # ── Build animated track HTML ──────────────────────────────────────────────
+    if steps_data:
+        track_inner = ""
+        for i, sd in enumerate(steps_data):
+            col  = sd["color"]
+            glow = _hex_to_rgba(col, 0.12)
+            track_inner += f"""
+              <div class="step-box" id="step-{i}" style="--dot-color:{col};--glow-color:{glow};" onclick="goToStep({i})">
+                <div class="step-num">{i + 1}</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">{sd["name"]}</div>
+                  <div class="step-role">{sd["role"]}</div>
                 </div>
-                <div style="font-size:12px;font-weight:700;color:#f0f6fc;
-                  margin-bottom:8px;line-height:1.3;">{platform}</div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">{action}</div>
-              </div>
-              {"<!-- arrow --><div style='color:#30363d;padding:0 8px;font-size:22px;'>&#8594;</div>" if i < len(steps) - 1 else ""}
-            </div>"""
+              </div>"""
+            if i < len(steps_data) - 1:
+                track_inner += f"""
+              <div class="arrow-wrap" id="arrow-{i}"><div class="arrow-track">
+                <div class="travel-dot" id="dot-{i}" style="background:{col};--t-color:{col};"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>"""
 
-        workflow_html = f"""
-        <div style="overflow-x:auto;padding-bottom:8px;">
-          <div style="display:flex;align-items:flex-start;min-width:max-content;gap:0;">
-            {step_cards}
+        anim_html = f"""
+          <div class="workflow-track" id="track">
+            {track_inner}
           </div>
-        </div>"""
+          <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="detail-panel" id="detailPanel">
+            <div class="detail-top">
+              <div class="detail-dot" id="detailDot"></div>
+              <div class="detail-name" id="detailName"></div>
+              <div class="detail-role-badge" id="detailRole"></div>
+              <div class="detail-step-label" id="detailLabel"></div>
+            </div>
+            <div class="detail-text" id="detailText"></div>
+            <div class="impact-block">
+              <div class="impact-label">&#128161; Impact</div>
+              <div class="impact-text" id="impactText"></div>
+            </div>
+            <div class="data-block">
+              <div class="data-block-label" id="dataBlockLabel">Data collected</div>
+              <div class="chips" id="dataChips"></div>
+            </div>
+          </div>
+          <div class="wf-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
+            <div class="step-counter" id="stepCounter">Step 1 of {n}</div>
+            <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
+          </div>"""
     else:
-        workflow_html = """
-        <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-          padding:24px;text-align:center;">
-          <span style="font-size:12px;color:#4d5561;font-style:italic;">
-            Workflow not yet configured
-          </span>
-        </div>"""
+        anim_html = """
+          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
+            padding:24px;text-align:center;">
+            <span style="font-size:12px;color:#4d5561;font-style:italic;">
+              Workflow not yet configured
+            </span>
+          </div>"""
 
-    # ── Connections chips ──
+    # ── Connections chips ──────────────────────────────────────────────────────
     if connections:
-        chips = ""
+        chips_html = ""
         for i, node in enumerate(connections):
             color = _node_color(node)
             if i > 0:
-                chips += '<span style="color:#30363d;font-size:16px;padding:0 4px;">&#8594;</span>'
-            chips += (
+                chips_html += '<span style="color:#30363d;font-size:16px;padding:0 4px;">&#8594;</span>'
+            chips_html += (
                 f'<span style="display:inline-flex;align-items:center;gap:6px;'
                 f'background:#1c2128;border:1px solid #30363d;border-radius:20px;'
                 f'padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;">'
                 f'<span style="width:8px;height:8px;border-radius:50%;'
                 f'background:{color};display:inline-block;"></span>{node}</span>'
             )
-        connections_html = f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">{chips}</div>'
+        connections_html = (
+            f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">'
+            f'{chips_html}</div>'
+        )
     else:
-        connections_html = '<span style="font-size:12px;color:#4d5561;font-style:italic;">None configured</span>'
+        connections_html = (
+            '<span style="font-size:12px;color:#4d5561;font-style:italic;">'
+            'None configured</span>'
+        )
+
+    # ── Trigger badge (frequency) ──────────────────────────────────────────────
+    trigger_badge = (
+        f'<span style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;'
+        f'background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;white-space:nowrap;">'
+        f'&#9889; {freq}</span>'
+        if freq != "Schedule TBD" else ""
+    )
+
+    # ── JS (built as a separate f-string so CSS in outer f-string stays clean) ─
+    script = f"""
+  const STEPS = {n}, TRAVEL_MS = 700;
+  let current = 0, traveling = false;
+  const stepData = {steps_json};
+
+  function updatePanel(idx) {{
+    if (!stepData.length) return;
+    var d = stepData[idx];
+    document.getElementById("detailDot").style.background   = d.color;
+    document.getElementById("detailName").textContent       = d.name;
+    document.getElementById("detailRole").textContent       = d.role;
+    document.getElementById("detailRole").style.borderColor = d.color + "55";
+    document.getElementById("detailRole").style.color       = d.color;
+    document.getElementById("detailLabel").textContent      = "Step " + (idx + 1) + " of " + STEPS;
+    document.getElementById("detailText").textContent       = d.text;
+    document.getElementById("impactText").textContent       = d.impact;
+    document.getElementById("dataBlockLabel").textContent   = d.dataLabel;
+    document.getElementById("dataChips").innerHTML =
+      (d.chips || []).map(function(c) {{
+        return '<span class="chip">' + c + '</span>';
+      }}).join("");
+  }}
+
+  function render(idx) {{
+    for (var i = 0; i < STEPS; i++) {{
+      var b = document.getElementById("step-" + i);
+      b.classList.remove("active", "done");
+      if (i < idx) b.classList.add("done");
+    }}
+    for (var i = 0; i < STEPS - 1; i++)
+      document.getElementById("arrow-" + i).classList.toggle("done", i < idx);
+    document.getElementById("step-" + idx).classList.add("active");
+    document.getElementById("progressBar").style.width = ((idx + 1) / STEPS * 100) + "%";
+    document.getElementById("stepCounter").textContent = "Step " + (idx + 1) + " of " + STEPS;
+    document.getElementById("prevBtn").disabled = idx === 0;
+    document.getElementById("nextBtn").disabled = idx === STEPS - 1;
+    updatePanel(idx);
+  }}
+
+  function setNavBtns(disabled) {{
+    document.getElementById("prevBtn").disabled = disabled || current === 0;
+    document.getElementById("nextBtn").disabled = disabled || current === STEPS - 1;
+  }}
+
+  function fireTravel(arrowIdx, cb) {{
+    traveling = true;
+    setNavBtns(true);
+    var dot = document.getElementById("dot-" + arrowIdx);
+    dot.classList.remove("go");
+    void dot.offsetWidth;
+    dot.classList.add("go");
+    setTimeout(function() {{ traveling = false; cb(); }}, TRAVEL_MS);
+  }}
+
+  function stepForward(cb) {{
+    if (current >= STEPS - 1) {{ if (cb) cb(); return; }}
+    var from = current;
+    document.getElementById("step-" + from).classList.remove("active");
+    document.getElementById("step-" + from).classList.add("done");
+    document.getElementById("arrow-" + from).classList.add("done");
+    fireTravel(from, function() {{
+      current++;
+      render(current);
+      if (cb) cb();
+    }});
+  }}
+
+  function goToStep(target) {{
+    if (traveling || target === current) return;
+    if (target < current) {{ current = target; render(current); return; }}
+    function advance() {{ if (current < target) stepForward(advance); }}
+    advance();
+  }}
+
+  function next() {{ if (traveling || current >= STEPS - 1) return; stepForward(); }}
+  function prev() {{ if (traveling || current <= 0) return; render(--current); }}
+
+  if (STEPS > 0) render(0);
+"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -1118,11 +1261,108 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
       color: #DC2626; text-transform: uppercase; }}
     .content {{ max-width: 900px; margin: 0 auto; padding: 36px 32px 64px;
       display: flex; flex-direction: column; gap: 24px; }}
-    .card {{ background: #161b22; border: 1px solid #21262d; border-radius: 12px; overflow: hidden; }}
-    .card-header {{ padding: 13px 20px; border-bottom: 1px solid #21262d; }}
+    .card {{ background: #161b22; border: 1px solid #21262d; border-radius: 12px; }}
+    .card-header {{ padding: 13px 20px; border-bottom: 1px solid #21262d;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; }}
     .card-label {{ font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
       text-transform: uppercase; color: #8b949e; }}
     .card-body {{ padding: 20px; }}
+
+    /* ── Animated workflow ── */
+    .workflow-track {{ display: flex; align-items: flex-start; padding-top: 14px; }}
+    .step-box {{ position: relative; background: #1c2128; border: 1px solid #30363d;
+      border-radius: 12px; flex: 1; min-width: 0; cursor: pointer;
+      transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s; }}
+    .step-box:hover:not(.active) {{ border-color: #484f58; }}
+    .step-box.active {{ border-color: var(--dot-color); box-shadow: 0 0 20px var(--glow-color); cursor: default; }}
+    .step-box.done {{ border-color: #30363d; opacity: 0.4; }}
+    .step-box.done:hover {{ opacity: 0.65; }}
+    .step-inner {{ padding: 18px 10px 14px; text-align: center; }}
+    .step-num {{ position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      width: 20px; height: 20px; border-radius: 50%; background: #0d1117;
+      border: 1px solid #30363d; font-size: 10px; font-weight: 700; color: #8b949e;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, color 0.3s, border-color 0.3s; z-index: 2; }}
+    .step-box.active .step-num {{ background: var(--dot-color); color: #fff; border-color: var(--dot-color); }}
+    .step-box.done .step-num {{ background: #238636; color: #fff; border-color: #238636; }}
+    .dot-ring {{ width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.03); border: 2px solid #30363d;
+      transition: background 0.3s, border-color 0.3s; position: relative; }}
+    .step-box.active .dot-ring {{ background: var(--glow-color); border-color: var(--dot-color); }}
+    .step-box.done .dot-ring {{ background: rgba(35,134,54,0.1); border-color: #238636; }}
+    .dot-ring::after {{ content: ''; position: absolute; width: 100%; height: 100%;
+      border-radius: 50%; border: 2px solid transparent; opacity: 0; }}
+    .step-box.active .dot-ring::after {{ border-color: var(--dot-color);
+      animation: pulse-ring 1.4s ease-out infinite; }}
+    @keyframes pulse-ring {{
+      0%   {{ opacity: 0.5; transform: scale(1); }}
+      100% {{ opacity: 0;   transform: scale(1.8); }}
+    }}
+    .dot-core {{ width: 12px; height: 12px; border-radius: 50%; background: #30363d;
+      transition: background 0.3s, transform 0.3s; }}
+    .step-box.active .dot-core {{ background: var(--dot-color); transform: scale(1.2); }}
+    .step-box.done .dot-core {{ background: #3fb950; }}
+    .step-platform {{ font-size: 11px; font-weight: 700; color: #c9d1d9; line-height: 1.3;
+      margin-bottom: 3px; transition: color 0.3s; }}
+    .step-box.active .step-platform {{ color: #f0f6fc; }}
+    .step-role {{ font-size: 9px; font-weight: 500; color: #4d5561;
+      letter-spacing: 0.4px; text-transform: uppercase; transition: color 0.3s; }}
+    .step-box.active .step-role {{ color: var(--dot-color); opacity: 0.9; }}
+    .arrow-wrap {{ display: flex; align-items: flex-start; padding-top: 48px;
+      flex-shrink: 0; width: 28px; }}
+    .arrow-track {{ width: 100%; height: 2px; background: #21262d;
+      position: relative; overflow: visible; transition: background 0.3s; }}
+    .arrow-wrap.done .arrow-track {{ background: #238636; }}
+    .arrow-head {{ position: absolute; right: -7px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; color: #30363d; line-height: 1; transition: color 0.3s; }}
+    .arrow-wrap.done .arrow-head {{ color: #3fb950; }}
+    .travel-dot {{ position: absolute; width: 10px; height: 10px; border-radius: 50%;
+      top: 50%; transform: translateY(-50%); left: -10px; opacity: 0;
+      box-shadow: 0 0 8px var(--t-color, #fff); }}
+    .travel-dot.go {{ animation: travel-anim 0.7s cubic-bezier(0.4,0,0.2,1) forwards; }}
+    @keyframes travel-anim {{
+      0%   {{ left: -5px;  opacity: 0; }}
+      10%  {{ left: 0;     opacity: 1; }}
+      85%  {{ left: 100%;  opacity: 1; }}
+      100% {{ left: 110%;  opacity: 0; }}
+    }}
+    .progress-wrap {{ margin-top: 16px; height: 3px; background: #21262d;
+      border-radius: 2px; overflow: hidden; }}
+    .progress-bar {{ height: 100%; width: 0%;
+      background: linear-gradient(90deg, #7C3AED, #a371f7);
+      border-radius: 2px; transition: width 0.4s ease; }}
+    .detail-panel {{ margin-top: 16px; border-top: 1px solid #21262d; padding-top: 16px; }}
+    .detail-top {{ display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }}
+    .detail-dot {{ width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }}
+    .detail-name {{ font-size: 14px; font-weight: 700; color: #f0f6fc; }}
+    .detail-role-badge {{ font-size: 9px; font-weight: 600; letter-spacing: 0.5px;
+      text-transform: uppercase; padding: 2px 7px; border-radius: 20px;
+      background: #1c2128; border: 1px solid #30363d; color: #6e7681; }}
+    .detail-step-label {{ font-size: 10px; color: #6e7681; margin-left: auto; font-weight: 500; }}
+    .detail-text {{ font-size: 13px; color: #8b949e; line-height: 1.75; margin-bottom: 14px; }}
+    .impact-block {{ background: #130d2a; border: 1px solid #3b2d6e;
+      border-left: 3px solid #7C3AED; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }}
+    .impact-label {{ font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #a371f7; margin-bottom: 5px; }}
+    .impact-text {{ font-size: 12px; color: #8b949e; line-height: 1.65; }}
+    .data-block {{ background: #1c2128; border: 1px solid #21262d; border-radius: 10px; padding: 12px 14px; }}
+    .data-block-label {{ font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #4d5561; margin-bottom: 8px; }}
+    .chips {{ display: flex; flex-wrap: wrap; gap: 5px; }}
+    .chip {{ font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px;
+      background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; }}
+    .wf-controls {{ margin-top: 20px; display: flex; align-items: center; gap: 14px; }}
+    .nav-btn {{ width: 40px; height: 40px; border-radius: 50%; background: #1c2128;
+      border: 1px solid #30363d; color: #c9d1d9; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s; }}
+    .nav-btn:hover:not(:disabled) {{ background: #282e36; border-color: #484f58; transform: scale(1.08); }}
+    .nav-btn:disabled {{ opacity: 0.25; cursor: not-allowed; }}
+    .step-counter {{ font-size: 13px; color: #8b949e; min-width: 80px;
+      text-align: center; font-weight: 500; }}
+
+    /* ── Stats grid ── */
     .stats-grid {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }}
     .stat-tile {{ background: #161b22; border: 1px solid #21262d;
       border-radius: 10px; padding: 18px 20px; }}
@@ -1157,7 +1397,7 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
   border-bottom:1px solid #21262d;border-left:4px solid {accent};">
   <div style="max-width:900px;margin:0 auto;padding:44px 32px 36px;">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;
-      gap:16px;margin-bottom:12px;">
+      gap:16px;margin-bottom:16px;">
       <h1 style="font-size:28px;font-weight:700;color:#f0f6fc;line-height:1.2;">
         {agent["name"]}
       </h1>
@@ -1170,10 +1410,15 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
         {stage}
       </span>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:20px;font-size:13px;color:#8b949e;">
-      <span>&#128337; {freq}</span>
-      <span>&#128197; Added {date_added}</span>
-      {"<span>&#10003; Completed " + date_completed + "</span>" if date_completed != "—" else ""}
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
+        background:#1c2128;border:1px solid #30363d;color:#8b949e;">
+        &#128337; {freq}
+      </span>
+      <span style="font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
+        background:#1c2128;border:1px solid #30363d;color:#8b949e;">
+        &#128279; {platform_count} platform{"s" if platform_count != 1 else ""} connected
+      </span>
     </div>
   </div>
 </div>
@@ -1183,23 +1428,26 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
 
   <!-- Description -->
   <div class="card">
-    <div class="card-header"><div class="card-label">📋 &nbsp;Description</div></div>
+    <div class="card-header"><div class="card-label">&#128203; &nbsp;Description</div></div>
     <div class="card-body">
       <p style="font-size:15px;line-height:1.8;color:#c9d1d9;">{desc}</p>
     </div>
   </div>
 
-  <!-- Workflow -->
+  <!-- Workflow (animated) -->
   <div class="card">
-    <div class="card-header"><div class="card-label">⚙️ &nbsp;Workflow</div></div>
+    <div class="card-header">
+      <div class="card-label">&#9881;&#65039; &nbsp;Workflow</div>
+      {trigger_badge}
+    </div>
     <div class="card-body">
-      {workflow_html}
+      {anim_html}
     </div>
   </div>
 
   <!-- Connections -->
   <div class="card">
-    <div class="card-header"><div class="card-label">🔗 &nbsp;Connections</div></div>
+    <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
       {connections_html}
     </div>
@@ -1217,7 +1465,7 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
     </div>
     <div class="stat-tile">
       <div class="stat-label">Platforms</div>
-      <div class="stat-value">{len(connections)} connected</div>
+      <div class="stat-value">{platform_count} connected</div>
     </div>
   </div>
 
@@ -1227,6 +1475,9 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
   Auto-generated by Agent Tracker &bull; R1 Concepts &bull; Every Friday 12 PM PST
 </div>
 
+<script>
+{script}
+</script>
 </body>
 </html>"""
 
