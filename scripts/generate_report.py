@@ -188,22 +188,13 @@ No bullet points. Plain paragraph prose only."""
 
 
 # ── Claude Workflow Steps ──────────────────────────────────────────────────────
-def generate_workflow_steps(agents: list[dict]) -> dict[str, list[dict]]:
-    """
-    Ask Claude to generate step-by-step workflow descriptions for each agent.
-    Returns a dict: { agent_name: [ {platform, action}, ... ] }
-    Agents with no connections get an empty list.
-    """
-    # Only process agents that have connections defined
-    agents_with_connections = [a for a in agents if a["connections"].strip()]
-    if not agents_with_connections:
-        return {}
-
+def _workflow_batch(batch: list[dict], client) -> dict:
+    """Ask Claude to generate rich workflow steps for a batch of agents."""
     agent_blocks = "\n\n".join(
         f'Agent: {a["name"]}\n'
         f'Description: {a["description"] or "No description provided"}\n'
         f'Connections: {a["connections"]}'
-        for a in agents_with_connections
+        for a in batch
     )
 
     prompt = f"""You are analyzing AI automation agents. For each agent below, generate a step-by-step workflow that explains what the agent actually does at each connection point.
@@ -213,9 +204,9 @@ Rules:
 - "platform": short tool/service name (e.g. "HubSpot CRM", "Claude AI", "Gmail")
 - "role": very short category label (e.g. "Ad Platform", "AI Model", "Email", "CRM", "Spreadsheet")
 - "action": what it does at this step, 1 sentence, plain English
-- "impact": business value or time saved at this step, 1-2 sentences, outcome-focused (no "without this step..." framing — lead with the positive result)
+- "impact": business value or time saved at this step, 1-2 sentences, outcome-focused (lead with the positive result, not "without this step...")
 - "dataLabel": describes the type of data at this step (e.g. "Data collected", "Analysis produced", "Email contains", "Records updated")
-- "chips": array of 3-6 short data-point labels that describe what specifically flows through this step (e.g. ["Spend", "ROAS", "CTR"] for an ad platform step)
+- "chips": array of 3-6 short data-point labels describing what flows through this step
 - Derive all fields logically from the description and connections — make them specific and meaningful
 - 2–4 steps per agent maximum
 - Return ONLY valid JSON — no explanation, no markdown, no code fences
@@ -239,25 +230,49 @@ Return format:
 Agents:
 {agent_blocks}"""
 
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     msg = client.messages.create(
         model="claude-opus-4-6",
-        max_tokens=4000,
+        max_tokens=8000,
         messages=[{"role": "user", "content": prompt}],
     )
     raw = msg.content[0].text.strip()
-
-    # Strip markdown code fences if present
     if raw.startswith("```"):
         raw = "\n".join(raw.split("\n")[1:])
     if raw.endswith("```"):
         raw = "\n".join(raw.split("\n")[:-1])
-
     try:
         return json.loads(raw.strip())
     except json.JSONDecodeError:
-        print("⚠️  Could not parse workflow JSON, skipping workflow steps")
+        print(f"⚠️  Could not parse workflow JSON for batch, skipping {len(batch)} agent(s)")
         return {}
+
+
+def generate_workflow_steps(agents: list[dict]) -> dict[str, list[dict]]:
+    """
+    Ask Claude to generate step-by-step workflow descriptions for each agent.
+    Returns a dict: { agent_name: [ {platform, role, action, impact, dataLabel, chips}, ... ] }
+    Agents with no connections get an empty list.
+    Processes in batches of 10 to stay within token limits.
+    """
+    agents_with_connections = [a for a in agents if a["connections"].strip()]
+    if not agents_with_connections:
+        return {}
+
+    client    = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    results   = {}
+    batch_size = 10
+    batches   = [
+        agents_with_connections[i:i + batch_size]
+        for i in range(0, len(agents_with_connections), batch_size)
+    ]
+
+    print(f"   Processing {len(agents_with_connections)} agent(s) in {len(batches)} batch(es)...")
+    for idx, batch in enumerate(batches):
+        print(f"   Batch {idx + 1}/{len(batches)}: {[a['name'] for a in batch]}")
+        batch_result = _workflow_batch(batch, client)
+        results.update(batch_result)
+
+    return results
 
 
 # ══════════════════════════════════════════════════════════════════════════════
