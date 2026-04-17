@@ -19,11 +19,108 @@
       color: #DC2626; text-transform: uppercase; }
     .content { max-width: 900px; margin: 0 auto; padding: 36px 32px 64px;
       display: flex; flex-direction: column; gap: 24px; }
-    .card { background: #161b22; border: 1px solid #21262d; border-radius: 12px; overflow: hidden; }
-    .card-header { padding: 13px 20px; border-bottom: 1px solid #21262d; }
+    .card { background: #161b22; border: 1px solid #21262d; border-radius: 12px; }
+    .card-header { padding: 13px 20px; border-bottom: 1px solid #21262d;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .card-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
       text-transform: uppercase; color: #8b949e; }
     .card-body { padding: 20px; }
+
+    /* ── Animated workflow ── */
+    .workflow-track { display: flex; align-items: flex-start; padding-top: 14px; }
+    .step-box { position: relative; background: #1c2128; border: 1px solid #30363d;
+      border-radius: 12px; flex: 1; min-width: 0; cursor: pointer;
+      transition: border-color 0.3s, box-shadow 0.3s, opacity 0.3s; }
+    .step-box:hover:not(.active) { border-color: #484f58; }
+    .step-box.active { border-color: var(--dot-color); box-shadow: 0 0 20px var(--glow-color); cursor: default; }
+    .step-box.done { border-color: #30363d; opacity: 0.4; }
+    .step-box.done:hover { opacity: 0.65; }
+    .step-inner { padding: 18px 10px 14px; text-align: center; }
+    .step-num { position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+      width: 20px; height: 20px; border-radius: 50%; background: #0d1117;
+      border: 1px solid #30363d; font-size: 10px; font-weight: 700; color: #8b949e;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, color 0.3s, border-color 0.3s; z-index: 2; }
+    .step-box.active .step-num { background: var(--dot-color); color: #fff; border-color: var(--dot-color); }
+    .step-box.done .step-num { background: #238636; color: #fff; border-color: #238636; }
+    .dot-ring { width: 40px; height: 40px; border-radius: 50%; margin: 0 auto 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.03); border: 2px solid #30363d;
+      transition: background 0.3s, border-color 0.3s; position: relative; }
+    .step-box.active .dot-ring { background: var(--glow-color); border-color: var(--dot-color); }
+    .step-box.done .dot-ring { background: rgba(35,134,54,0.1); border-color: #238636; }
+    .dot-ring::after { content: ''; position: absolute; width: 100%; height: 100%;
+      border-radius: 50%; border: 2px solid transparent; opacity: 0; }
+    .step-box.active .dot-ring::after { border-color: var(--dot-color);
+      animation: pulse-ring 1.4s ease-out infinite; }
+    @keyframes pulse-ring {
+      0%   { opacity: 0.5; transform: scale(1); }
+      100% { opacity: 0;   transform: scale(1.8); }
+    }
+    .dot-core { width: 12px; height: 12px; border-radius: 50%; background: #30363d;
+      transition: background 0.3s, transform 0.3s; }
+    .step-box.active .dot-core { background: var(--dot-color); transform: scale(1.2); }
+    .step-box.done .dot-core { background: #3fb950; }
+    .step-platform { font-size: 11px; font-weight: 700; color: #c9d1d9; line-height: 1.3;
+      margin-bottom: 3px; transition: color 0.3s; }
+    .step-box.active .step-platform { color: #f0f6fc; }
+    .step-role { font-size: 9px; font-weight: 500; color: #4d5561;
+      letter-spacing: 0.4px; text-transform: uppercase; transition: color 0.3s; }
+    .step-box.active .step-role { color: var(--dot-color); opacity: 0.9; }
+    .arrow-wrap { display: flex; align-items: flex-start; padding-top: 48px;
+      flex-shrink: 0; width: 28px; }
+    .arrow-track { width: 100%; height: 2px; background: #21262d;
+      position: relative; overflow: visible; transition: background 0.3s; }
+    .arrow-wrap.done .arrow-track { background: #238636; }
+    .arrow-head { position: absolute; right: -7px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; color: #30363d; line-height: 1; transition: color 0.3s; }
+    .arrow-wrap.done .arrow-head { color: #3fb950; }
+    .travel-dot { position: absolute; width: 10px; height: 10px; border-radius: 50%;
+      top: 50%; transform: translateY(-50%); left: -10px; opacity: 0;
+      box-shadow: 0 0 8px var(--t-color, #fff); }
+    .travel-dot.go { animation: travel-anim 0.7s cubic-bezier(0.4,0,0.2,1) forwards; }
+    @keyframes travel-anim {
+      0%   { left: -5px;  opacity: 0; }
+      10%  { left: 0;     opacity: 1; }
+      85%  { left: 100%;  opacity: 1; }
+      100% { left: 110%;  opacity: 0; }
+    }
+    .progress-wrap { margin-top: 16px; height: 3px; background: #21262d;
+      border-radius: 2px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%;
+      background: linear-gradient(90deg, #7C3AED, #a371f7);
+      border-radius: 2px; transition: width 0.4s ease; }
+    .detail-panel { margin-top: 16px; border-top: 1px solid #21262d; padding-top: 16px; }
+    .detail-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .detail-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .detail-name { font-size: 14px; font-weight: 700; color: #f0f6fc; }
+    .detail-role-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.5px;
+      text-transform: uppercase; padding: 2px 7px; border-radius: 20px;
+      background: #1c2128; border: 1px solid #30363d; color: #6e7681; }
+    .detail-step-label { font-size: 10px; color: #6e7681; margin-left: auto; font-weight: 500; }
+    .detail-text { font-size: 13px; color: #8b949e; line-height: 1.75; margin-bottom: 14px; }
+    .impact-block { background: #130d2a; border: 1px solid #3b2d6e;
+      border-left: 3px solid #7C3AED; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+    .impact-label { font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #a371f7; margin-bottom: 5px; }
+    .impact-text { font-size: 12px; color: #8b949e; line-height: 1.65; }
+    .data-block { background: #1c2128; border: 1px solid #21262d; border-radius: 10px; padding: 12px 14px; }
+    .data-block-label { font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #4d5561; margin-bottom: 8px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px;
+      background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; }
+    .wf-controls { margin-top: 20px; display: flex; align-items: center; gap: 14px; }
+    .nav-btn { width: 40px; height: 40px; border-radius: 50%; background: #1c2128;
+      border: 1px solid #30363d; color: #c9d1d9; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s; }
+    .nav-btn:hover:not(:disabled) { background: #282e36; border-color: #484f58; transform: scale(1.08); }
+    .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+    .step-counter { font-size: 13px; color: #8b949e; min-width: 80px;
+      text-align: center; font-weight: 500; }
+
+    /* ── Stats grid ── */
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .stat-tile { background: #161b22; border: 1px solid #21262d;
       border-radius: 10px; padding: 18px 20px; }
@@ -58,7 +155,7 @@
   border-bottom:1px solid #21262d;border-left:4px solid #3fb950;">
   <div style="max-width:900px;margin:0 auto;padding:44px 32px 36px;">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;
-      gap:16px;margin-bottom:12px;">
+      gap:16px;margin-bottom:16px;">
       <h1 style="font-size:28px;font-weight:700;color:#f0f6fc;line-height:1.2;">
         Creator Outreach
       </h1>
@@ -71,10 +168,15 @@
         Completed
       </span>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:20px;font-size:13px;color:#8b949e;">
-      <span>&#128337; Currently On-Demand > (Daily)</span>
-      <span>&#128197; Added 4/9/2026</span>
-      <span>&#10003; Completed 4/9/2026</span>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
+        background:#1c2128;border:1px solid #30363d;color:#8b949e;">
+        &#128337; Currently On-Demand > (Daily)
+      </span>
+      <span style="font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
+        background:#1c2128;border:1px solid #30363d;color:#8b949e;">
+        &#128279; 1 platform connected
+      </span>
     </div>
   </div>
 </div>
@@ -84,29 +186,32 @@
 
   <!-- Description -->
   <div class="card">
-    <div class="card-header"><div class="card-label">📋 &nbsp;Description</div></div>
+    <div class="card-header"><div class="card-label">&#128203; &nbsp;Description</div></div>
     <div class="card-body">
       <p style="font-size:15px;line-height:1.8;color:#c9d1d9;">AI outreach to qualified creators using learned sequences and prompts.</p>
     </div>
   </div>
 
-  <!-- Workflow -->
+  <!-- Workflow (animated) -->
   <div class="card">
-    <div class="card-header"><div class="card-label">⚙️ &nbsp;Workflow</div></div>
+    <div class="card-header">
+      <div class="card-label">&#9881;&#65039; &nbsp;Workflow</div>
+      <span style="font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;white-space:nowrap;">&#9889; Currently On-Demand > (Daily)</span>
+    </div>
     <div class="card-body">
       
-        <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-          padding:24px;text-align:center;">
-          <span style="font-size:12px;color:#4d5561;font-style:italic;">
-            Workflow not yet configured
-          </span>
-        </div>
+          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
+            padding:24px;text-align:center;">
+            <span style="font-size:12px;color:#4d5561;font-style:italic;">
+              Workflow not yet configured
+            </span>
+          </div>
     </div>
   </div>
 
   <!-- Connections -->
   <div class="card">
-    <div class="card-header"><div class="card-label">🔗 &nbsp;Connections</div></div>
+    <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#4285F4;display:inline-block;"></span>Gemini API, Gmail API, Google Drive API</span></div>
     </div>
@@ -134,5 +239,86 @@
   Auto-generated by Agent Tracker &bull; R1 Concepts &bull; Every Friday 12 PM PST
 </div>
 
+<script>
+
+  const STEPS = 0, TRAVEL_MS = 700;
+  let current = 0, traveling = false;
+  const stepData = [];
+
+  function updatePanel(idx) {
+    if (!stepData.length) return;
+    var d = stepData[idx];
+    document.getElementById("detailDot").style.background   = d.color;
+    document.getElementById("detailName").textContent       = d.name;
+    document.getElementById("detailRole").textContent       = d.role;
+    document.getElementById("detailRole").style.borderColor = d.color + "55";
+    document.getElementById("detailRole").style.color       = d.color;
+    document.getElementById("detailLabel").textContent      = "Step " + (idx + 1) + " of " + STEPS;
+    document.getElementById("detailText").textContent       = d.text;
+    document.getElementById("impactText").textContent       = d.impact;
+    document.getElementById("dataBlockLabel").textContent   = d.dataLabel;
+    document.getElementById("dataChips").innerHTML =
+      (d.chips || []).map(function(c) {
+        return '<span class="chip">' + c + '</span>';
+      }).join("");
+  }
+
+  function render(idx) {
+    for (var i = 0; i < STEPS; i++) {
+      var b = document.getElementById("step-" + i);
+      b.classList.remove("active", "done");
+      if (i < idx) b.classList.add("done");
+    }
+    for (var i = 0; i < STEPS - 1; i++)
+      document.getElementById("arrow-" + i).classList.toggle("done", i < idx);
+    document.getElementById("step-" + idx).classList.add("active");
+    document.getElementById("progressBar").style.width = ((idx + 1) / STEPS * 100) + "%";
+    document.getElementById("stepCounter").textContent = "Step " + (idx + 1) + " of " + STEPS;
+    document.getElementById("prevBtn").disabled = idx === 0;
+    document.getElementById("nextBtn").disabled = idx === STEPS - 1;
+    updatePanel(idx);
+  }
+
+  function setNavBtns(disabled) {
+    document.getElementById("prevBtn").disabled = disabled || current === 0;
+    document.getElementById("nextBtn").disabled = disabled || current === STEPS - 1;
+  }
+
+  function fireTravel(arrowIdx, cb) {
+    traveling = true;
+    setNavBtns(true);
+    var dot = document.getElementById("dot-" + arrowIdx);
+    dot.classList.remove("go");
+    void dot.offsetWidth;
+    dot.classList.add("go");
+    setTimeout(function() { traveling = false; cb(); }, TRAVEL_MS);
+  }
+
+  function stepForward(cb) {
+    if (current >= STEPS - 1) { if (cb) cb(); return; }
+    var from = current;
+    document.getElementById("step-" + from).classList.remove("active");
+    document.getElementById("step-" + from).classList.add("done");
+    document.getElementById("arrow-" + from).classList.add("done");
+    fireTravel(from, function() {
+      current++;
+      render(current);
+      if (cb) cb();
+    });
+  }
+
+  function goToStep(target) {
+    if (traveling || target === current) return;
+    if (target < current) { current = target; render(current); return; }
+    function advance() { if (current < target) stepForward(advance); }
+    advance();
+  }
+
+  function next() { if (traveling || current >= STEPS - 1) return; stepForward(); }
+  function prev() { if (traveling || current <= 0) return; render(--current); }
+
+  if (STEPS > 0) render(0);
+
+</script>
 </body>
 </html>
