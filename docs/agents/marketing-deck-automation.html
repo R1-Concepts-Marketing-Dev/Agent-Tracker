@@ -200,11 +200,63 @@
     </div>
     <div class="card-body">
       
-          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-            padding:24px;text-align:center;">
-            <span style="font-size:12px;color:#4d5561;font-style:italic;">
-              Workflow not yet configured
-            </span>
+          <div class="workflow-track" id="track">
+            
+              <div class="step-box" id="step-0" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(0)">
+                <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">HubSpot API</div>
+                  <div class="step-role">CRM</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#FF7A59;--t-color:#FF7A59;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#E37400;--glow-color:rgba(227,116,0,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">GA4 / Search Console / Attentive</div>
+                  <div class="step-role">Analytics</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#E37400;--t-color:#E37400;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Google Slides API</div>
+                  <div class="step-role">Presentation</div>
+                </div>
+              </div>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="detail-panel" id="detailPanel">
+            <div class="detail-top">
+              <div class="detail-dot" id="detailDot"></div>
+              <div class="detail-name" id="detailName"></div>
+              <div class="detail-role-badge" id="detailRole"></div>
+              <div class="detail-step-label" id="detailLabel"></div>
+            </div>
+            <div class="detail-text" id="detailText"></div>
+            <div class="impact-block">
+              <div class="impact-label">&#128161; Impact</div>
+              <div class="impact-text" id="impactText"></div>
+            </div>
+            <div class="data-block">
+              <div class="data-block-label" id="dataBlockLabel">Data collected</div>
+              <div class="chips" id="dataChips"></div>
+            </div>
+          </div>
+          <div class="wf-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
+            <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
   </div>
@@ -241,9 +293,9 @@
 
 <script>
 
-  const STEPS = 0, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [];
+  const stepData = [{"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Extracts lifecycle reporting metrics including lead counts, conversion rates, and email engagement data for the reporting period.", "impact": "Centralizes CRM performance data automatically, removing the need to manually pull and compile HubSpot reports each month.", "dataLabel": "Data collected", "chips": ["Lead counts", "Conversion rates", "Email open rates", "Click-through rates", "Lifecycle stages"]}, {"name": "GA4 / Search Console / Attentive", "role": "Analytics", "color": "#E37400", "text": "Pulls website traffic, organic search performance, keyword rankings, and SMS campaign metrics from GA4, Google Search Console, and Attentive.", "impact": "Aggregates multi-channel marketing data from three platforms simultaneously, saving significant time and ensuring no metrics are missed.", "dataLabel": "Metrics gathered", "chips": ["Organic traffic", "Keyword rankings", "SMS open rates", "Click data", "Impressions", "Session counts"]}, {"name": "Google Slides API", "role": "Presentation", "color": "#4285F4", "text": "Populates slides 48-55 of the monthly Marketing Highlights deck with the collected metrics, formatting charts, tables, and data points automatically.", "impact": "Transforms raw data from four platforms into presentation-ready slides instantly, eliminating manual slide formatting and data entry errors.", "dataLabel": "Slides updated", "chips": ["Formatted charts", "Performance tables", "Month-over-month trends", "Channel summaries", "KPI highlights"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

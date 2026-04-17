@@ -200,11 +200,63 @@
     </div>
     <div class="card-body">
       
-          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-            padding:24px;text-align:center;">
-            <span style="font-size:12px;color:#4d5561;font-style:italic;">
-              Workflow not yet configured
-            </span>
+          <div class="workflow-track" id="track">
+            
+              <div class="step-box" id="step-0" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(0)">
+                <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Google Drive API</div>
+                  <div class="step-role">Document Storage</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Gemini API</div>
+                  <div class="step-role">AI Model</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#64748B;--t-color:#64748B;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Gmail API</div>
+                  <div class="step-role">Email</div>
+                </div>
+              </div>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="detail-panel" id="detailPanel">
+            <div class="detail-top">
+              <div class="detail-dot" id="detailDot"></div>
+              <div class="detail-name" id="detailName"></div>
+              <div class="detail-role-badge" id="detailRole"></div>
+              <div class="detail-step-label" id="detailLabel"></div>
+            </div>
+            <div class="detail-text" id="detailText"></div>
+            <div class="impact-block">
+              <div class="impact-label">&#128161; Impact</div>
+              <div class="impact-text" id="impactText"></div>
+            </div>
+            <div class="data-block">
+              <div class="data-block-label" id="dataBlockLabel">Data collected</div>
+              <div class="chips" id="dataChips"></div>
+            </div>
+          </div>
+          <div class="wf-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
+            <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
   </div>
@@ -241,9 +293,9 @@
 
 <script>
 
-  const STEPS = 0, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [];
+  const stepData = [{"name": "Google Drive API", "role": "Document Storage", "color": "#4285F4", "text": "Retrieves learned outreach sequences, email templates, and prompt guidelines stored in Google Drive for the campaign.", "impact": "Ensures outreach messaging follows proven sequences and brand guidelines, maintaining consistency across all creator communications.", "dataLabel": "Data collected", "chips": ["Email templates", "Sequence steps", "Prompt guidelines", "Brand brief", "Offer terms"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Generates personalized outreach emails for each qualified creator using learned sequences and tailored prompts.", "impact": "Produces unique, compelling outreach at scale that feels personal, dramatically increasing response rates compared to generic templates.", "dataLabel": "Content generated", "chips": ["Personalized pitch", "Creator name ref", "Collaboration offer", "Subject line", "CTA"]}, {"name": "Gmail API", "role": "Email", "color": "#EA4335", "text": "Sends the AI-generated outreach emails to qualified creators directly from the team's Gmail account.", "impact": "Automates the entire send process so dozens of personalized outreach emails go out daily without manual copy-paste or scheduling.", "dataLabel": "Email contains", "chips": ["Recipient address", "Outreach message", "Send timestamp", "Thread ID", "Follow-up schedule"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

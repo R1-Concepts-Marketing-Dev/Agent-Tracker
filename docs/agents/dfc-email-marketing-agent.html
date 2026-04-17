@@ -200,11 +200,63 @@
     </div>
     <div class="card-body">
       
-          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-            padding:24px;text-align:center;">
-            <span style="font-size:12px;color:#4d5561;font-style:italic;">
-              Workflow not yet configured
-            </span>
+          <div class="workflow-track" id="track">
+            
+              <div class="step-box" id="step-0" style="--dot-color:#2563EB;--glow-color:rgba(37,99,235,0.12);" onclick="goToStep(0)">
+                <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">DFC Website</div>
+                  <div class="step-role">Product Source</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#2563EB;--t-color:#2563EB;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Anthropic API</div>
+                  <div class="step-role">AI Model</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#7C3AED;--t-color:#7C3AED;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">HubSpot API</div>
+                  <div class="step-role">Email Platform</div>
+                </div>
+              </div>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="detail-panel" id="detailPanel">
+            <div class="detail-top">
+              <div class="detail-dot" id="detailDot"></div>
+              <div class="detail-name" id="detailName"></div>
+              <div class="detail-role-badge" id="detailRole"></div>
+              <div class="detail-step-label" id="detailLabel"></div>
+            </div>
+            <div class="detail-text" id="detailText"></div>
+            <div class="impact-block">
+              <div class="impact-label">&#128161; Impact</div>
+              <div class="impact-text" id="impactText"></div>
+            </div>
+            <div class="data-block">
+              <div class="data-block-label" id="dataBlockLabel">Data collected</div>
+              <div class="chips" id="dataChips"></div>
+            </div>
+          </div>
+          <div class="wf-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
+            <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
   </div>
@@ -241,9 +293,9 @@
 
 <script>
 
-  const STEPS = 0, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [];
+  const stepData = [{"name": "DFC Website", "role": "Product Source", "color": "#2563EB", "text": "Scrapes Dynamic Friction Company product listings, promotions, and brand content from the DFC website.", "impact": "Keeps email content aligned with the latest DFC product catalog and offers, removing manual data gathering from the workflow.", "dataLabel": "Data collected", "chips": ["Product names", "Part numbers", "Pricing", "Promo details", "Brand assets", "Product categories"]}, {"name": "Anthropic API", "role": "AI Model", "color": "#7C3AED", "text": "Generates a daily marketing email with DFC-specific branding, messaging, and product recommendations.", "impact": "Delivers unique, high-quality email creative every day for the DFC brand without requiring a dedicated copywriter.", "dataLabel": "Content generated", "chips": ["Subject line", "Body content", "Product callouts", "CTA buttons", "DFC brand voice"]}, {"name": "HubSpot API", "role": "Email Platform", "color": "#FF7A59", "text": "Creates the marketing email in HubSpot and distributes it to DFC contact lists via the Marketing Email API.", "impact": "Ensures daily DFC campaigns are published and sent on schedule to the right audience segments with zero manual intervention.", "dataLabel": "Records updated", "chips": ["Contact lists", "Send status", "Campaign tracking", "Delivery logs", "Email ID"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

@@ -200,11 +200,75 @@
     </div>
     <div class="card-body">
       
-          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-            padding:24px;text-align:center;">
-            <span style="font-size:12px;color:#4d5561;font-style:italic;">
-              Workflow not yet configured
-            </span>
+          <div class="workflow-track" id="track">
+            
+              <div class="step-box" id="step-0" style="--dot-color:#FF0000;--glow-color:rgba(255,0,0,0.12);" onclick="goToStep(0)">
+                <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">YouTube</div>
+                  <div class="step-role">Video Source</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#FF0000;--t-color:#FF0000;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#21759B;--glow-color:rgba(33,117,155,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">WordPress</div>
+                  <div class="step-role">CMS</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#21759B;--t-color:#21759B;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">HubSpot API</div>
+                  <div class="step-role">Email Marketing</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-2"><div class="arrow-track">
+                <div class="travel-dot" id="dot-2" style="background:#FF7A59;--t-color:#FF7A59;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-3" style="--dot-color:#FFD000;--glow-color:rgba(255,208,0,0.12);" onclick="goToStep(3)">
+                <div class="step-num">4</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Attentive SMS</div>
+                  <div class="step-role">SMS Marketing</div>
+                </div>
+              </div>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="detail-panel" id="detailPanel">
+            <div class="detail-top">
+              <div class="detail-dot" id="detailDot"></div>
+              <div class="detail-name" id="detailName"></div>
+              <div class="detail-role-badge" id="detailRole"></div>
+              <div class="detail-step-label" id="detailLabel"></div>
+            </div>
+            <div class="detail-text" id="detailText"></div>
+            <div class="impact-block">
+              <div class="impact-label">&#128161; Impact</div>
+              <div class="impact-text" id="impactText"></div>
+            </div>
+            <div class="data-block">
+              <div class="data-block-label" id="dataBlockLabel">Data collected</div>
+              <div class="chips" id="dataChips"></div>
+            </div>
+          </div>
+          <div class="wf-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
+            <div class="step-counter" id="stepCounter">Step 1 of 4</div>
+            <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
   </div>
@@ -241,9 +305,9 @@
 
 <script>
 
-  const STEPS = 0, TRAVEL_MS = 700;
+  const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [];
+  const stepData = [{"name": "YouTube", "role": "Video Source", "color": "#FF0000", "text": "Pulls the latest Friction Friday video URL, title, thumbnail, and transcript each week.", "impact": "Eliminates manual video tracking and ensures every new episode is instantly available for repurposing across channels.", "dataLabel": "Data collected", "chips": ["Video URL", "Video Title", "Thumbnail", "Transcript", "Publish Date"]}, {"name": "WordPress", "role": "CMS", "color": "#21759B", "text": "Auto-generates and publishes a blog post embedding the video with SEO-optimized copy derived from the transcript.", "impact": "Drives organic search traffic and gives every video a permanent, indexable home — saving 30-60 minutes of manual content creation per week.", "dataLabel": "Content published", "chips": ["Blog Post URL", "SEO Meta Tags", "Embedded Video", "Post Excerpt"]}, {"name": "HubSpot API", "role": "Email Marketing", "color": "#FF7A59", "text": "Triggers a weekly email campaign to the Friction Friday subscriber list featuring the new video and blog link.", "impact": "Keeps the DFC audience engaged with consistent weekly touchpoints, boosting open rates and driving traffic back to the blog and YouTube.", "dataLabel": "Email contains", "chips": ["Subject Line", "Video Thumbnail", "Blog Link", "CTA Button", "Recipient List"]}, {"name": "Attentive SMS", "role": "SMS Marketing", "color": "#FFD000", "text": "Sends an SMS notification to opted-in contacts with a short message and link to the new Friction Friday episode.", "impact": "Reaches contacts directly on mobile for higher immediate engagement, complementing email with a 98% open-rate channel.", "dataLabel": "SMS contains", "chips": ["Short Message", "Video Link", "Brand Name", "Opt-out Footer"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

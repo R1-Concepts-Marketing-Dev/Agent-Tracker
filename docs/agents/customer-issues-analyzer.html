@@ -200,11 +200,51 @@
     </div>
     <div class="card-body">
       
-          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-            padding:24px;text-align:center;">
-            <span style="font-size:12px;color:#4d5561;font-style:italic;">
-              Workflow not yet configured
-            </span>
+          <div class="workflow-track" id="track">
+            
+              <div class="step-box" id="step-0" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(0)">
+                <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">HubSpot API</div>
+                  <div class="step-role">CRM</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#FF7A59;--t-color:#FF7A59;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Google Sheets API</div>
+                  <div class="step-role">Spreadsheet</div>
+                </div>
+              </div>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="detail-panel" id="detailPanel">
+            <div class="detail-top">
+              <div class="detail-dot" id="detailDot"></div>
+              <div class="detail-name" id="detailName"></div>
+              <div class="detail-role-badge" id="detailRole"></div>
+              <div class="detail-step-label" id="detailLabel"></div>
+            </div>
+            <div class="detail-text" id="detailText"></div>
+            <div class="impact-block">
+              <div class="impact-label">&#128161; Impact</div>
+              <div class="impact-text" id="impactText"></div>
+            </div>
+            <div class="data-block">
+              <div class="data-block-label" id="dataBlockLabel">Data collected</div>
+              <div class="chips" id="dataChips"></div>
+            </div>
+          </div>
+          <div class="wf-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
+            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
+            <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
   </div>
@@ -241,9 +281,9 @@
 
 <script>
 
-  const STEPS = 0, TRAVEL_MS = 700;
+  const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [];
+  const stepData = [{"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Pulls Amazon in-box flyer return and issue form submissions captured as HubSpot form entries or contacts.", "impact": "Consolidates scattered customer issue data from Amazon packaging inserts into a single structured source for analysis.", "dataLabel": "Data collected", "chips": ["Customer name", "Order ID", "Issue type", "Return reason", "Product SKU", "Submission date"]}, {"name": "Google Sheets API", "role": "Spreadsheet", "color": "#4285F4", "text": "Syncs each form submission into a Google Sheet with structured columns for trending, filtering, and team analysis.", "impact": "Gives operations and product teams a live, sortable dashboard of customer issues to identify recurring problems and reduce return rates.", "dataLabel": "Records updated", "chips": ["Issue log rows", "Return categories", "SKU frequency", "Date stamps", "Trend data"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

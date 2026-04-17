@@ -200,11 +200,63 @@
     </div>
     <div class="card-body">
       
-          <div style="background:#1c2128;border:1px dashed #30363d;border-radius:10px;
-            padding:24px;text-align:center;">
-            <span style="font-size:12px;color:#4d5561;font-style:italic;">
-              Workflow not yet configured
-            </span>
+          <div class="workflow-track" id="track">
+            
+              <div class="step-box" id="step-0" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(0)">
+                <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Google Ads</div>
+                  <div class="step-role">Ad Platform</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Claude AI</div>
+                  <div class="step-role">AI Model</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#7C3AED;--t-color:#7C3AED;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Gmail</div>
+                  <div class="step-role">Email</div>
+                </div>
+              </div>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+          <div class="detail-panel" id="detailPanel">
+            <div class="detail-top">
+              <div class="detail-dot" id="detailDot"></div>
+              <div class="detail-name" id="detailName"></div>
+              <div class="detail-role-badge" id="detailRole"></div>
+              <div class="detail-step-label" id="detailLabel"></div>
+            </div>
+            <div class="detail-text" id="detailText"></div>
+            <div class="impact-block">
+              <div class="impact-label">&#128161; Impact</div>
+              <div class="impact-text" id="impactText"></div>
+            </div>
+            <div class="data-block">
+              <div class="data-block-label" id="dataBlockLabel">Data collected</div>
+              <div class="chips" id="dataChips"></div>
+            </div>
+          </div>
+          <div class="wf-controls">
+            <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
+            <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
   </div>
@@ -241,9 +293,9 @@
 
 <script>
 
-  const STEPS = 0, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [];
+  const stepData = [{"name": "Google Ads", "role": "Ad Platform", "color": "#4285F4", "text": "Pulls active search ad copy, headlines, descriptions, and performance metrics from the Google Ads account.", "impact": "Provides a complete snapshot of search ad performance without manually navigating the Google Ads interface or building custom reports.", "dataLabel": "Data collected", "chips": ["Headlines", "Descriptions", "CTR", "Quality Score", "Conversion rate", "Ad group"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Benchmarks each ad's copy against performance thresholds, identifies weak performers, and drafts improved headline and description variants.", "impact": "Pinpoints exactly which ads need attention and delivers ready-to-test alternatives, compressing what used to be a full audit cycle into minutes.", "dataLabel": "Analysis produced", "chips": ["Underperforming ads flagged", "Rewrite suggestions", "Keyword alignment notes", "Priority scores"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends the audit report with flagged search ads and recommended copy improvements to the search team.", "impact": "The team gets a prioritized, actionable audit delivered directly to their inbox, enabling faster optimization without scheduling a review session.", "dataLabel": "Email contains", "chips": ["Flagged ad list", "Headline rewrites", "Description rewrites", "Performance comparisons"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
