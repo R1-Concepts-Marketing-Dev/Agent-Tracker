@@ -192,6 +192,8 @@
     </div>
   </div>
 
+  
+
   <!-- Workflow (animated) -->
   <div class="card">
     <div class="card-header">
@@ -207,7 +209,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Dream + Backorder Report</div>
-                  <div class="step-role">Inventory Database</div>
+                  <div class="step-role">Inventory System</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -295,7 +297,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream + Backorder Report", "role": "Inventory Database", "color": "#4B5563", "text": "Ingests the weekly backorder report and enriches each line item with live inventory status from Dream (on hand, on order, in transit).", "impact": "Replaces the current process of a dozen people doing independent lookups, consolidating all inventory status checks into one automated pass.", "dataLabel": "Data collected", "chips": ["Backorder items", "On hand qty", "On order qty", "In transit qty", "Dead-end flags"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Analyzes enriched backorder data, flags dead-end parts with no sourcing path, and generates draft customer communication for each order status.", "impact": "Automatically prioritizes the most critical backorder issues and drafts customer-facing updates, saving hours of manual triage and communication writing.", "dataLabel": "Analysis produced", "chips": ["Dead-end parts flagged", "Draft customer emails", "Status categories", "Priority ranking"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends the enriched backorder report with flagged items and draft customer communications to the relevant team members.", "impact": "Delivers a complete, actionable backorder package ready for review and sending, dramatically reducing the time from report generation to customer communication.", "dataLabel": "Email contains", "chips": ["Enriched backorder report", "Customer draft emails", "Dead-end alerts", "Inventory summary"]}];
+  const stepData = [{"name": "Dream + Backorder Report", "role": "Inventory System", "color": "#4B5563", "text": "Pulls the weekly backorder report and enriches each line item with live inventory status from Dream (on hand, on order, in transit).", "impact": "Replaces a dozen people doing independent lookups by centralizing real-time inventory data against every backordered part automatically.", "dataLabel": "Data collected", "chips": ["Backorder line items", "On-hand quantity", "On-order status", "In-transit ETAs", "Part numbers", "Dead-end flags"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Analyzes enriched backorder data to flag dead-end parts with no sourcing path and drafts customer communication templates for each order status scenario.", "impact": "Surfaces the most critical supply issues instantly and generates ready-to-send customer updates, eliminating hours of manual triage and email drafting.", "dataLabel": "Analysis produced", "chips": ["Dead-end parts flagged", "Draft customer emails", "Status categorization", "Priority alerts"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends the enriched backorder report with flagged issues and draft customer communications to the operations team.", "impact": "Enables the team to immediately act on backorder issues and communicate proactively with customers, dramatically reducing response time.", "dataLabel": "Email contains", "chips": ["Enriched backorder report", "Dead-end alerts", "Draft customer emails", "Inventory status summary"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

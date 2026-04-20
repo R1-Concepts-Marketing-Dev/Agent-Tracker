@@ -192,6 +192,8 @@
     </div>
   </div>
 
+  
+
   <!-- Workflow (animated) -->
   <div class="card">
     <div class="card-header">
@@ -218,8 +220,8 @@
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">DFC Catalog System</div>
-                  <div class="step-role">Inventory Database</div>
+                  <div class="step-platform">DFC Catalog</div>
+                  <div class="step-role">Inventory System</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -307,7 +309,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Web Scraping", "role": "Data Extraction", "color": "#64748B", "text": "Scrapes Gyro Disc, Alcon, and Brembo online catalogs to compile a complete make/model/year reference sheet for two-piece rotors.", "impact": "Eliminates the manual process of visiting multiple supplier websites and copying product data, capturing the full competitive landscape automatically.", "dataLabel": "Data collected", "chips": ["Part numbers", "Vehicle fitment", "Rotor specs", "Supplier source", "Make/model/year"]}, {"name": "DFC Catalog System", "role": "Inventory Database", "color": "#2563EB", "text": "Cross-references scraped competitor rotor data against DFC's existing parts catalog to identify overlaps and coverage gaps.", "impact": "Instantly reveals market opportunities where DFC can expand or compete, replacing hours of manual catalog comparison work.", "dataLabel": "Analysis produced", "chips": ["DFC matches", "Coverage gaps", "Competitor-only parts", "Cross-reference map"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Runs automated outreach to customers to gather demand data for identified rotor applications.", "impact": "Validates market demand before committing to new inventory, ensuring product expansion decisions are backed by real customer interest.", "dataLabel": "Email contains", "chips": ["Customer survey", "Vehicle applications", "Demand inquiry", "Response tracking"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles all scraped data, cross-references, and customer demand responses into one formatted output sheet for Dino.", "impact": "Delivers a single, comprehensive reference document that combines supplier catalogs, DFC inventory status, and demand signals — ready for executive decision-making.", "dataLabel": "Records updated", "chips": ["Master rotor catalog", "Demand data", "Gap analysis", "Supplier comparison", "Formatted for Dino"]}];
+  const stepData = [{"name": "Web Scraping", "role": "Data Extraction", "color": "#64748B", "text": "Scrapes Gyro Disc, Alcon, and Brembo's online catalogs to compile a comprehensive make/model/year reference sheet for two-piece rotors.", "impact": "Automates the tedious process of manually browsing three separate manufacturer websites and compiling fitment data into one source.", "dataLabel": "Data collected", "chips": ["Gyro Disc catalog", "Alcon catalog", "Brembo catalog", "Make/model/year fitment", "Part numbers"]}, {"name": "DFC Catalog", "role": "Inventory System", "color": "#2563EB", "text": "Cross-references the scraped two-piece rotor data against DFC's existing parts catalog to identify overlaps and coverage gaps.", "impact": "Reveals exactly where DFC already competes and where market opportunities exist, without requiring manual catalog comparison.", "dataLabel": "Analysis produced", "chips": ["DFC matching parts", "Coverage gaps", "Competitor-only fitments", "Cross-reference table"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to customers to gather demand data on two-piece rotor applications.", "impact": "Collects real-world demand signals directly from customers to validate which gaps are worth filling, replacing guesswork with data.", "dataLabel": "Email contains", "chips": ["Customer survey", "Vehicle application queries", "Demand interest form", "Response tracking"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles the scraped data, cross-reference results, and customer demand responses into one formatted output sheet for Dino.", "impact": "Delivers a single, decision-ready document that combines competitor intelligence, inventory analysis, and demand data for product planning.", "dataLabel": "Records updated", "chips": ["Compiled catalog", "Demand data", "Gap analysis", "Formatted for Dino"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
