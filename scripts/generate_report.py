@@ -885,10 +885,20 @@ def _full_report_card(agent: dict, steps: list[dict]) -> str:
       border-left:3px solid {accent};overflow:hidden;margin-bottom:12px;">
       <div style="padding:18px 20px 14px;">
 
-        <!-- Name + badge -->
-        <div style="font-size:14px;font-weight:700;color:#e6edf3;margin-bottom:5px;">
-          {agent["name"]}{published_badge}
+        <!-- Top row: name + view details button -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;
+          gap:12px;margin-bottom:5px;">
+          <div style="font-size:14px;font-weight:700;color:#e6edf3;">
+            {agent["name"]}{published_badge}
+          </div>
+          <a href="agents/{slug}.html"
+            style="font-size:11px;font-weight:700;color:#a78bfa;text-decoration:none;
+              padding:4px 12px;border-radius:6px;border:1px solid #3b2d6e;
+              background:#1a0d3a;white-space:nowrap;flex-shrink:0;">
+            View details &#8594;
+          </a>
         </div>
+
         <div style="font-size:11px;color:#8b949e;line-height:1.55;margin-bottom:14px;">
           {desc or "&nbsp;"}
         </div>
@@ -903,17 +913,9 @@ def _full_report_card(agent: dict, steps: list[dict]) -> str:
         <div style="height:1px;background:#161b22;margin:14px 0 12px;"></div>
 
         <!-- Footer -->
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
           <span style="font-size:10px;color:#6e7681;">&#128337; {freq}</span>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <a href="agents/{slug}.html"
-              style="font-size:11px;font-weight:600;color:#8b949e;text-decoration:none;
-                padding:4px 10px;border-radius:6px;border:1px solid #30363d;
-                background:#1c2128;white-space:nowrap;">
-              View details &#8594;
-            </a>
-            {stage_pill}
-          </div>
+          {stage_pill}
         </div>
 
       </div>
