@@ -206,7 +206,7 @@
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Dream (ERP/Catalog)</div>
+                  <div class="step-platform">Dream + Backorder Report</div>
                   <div class="step-role">Inventory System</div>
                 </div>
               </div>
@@ -214,16 +214,16 @@
                 <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Backorder Report</div>
-                  <div class="step-role">Spreadsheet</div>
+                  <div class="step-platform">Claude AI</div>
+                  <div class="step-role">AI Model</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#4B5563;--t-color:#4B5563;"></div>
+                <div class="travel-dot" id="dot-1" style="background:#7C3AED;--t-color:#7C3AED;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-2" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(2)">
@@ -295,7 +295,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream (ERP/Catalog)", "role": "Inventory System", "color": "#4B5563", "text": "Pulls live inventory status data including on-hand quantities, on-order items, and in-transit shipments for backordered parts.", "impact": "Replaces the manual process of a dozen people doing independent inventory lookups by centralizing live data into one automated pull.", "dataLabel": "Data collected", "chips": ["On-hand quantity", "On-order status", "In-transit tracking", "Part numbers", "Source availability"]}, {"name": "Backorder Report", "role": "Spreadsheet", "color": "#4B5563", "text": "Cross-references the weekly backorder report with live inventory data, enriches each line item with current status, and flags dead-end parts with no sourcing option.", "impact": "Transforms a static backorder list into a dynamic, enriched report that instantly shows which orders can be fulfilled and which need escalation.", "dataLabel": "Analysis produced", "chips": ["Enriched backorder lines", "Dead-end part flags", "Fulfillment ETA", "Source status", "Priority ranking"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications for backordered items along with the enriched status report to the team.", "impact": "Automates customer communication drafting and internal reporting, saving hours of repetitive outreach while keeping customers proactively informed.", "dataLabel": "Email contains", "chips": ["Draft customer emails", "Enriched backorder report", "Dead-end alerts", "Status summary"]}];
+  const stepData = [{"name": "Dream + Backorder Report", "role": "Inventory System", "color": "#4B5563", "text": "Ingests the weekly backorder report and enriches each line item with live inventory status — on hand, on order, or in transit — from the Dream system.", "impact": "Replaces the current process of a dozen people doing independent lookups by centralizing all inventory status data into a single enriched report automatically.", "dataLabel": "Data collected", "chips": ["Backorder line items", "On-hand qty", "On-order qty", "In-transit status", "Dead-end flags", "Part numbers"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Flags dead-end parts with no available source, prioritizes critical backorders, and generates draft customer communication for each affected order.", "impact": "Eliminates hours of manual triage and email drafting, ensuring customers are proactively notified and no dead-end part slips through the cracks.", "dataLabel": "Analysis produced", "chips": ["Dead-end part flags", "Priority rankings", "Draft customer emails", "Status summary"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends the enriched backorder report and draft customer communications to the relevant team members for review and dispatch.", "impact": "Accelerates customer response times from days to hours and gives the team ready-to-send messages instead of starting communications from scratch.", "dataLabel": "Email contains", "chips": ["Enriched backorder report", "Draft customer emails", "Dead-end alerts", "Inventory summary"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
