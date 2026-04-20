@@ -338,6 +338,38 @@ NODE_COLORS: dict[str, str] = {
 }
 DEFAULT_NODE_COLOR = "#4B5563"
 
+# ── Metrics tile palette + icon map ───────────────────────────────────────────
+METRIC_PALETTE = ["#3fb950", "#58a6ff", "#e3b341", "#a371f7", "#f78166", "#79c0ff"]
+
+METRIC_ICONS: list[tuple[list[str], str]] = [
+    (["conversion", "convert"],                   "🎯"),
+    (["revenue", "sales", "income", "gmv"],        "💰"),
+    (["roas", "return on ad"],                     "📊"),
+    (["ctr", "click-through", "click through"],    "🖱️"),
+    (["spend", "cost", "budget", "cpc", "cpm"],    "💸"),
+    (["impression", "reach", "view"],              "👁️"),
+    (["lead"],                                     "🧲"),
+    (["order", "purchase"],                        "📦"),
+    (["aov", "average order", "basket"],           "🛒"),
+    (["email", "open rate"],                       "📧"),
+    (["follower", "subscriber", "audience"],       "👥"),
+    (["traffic", "visit", "session", "user"],      "🌐"),
+    (["time", "duration", "hour", "minute"],       "⏱️"),
+    (["rate", "percent"],                          "📐"),
+    (["score", "rating", "nps"],                   "⭐"),
+    (["click"],                                    "🖱️"),
+]
+DEFAULT_METRIC_ICON = "📈"
+
+
+def _metric_icon(label: str) -> str:
+    """Return an emoji that best matches a metric column name."""
+    ll = label.lower()
+    for keywords, icon in METRIC_ICONS:
+        if any(kw in ll for kw in keywords):
+            return icon
+    return DEFAULT_METRIC_ICON
+
 # Stage styles: (text, bg, border)
 STAGE: dict[str, tuple[str, str, str]] = {
     "Completed":   ("#3fb950", "#0d2119", "#238636"),
@@ -1200,19 +1232,36 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
     # ── Metrics section (columns H onwards, only non-empty values) ─────────────
     metrics = agent.get("metrics", {})
     if metrics:
-        metric_tiles = "".join(
-            f'<div class="stat-tile">'
-            f'<div class="stat-label">{label}</div>'
-            f'<div class="stat-value">{value}</div>'
-            f'</div>'
-            for label, value in metrics.items()
-        )
+        metric_tiles = ""
+        for idx, (label, value) in enumerate(metrics.items()):
+            accent    = METRIC_PALETTE[idx % len(METRIC_PALETTE)]
+            tint      = _hex_to_rgba(accent, 0.08)
+            accent_dim = _hex_to_rgba(accent, 0.2)
+            icon      = _metric_icon(label)
+            metric_tiles += (
+                f'<div style="background:#0d1117;border:1px solid #21262d;'
+                f'border-left:3px solid {accent};border-radius:10px;'
+                f'padding:14px 16px;display:flex;align-items:center;gap:14px;">'
+                f'<div style="width:42px;height:42px;border-radius:10px;flex-shrink:0;'
+                f'display:flex;align-items:center;justify-content:center;font-size:19px;'
+                f'background:{tint};border:1px solid {accent_dim};">{icon}</div>'
+                f'<div style="flex:1;min-width:0;">'
+                f'<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;'
+                f'text-transform:uppercase;color:#4d5561;margin-bottom:3px;">{label}</div>'
+                f'</div>'
+                f'<div style="font-size:26px;font-weight:800;color:{accent};white-space:nowrap;'
+                f'flex-shrink:0;">{value}</div>'
+                f'</div>'
+            )
         metrics_section = f"""
   <!-- Metrics -->
   <div class="card">
-    <div class="card-header"><div class="card-label">&#128200; &nbsp;Metrics</div></div>
+    <div class="card-header">
+      <div class="card-label">&#128200; &nbsp;Metrics</div>
+      <span style="font-size:10px;color:#4d5561;">{len(metrics)} data point{"s" if len(metrics) != 1 else ""}</span>
+    </div>
     <div class="card-body">
-      <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
         {metric_tiles}
       </div>
     </div>
@@ -1495,8 +1544,6 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
     </div>
   </div>
 
-  {metrics_section}
-
   <!-- Workflow (animated) -->
   <div class="card">
     <div class="card-header">
@@ -1507,6 +1554,8 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
       {anim_html}
     </div>
   </div>
+
+  {metrics_section}
 
   <!-- Connections -->
   <div class="card">
