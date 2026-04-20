@@ -74,6 +74,9 @@ def _fetch_csv(gid: str) -> list[dict]:
     with urllib.request.urlopen(url) as resp:
         content = resp.read().decode("utf-8")
     reader = csv.DictReader(io.StringIO(content))
+    # Metric columns start at column H (index 7 onwards)
+    all_fields    = reader.fieldnames or []
+    metric_fields = [f for f in all_fields[7:] if f and f.strip()]
     agents = []
     for row in reader:
         agent = {
@@ -82,8 +85,14 @@ def _fetch_csv(gid: str) -> list[dict]:
             "frequency":     row.get("Frequency", "").strip(),
             "connections":   row.get("Connections", "").strip(),
             "description":   row.get("Description", "").strip(),
-            "date_added":      row.get("Date Added", "").strip(),
-            "stage_updated":   row.get("Date Completed", "").strip(),
+            "date_added":    row.get("Date Added", "").strip(),
+            "stage_updated": row.get("Date Completed", "").strip(),
+            # Only include metric columns that have a value for this agent
+            "metrics": {
+                f: row.get(f, "").strip()
+                for f in metric_fields
+                if row.get(f, "").strip()
+            },
         }
         if agent["name"]:
             agent["stage"] = _normalize_stage(agent["stage"])
@@ -1188,6 +1197,29 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
         if freq != "Schedule TBD" else ""
     )
 
+    # ── Metrics section (columns H onwards, only non-empty values) ─────────────
+    metrics = agent.get("metrics", {})
+    if metrics:
+        metric_tiles = "".join(
+            f'<div class="stat-tile">'
+            f'<div class="stat-label">{label}</div>'
+            f'<div class="stat-value">{value}</div>'
+            f'</div>'
+            for label, value in metrics.items()
+        )
+        metrics_section = f"""
+  <!-- Metrics -->
+  <div class="card">
+    <div class="card-header"><div class="card-label">&#128200; &nbsp;Metrics</div></div>
+    <div class="card-body">
+      <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));">
+        {metric_tiles}
+      </div>
+    </div>
+  </div>"""
+    else:
+        metrics_section = ""
+
     # ── JS (built as a separate f-string so CSS in outer f-string stays clean) ─
     script = f"""
   const STEPS = {n}, TRAVEL_MS = 700;
@@ -1462,6 +1494,8 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
       <p style="font-size:15px;line-height:1.8;color:#c9d1d9;">{desc}</p>
     </div>
   </div>
+
+  {metrics_section}
 
   <!-- Workflow (animated) -->
   <div class="card">
