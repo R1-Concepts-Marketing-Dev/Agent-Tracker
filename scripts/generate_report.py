@@ -448,15 +448,18 @@ def _slugify(name: str) -> str:
 
 
 def _parse_connections(raw: str) -> list[str]:
-    """Return a flat ordered list of node names from the connections string."""
+    """Return a flat ordered list of node names from the connections string.
+    Supports -> arrow notation, + grouping, and plain comma separation.
+    """
     if not raw:
         return []
     nodes: list[str] = []
     for part in raw.split("->"):
-        for node in part.split("+"):
-            n = node.strip()
-            if n:
-                nodes.append(n)
+        for subpart in part.split("+"):
+            for node in subpart.split(","):
+                n = node.strip()
+                if n:
+                    nodes.append(n)
     return nodes
 
 
