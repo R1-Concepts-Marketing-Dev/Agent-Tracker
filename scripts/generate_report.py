@@ -891,7 +891,7 @@ def _full_report_card(agent: dict, steps: list[dict]) -> str:
           <div style="font-size:14px;font-weight:700;color:#e6edf3;">
             {agent["name"]}{published_badge}
           </div>
-          <a href="agents/{slug}.html"
+          <a href="agents/{slug}.html" target="_blank" rel="noopener noreferrer"
             style="font-size:11px;font-weight:700;color:#a78bfa;text-decoration:none;
               padding:4px 12px;border-radius:6px;border:1px solid #3b2d6e;
               background:#1a0d3a;white-space:nowrap;flex-shrink:0;">
