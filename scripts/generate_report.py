@@ -813,6 +813,7 @@ def _full_report_card(agent: dict, steps: list[dict]) -> str:
     accent = CARD_BORDER.get(agent["stage"], "#30363d")
     freq   = agent["frequency"] or "Schedule TBD"
     desc   = agent["description"]
+    slug   = _slugify(agent["name"])
 
     is_new          = _is_recent(agent.get("date_added", ""))
     is_stage_updated = _is_recent(agent.get("stage_updated", "")) and not is_new
@@ -902,9 +903,17 @@ def _full_report_card(agent: dict, steps: list[dict]) -> str:
         <div style="height:1px;background:#161b22;margin:14px 0 12px;"></div>
 
         <!-- Footer -->
-        <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <span style="font-size:10px;color:#6e7681;">&#128337; {freq}</span>
-          {stage_pill}
+          <div style="display:flex;align-items:center;gap:8px;">
+            <a href="agents/{slug}.html"
+              style="font-size:11px;font-weight:600;color:#8b949e;text-decoration:none;
+                padding:4px 10px;border-radius:6px;border:1px solid #30363d;
+                background:#1c2128;white-space:nowrap;">
+              View details &#8594;
+            </a>
+            {stage_pill}
+          </div>
         </div>
 
       </div>
