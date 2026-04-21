@@ -219,7 +219,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Google Drive API</div>
-                  <div class="step-role">File Storage</div>
+                  <div class="step-role">Document Storage</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -232,6 +232,18 @@
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Gemini API</div>
                   <div class="step-role">AI Model</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-2"><div class="arrow-track">
+                <div class="travel-dot" id="dot-2" style="background:#64748B;--t-color:#64748B;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-3" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(3)">
+                <div class="step-num">4</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Gmail API</div>
+                  <div class="step-role">Email</div>
                 </div>
               </div>
           </div>
@@ -255,7 +267,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 4</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -295,9 +307,9 @@
 
 <script>
 
-  const STEPS = 3, TRAVEL_MS = 700;
+  const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Gmail API", "role": "Email", "color": "#EA4335", "text": "Monitors Gmail inbox for creator replies and pulls in the full conversation thread for AI analysis.", "impact": "Ensures no creator response is missed and every reply is processed promptly, maintaining momentum in partnership negotiations.", "dataLabel": "Data collected", "chips": ["Reply content", "Thread history", "Creator name", "Timestamp", "Conversation stage"]}, {"name": "Google Drive API", "role": "File Storage", "color": "#4285F4", "text": "Retrieves historical influencer email conversations and negotiation patterns from Google Drive to inform AI response generation.", "impact": "Leverages institutional knowledge from past successful negotiations so the AI responds with proven strategies and appropriate terms.", "dataLabel": "Data collected", "chips": ["Past negotiations", "Successful terms", "Conversation patterns", "Rate benchmarks", "Objection handling"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Generates context-aware reply emails using learned negotiation tactics, conversation history, and creator-specific deal parameters.", "impact": "Handles ongoing creator negotiations intelligently and at scale, maintaining professional and strategic conversations without constant human drafting.", "dataLabel": "Content produced", "chips": ["Negotiation reply", "Counter-offer terms", "Tone matching", "Deal parameters", "Follow-up actions"]}];
+  const stepData = [{"name": "Gmail API", "role": "Email", "color": "#EA4335", "text": "Monitors the inbox for creator replies to outreach emails, capturing response content, sentiment, and conversation thread context.", "impact": "Ensures no creator response is missed and provides the AI with full conversation history for contextually accurate follow-ups.", "dataLabel": "Data collected", "chips": ["Reply content", "Creator name", "Thread history", "Response timestamp", "Sentiment signal"]}, {"name": "Google Drive API", "role": "Document Storage", "color": "#4285F4", "text": "Retrieves historical influencer negotiation emails, conversation patterns, and approved deal terms from Google Drive to guide the AI response strategy.", "impact": "Grounds every AI reply in real negotiation precedent, ensuring responses align with proven strategies and approved partnership terms.", "dataLabel": "Data collected", "chips": ["Past negotiation emails", "Deal term templates", "Approved rate ranges", "Conversation playbooks", "Escalation rules"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Drafts contextual reply emails using learned negotiation tactics, previous conversation history, and approved deal parameters to advance the creator relationship.", "impact": "Handles multi-turn creator negotiations autonomously, reducing the team's email workload while maintaining strategic consistency across all creator conversations.", "dataLabel": "Content produced", "chips": ["Negotiation reply draft", "Counter-offer language", "Deal terms proposed", "Tone adjustment", "Escalation recommendation"]}, {"name": "Gmail API", "role": "Email", "color": "#EA4335", "text": "Sends the AI-drafted negotiation reply within the existing email thread and logs the interaction for future learning.", "impact": "Keeps creator conversations moving without delays, ensuring timely responses that maintain creator interest and accelerate deal closure.", "dataLabel": "Email contains", "chips": ["Reply body", "Thread continuation", "Send timestamp", "Negotiation status", "Next step CTA"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
