@@ -93,53 +93,95 @@ def _fetch_csv(gid: str) -> list[dict]:
     return agents
 
 
-def _fetch_agent_metrics(sheet_url: str) -> dict:
-    """
-    Fetch metrics from a linked Google Sheet.
-    Expects two columns: col A = metric name, col B = value.
-    Skips header rows where the first cell looks like a label (e.g. "Metric").
-    Converts share/edit URLs to CSV export format automatically.
-    Returns {name: value} dict for non-empty rows only.
-    """
+def _sheet_url_to_csv(sheet_url: str) -> str | None:
+    """Convert any Google Sheets URL to a CSV export URL. Returns None if unparseable."""
     import re as _re
-    if not sheet_url:
-        return {}
-
     match = _re.search(r'/spreadsheets/d/([a-zA-Z0-9_-]+)', sheet_url)
     if not match:
-        print(f"   ⚠️  Could not parse sheet ID from: {sheet_url}")
-        return {}
-
+        return None
     sheet_id  = match.group(1)
     gid_match = _re.search(r'[#&?]gid=(\d+)', sheet_url)
     gid       = gid_match.group(1) if gid_match else "0"
-    csv_url   = (
+    return (
         f"https://docs.google.com/spreadsheets/d/{sheet_id}"
         f"/export?format=csv&gid={gid}"
     )
 
-    try:
-        with urllib.request.urlopen(csv_url) as resp:
-            content = resp.read().decode("utf-8")
-    except Exception as e:
-        print(f"   ⚠️  Could not fetch metrics sheet ({e}): {sheet_url}")
+
+def _fetch_and_parse_metrics(sheet_url: str, client) -> dict:
+    """
+    Fetch a metrics Google Sheet and use Claude to parse it into a normalized dict.
+    Works with any sheet layout — two-column, time-series, or anything else.
+
+    Returns:
+        {
+          "Metric Name": {
+            "value": "current/most recent value",
+            "total": "YTD or cumulative total, or null",
+            "delta": "MoM change e.g. '+12%', or null"
+          },
+          ...
+        }
+    """
+    if not sheet_url:
         return {}
 
-    metrics = {}
-    reader  = csv.reader(io.StringIO(content))
-    for row in reader:
-        if len(row) < 2:
-            continue
-        name  = row[0].strip()
-        value = row[1].strip()
-        # Skip blank rows and any header row (e.g. "Metric" / "Value")
-        if not name or not value:
-            continue
-        if name.lower() in {"metric", "name", "label", "key"}:
-            continue
-        metrics[name] = value
+    csv_url = _sheet_url_to_csv(sheet_url)
+    if not csv_url:
+        print(f"   ⚠️  Could not parse sheet ID from: {sheet_url}")
+        return {}
 
-    return metrics
+    try:
+        with urllib.request.urlopen(csv_url) as resp:
+            csv_text = resp.read().decode("utf-8")
+    except Exception as e:
+        print(f"   ⚠️  Could not fetch metrics sheet ({e})")
+        return {}
+
+    if not csv_text.strip():
+        return {}
+
+    prompt = f"""You are parsing a metrics spreadsheet for an AI automation agent.
+The sheet may use any layout — two-column list, time-series by month, or anything else.
+Extract all meaningful metrics and return ONLY valid JSON — no explanation, no markdown.
+
+Return this exact structure:
+{{
+  "Metric Name": {{
+    "value": "most recent or current value as a clean human-readable string",
+    "total": "YTD or cumulative total if present or calculable, else null",
+    "delta": "MoM or period-over-period change if available (e.g. '+12%' or '-3%'), else null"
+  }}
+}}
+
+Rules:
+- Time-series sheets: use the most recent non-empty data row for "value"
+- If a Total or YTD row exists, use it for "total"; if data can be summed, sum it
+- Pair MoM %/change columns with their parent metric as "delta" — not as standalone metrics
+- Skip YoY, QoQ, and other secondary derived columns entirely
+- Skip columns that are fully empty
+- Format numbers cleanly: "24,310" not "24310.0", "7.6%" not "0.076"
+- Keep metric names concise and human-readable (strip redundant words like "Est.")
+- For rate/average metrics (CTR, Avg Position, etc.) "total" should be the period average, not a sum
+
+CSV data:
+{csv_text}"""
+
+    try:
+        msg = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=1000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = msg.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = "\n".join(raw.split("\n")[1:])
+        if raw.endswith("```"):
+            raw = "\n".join(raw.split("\n")[:-1])
+        return json.loads(raw.strip())
+    except Exception as e:
+        print(f"   ⚠️  Claude could not parse metrics ({e})")
+        return {}
 
 
 def fetch_sheet_data() -> list[dict]:
@@ -1271,15 +1313,60 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
         if freq != "Schedule TBD" else ""
     )
 
-    # ── Metrics section (columns H onwards, only non-empty values) ─────────────
+    # ── Metrics section ────────────────────────────────────────────────────────
     metrics = agent.get("metrics", {})
     if metrics:
         metric_tiles = ""
-        for idx, (label, value) in enumerate(metrics.items()):
-            accent    = METRIC_PALETTE[idx % len(METRIC_PALETTE)]
-            tint      = _hex_to_rgba(accent, 0.08)
+        for idx, (label, entry) in enumerate(metrics.items()):
+            # Support both old {name: str} and new {name: {value, total, delta}} formats
+            if isinstance(entry, dict):
+                value = entry.get("value", "")
+                total = entry.get("total", None)
+                delta = entry.get("delta", None)
+            else:
+                value = entry
+                total = None
+                delta = None
+
+            accent     = METRIC_PALETTE[idx % len(METRIC_PALETTE)]
+            tint       = _hex_to_rgba(accent, 0.08)
             accent_dim = _hex_to_rgba(accent, 0.2)
-            icon      = _metric_icon(label)
+            icon       = _metric_icon(label)
+
+            # Delta badge (MoM %)
+            delta_html = ""
+            if delta:
+                import re as _re2
+                num_match = _re2.search(r'[-+]?\d+\.?\d*', delta.replace(",", ""))
+                is_positive = "+" in delta or (
+                    num_match and float(num_match.group()) > 0
+                )
+                is_negative = "-" in delta or (
+                    num_match and float(num_match.group()) < 0
+                )
+                d_color = "#3fb950" if is_positive else ("#f78166" if is_negative else "#8b949e")
+                arrow   = "▲" if is_positive else ("▼" if is_negative else "●")
+                delta_html = (
+                    f'<div style="font-size:10px;font-weight:600;color:{d_color};'
+                    f'margin-top:3px;">{arrow} {delta} MoM</div>'
+                )
+
+            # Total display (below delta in the middle column)
+            total_html = ""
+            if total:
+                total_html = (
+                    f'<div style="font-size:10px;color:#4d5561;margin-top:2px;">'
+                    f'Total: <span style="color:#6e7681;font-weight:500;">{total}</span></div>'
+                )
+
+            # Right side: big current value + small "This Month" label if total present
+            value_label = (
+                '<div style="font-size:9px;color:#4d5561;font-weight:600;'
+                'letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;'
+                'text-align:right;">This Month</div>'
+                if total else ""
+            )
+
             metric_tiles += (
                 f'<div style="background:#0d1117;border:1px solid #21262d;'
                 f'border-left:3px solid {accent};border-radius:10px;'
@@ -1290,9 +1377,14 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
                 f'<div style="flex:1;min-width:0;">'
                 f'<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;'
                 f'text-transform:uppercase;color:#4d5561;margin-bottom:3px;">{label}</div>'
+                f'{delta_html}'
+                f'{total_html}'
                 f'</div>'
-                f'<div style="font-size:26px;font-weight:800;color:{accent};white-space:nowrap;'
-                f'flex-shrink:0;">{value}</div>'
+                f'<div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;">'
+                f'<div style="font-size:26px;font-weight:800;color:{accent};'
+                f'white-space:nowrap;line-height:1;">{value}</div>'
+                f'{value_label}'
+                f'</div>'
                 f'</div>'
             )
         metrics_section = f"""
@@ -1653,20 +1745,32 @@ def send_email(html: str, week_str: str) -> None:
 # ── Workflow cache (save/load so refresh runs don't need Claude) ───────────────
 WORKFLOW_CACHE_PATH = "docs/workflow_cache.json"
 
-def save_workflow_cache(workflow_map: dict) -> None:
+def save_workflow_cache(workflow_map: dict, metrics_map: dict = None) -> None:
     os.makedirs("docs", exist_ok=True)
+    cache = {
+        "workflows": workflow_map,
+        "metrics":   metrics_map or {},
+    }
     with open(WORKFLOW_CACHE_PATH, "w", encoding="utf-8") as f:
-        json.dump(workflow_map, f, indent=2)
-    print(f"   💾 Workflow cache saved ({len(workflow_map)} agents)")
+        json.dump(cache, f, indent=2)
+    print(f"   💾 Cache saved ({len(workflow_map)} workflows, {len(metrics_map or {})} metrics)")
 
-def load_workflow_cache() -> dict:
+
+def load_workflow_cache() -> tuple[dict, dict]:
     if os.path.exists(WORKFLOW_CACHE_PATH):
         with open(WORKFLOW_CACHE_PATH, encoding="utf-8") as f:
             data = json.load(f)
-        print(f"   📂 Loaded workflow cache ({len(data)} agents)")
-        return data
-    print("   ⚠️  No workflow cache found — pages will show placeholder workflow")
-    return {}
+        # Backward-compat: old format was a flat {agent_name: [steps]} dict
+        if "workflows" in data:
+            workflows = data["workflows"]
+            metrics   = data.get("metrics", {})
+        else:
+            workflows = data
+            metrics   = {}
+        print(f"   📂 Loaded cache ({len(workflows)} workflows, {len(metrics)} metrics)")
+        return workflows, metrics
+    print("   ⚠️  No cache found — pages will show placeholder workflow")
+    return {}, {}
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
@@ -1679,23 +1783,17 @@ def main() -> None:
     agents = fetch_sheet_data()
     print(f"   Found {len(agents)} agents")
 
-    print("📊 Fetching metrics from linked sheets...")
-    metrics_fetched = 0
-    for agent in agents:
-        link = agent.get("metric_link", "")
-        if link:
-            agent["metrics"] = _fetch_agent_metrics(link)
-            if agent["metrics"]:
-                metrics_fetched += 1
-                print(f"   {agent['name']}: {len(agent['metrics'])} metric(s)")
-    print(f"   ✅ Metrics fetched for {metrics_fetched} agent(s)")
-
     if refresh_only:
-        # ── Refresh mode: no Claude, no email ──────────────────────────────
+        # ── Refresh mode: load everything from cache, no Claude, no email ──
         print("🔄 Refresh-only mode — skipping Claude calls and email")
 
-        print("📂 Loading cached workflow steps...")
-        workflow_map = load_workflow_cache()
+        print("📂 Loading cached workflow steps and metrics...")
+        workflow_map, metrics_map = load_workflow_cache()
+
+        # Apply cached metrics to agents
+        for agent in agents:
+            if agent["name"] in metrics_map:
+                agent["metrics"] = metrics_map[agent["name"]]
 
         print("🏗️  Building full report (GitHub Pages)...")
         new_rows, stage_changes = detect_changes(agents)
@@ -1737,8 +1835,21 @@ def main() -> None:
         workflow_map = generate_workflow_steps(agents)
         print(f"   Generated workflows for {len(workflow_map)} agent(s)")
 
-        print("💾 Saving workflow cache for refresh runs...")
-        save_workflow_cache(workflow_map)
+        print("📊 Fetching and parsing agent metrics with Claude...")
+        metrics_map = {}
+        metrics_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        for agent in agents:
+            link = agent.get("metric_link", "")
+            if link:
+                parsed = _fetch_and_parse_metrics(link, metrics_client)
+                if parsed:
+                    agent["metrics"] = parsed
+                    metrics_map[agent["name"]] = parsed
+                    print(f"   {agent['name']}: {len(parsed)} metric(s)")
+        print(f"   ✅ Metrics parsed for {len(metrics_map)} agent(s)")
+
+        print("💾 Saving cache (workflows + metrics) for refresh runs...")
+        save_workflow_cache(workflow_map, metrics_map)
 
         print("🏗️  Building email (simplified)...")
         email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
