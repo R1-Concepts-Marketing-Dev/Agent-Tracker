@@ -74,9 +74,6 @@ def _fetch_csv(gid: str) -> list[dict]:
     with urllib.request.urlopen(url) as resp:
         content = resp.read().decode("utf-8")
     reader = csv.DictReader(io.StringIO(content))
-    # Metric columns start at column H (index 7 onwards)
-    all_fields    = reader.fieldnames or []
-    metric_fields = [f for f in all_fields[7:] if f and f.strip()]
     agents = []
     for row in reader:
         agent = {
@@ -87,17 +84,62 @@ def _fetch_csv(gid: str) -> list[dict]:
             "description":   row.get("Description", "").strip(),
             "date_added":    row.get("Date Added", "").strip(),
             "stage_updated": row.get("Date Completed", "").strip(),
-            # Only include metric columns that have a value for this agent
-            "metrics": {
-                f: row.get(f, "").strip()
-                for f in metric_fields
-                if row.get(f, "").strip()
-            },
+            "metric_link":   row.get("Metric Link", "").strip(),
+            "metrics":       {},   # populated later by _fetch_agent_metrics
         }
         if agent["name"]:
             agent["stage"] = _normalize_stage(agent["stage"])
             agents.append(agent)
     return agents
+
+
+def _fetch_agent_metrics(sheet_url: str) -> dict:
+    """
+    Fetch metrics from a linked Google Sheet.
+    Expects two columns: col A = metric name, col B = value.
+    Skips header rows where the first cell looks like a label (e.g. "Metric").
+    Converts share/edit URLs to CSV export format automatically.
+    Returns {name: value} dict for non-empty rows only.
+    """
+    import re as _re
+    if not sheet_url:
+        return {}
+
+    match = _re.search(r'/spreadsheets/d/([a-zA-Z0-9_-]+)', sheet_url)
+    if not match:
+        print(f"   ⚠️  Could not parse sheet ID from: {sheet_url}")
+        return {}
+
+    sheet_id  = match.group(1)
+    gid_match = _re.search(r'[#&?]gid=(\d+)', sheet_url)
+    gid       = gid_match.group(1) if gid_match else "0"
+    csv_url   = (
+        f"https://docs.google.com/spreadsheets/d/{sheet_id}"
+        f"/export?format=csv&gid={gid}"
+    )
+
+    try:
+        with urllib.request.urlopen(csv_url) as resp:
+            content = resp.read().decode("utf-8")
+    except Exception as e:
+        print(f"   ⚠️  Could not fetch metrics sheet ({e}): {sheet_url}")
+        return {}
+
+    metrics = {}
+    reader  = csv.reader(io.StringIO(content))
+    for row in reader:
+        if len(row) < 2:
+            continue
+        name  = row[0].strip()
+        value = row[1].strip()
+        # Skip blank rows and any header row (e.g. "Metric" / "Value")
+        if not name or not value:
+            continue
+        if name.lower() in {"metric", "name", "label", "key"}:
+            continue
+        metrics[name] = value
+
+    return metrics
 
 
 def fetch_sheet_data() -> list[dict]:
@@ -1636,6 +1678,17 @@ def main() -> None:
     print("📥 Fetching Google Sheet data...")
     agents = fetch_sheet_data()
     print(f"   Found {len(agents)} agents")
+
+    print("📊 Fetching metrics from linked sheets...")
+    metrics_fetched = 0
+    for agent in agents:
+        link = agent.get("metric_link", "")
+        if link:
+            agent["metrics"] = _fetch_agent_metrics(link)
+            if agent["metrics"]:
+                metrics_fetched += 1
+                print(f"   {agent['name']}: {len(agent['metrics'])} metric(s)")
+    print(f"   ✅ Metrics fetched for {metrics_fetched} agent(s)")
 
     if refresh_only:
         # ── Refresh mode: no Claude, no email ──────────────────────────────
