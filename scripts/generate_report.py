@@ -822,7 +822,7 @@ def build_email_html(
       <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
         <tr>
           <td align="center">
-            <a href="https://ben-westreich.github.io/Agent-Tracker/"
+            <a href="https://r1-concepts-marketing-dev.github.io/Agent-Tracker/"
               style="display:inline-block;background:#1a1040;
                 color:#fff;font-size:13px;font-weight:700;text-decoration:none;
                 padding:14px 40px;border-radius:50px;letter-spacing:0.3px;
