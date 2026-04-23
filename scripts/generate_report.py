@@ -1773,15 +1773,90 @@ def load_workflow_cache() -> tuple[dict, dict]:
     return {}, {}
 
 
+# ── Self-metrics writer ────────────────────────────────────────────────────────
+SELF_METRICS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1j5xWfZOo8wgC1E-yoiQlTikz2ateGQ1SYjgtKGLfRPA/edit?gid=0#gid=0"
+
+def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> None:
+    """
+    Write Agent Tracker self-metrics to the tracking sheet.
+    Writes to fixed cells:
+      B2 — Total agents tracked
+      B3 — Total completed
+      B4 — Total in progress
+      B5 — Total planned
+      B6 — Reports created (running total; only incremented when increment_reports=True,
+           i.e. on full weekly runs when an email is actually sent)
+
+    Requires GOOGLE_SERVICE_ACCOUNT_JSON secret (service account with
+    Editor access to the metrics sheet).
+    """
+    sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+    if not sa_json:
+        print("   ⚠️  GOOGLE_SERVICE_ACCOUNT_JSON not set — skipping self-metrics write")
+        return
+
+    try:
+        import gspread
+        from google.oauth2.service_account import Credentials
+
+        creds = Credentials.from_service_account_info(
+            json.loads(sa_json),
+            scopes=["https://www.googleapis.com/auth/spreadsheets"],
+        )
+        gc = gspread.authorize(creds)
+
+        import re as _re
+        match    = _re.search(r'/spreadsheets/d/([a-zA-Z0-9_-]+)', SELF_METRICS_SHEET_URL)
+        sheet_id = match.group(1) if match else ""
+        ws       = gc.open_by_key(sheet_id).get_worksheet(0)
+
+        total     = len(agents)
+        completed = sum(1 for a in agents if a["stage"] == "Completed")
+        in_prog   = sum(1 for a in agents if a["stage"] == "In Progress")
+        planned   = sum(1 for a in agents if a["stage"] == "Planned")
+
+        updates = [
+            {"range": "B2", "values": [[total]]},
+            {"range": "B3", "values": [[completed]]},
+            {"range": "B4", "values": [[in_prog]]},
+            {"range": "B5", "values": [[planned]]},
+        ]
+
+        if increment_reports:
+            raw = ws.acell("B6").value or "0"
+            try:
+                reports = int(str(raw).replace(",", "").strip()) + 1
+            except ValueError:
+                reports = 1
+            updates.append({"range": "B6", "values": [[reports]]})
+            print(f"   ✅ Self-metrics written — {total} agents, {reports} reports total")
+        else:
+            print(f"   ✅ Self-metrics written — {total} agents (counts only, B6 unchanged)")
+
+        ws.batch_update(updates)
+
+    except Exception as e:
+        print(f"   ⚠️  Could not write self-metrics ({e})")
+
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 def main() -> None:
-    # REFRESH_ONLY=true  → rebuild pages only, no Claude calls, no email
-    refresh_only = os.environ.get("REFRESH_ONLY", "false").lower() == "true"
+    # REFRESH_ONLY=true       → rebuild pages only, no Claude calls, no email
+    # SELF_METRICS_ONLY=true  → update agent counts in tracking sheet only, nothing else
+    refresh_only       = os.environ.get("REFRESH_ONLY",       "false").lower() == "true"
+    self_metrics_only  = os.environ.get("SELF_METRICS_ONLY",  "false").lower() == "true"
     week_str = datetime.datetime.now().strftime("%B %d, %Y")
 
     print("📥 Fetching Google Sheet data...")
     agents = fetch_sheet_data()
     print(f"   Found {len(agents)} agents")
+
+    if self_metrics_only:
+        # ── Daily self-metrics mode: counts only, no email increment ───────
+        print("📊 Self-metrics-only mode — updating agent counts...")
+        _write_self_metrics(agents, increment_reports=False)
+        print("✅ Done!")
+        return
 
     if refresh_only:
         # ── Refresh mode: load everything from cache, no Claude, no email ──
@@ -1871,6 +1946,9 @@ def main() -> None:
             with open(f"docs/agents/{slug}.html", "w", encoding="utf-8") as f:
                 f.write(page_html)
         print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
+
+        print("📊 Writing self-metrics to Agent Tracker sheet...")
+        _write_self_metrics(agents)
 
         print("📧 Sending email...")
         send_email(email_html, week_str)
