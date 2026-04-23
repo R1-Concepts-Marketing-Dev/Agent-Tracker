@@ -1,9 +1,9 @@
-name: Weekly Agent Pipeline Report
+name: Daily Agent Pipeline Report
 
 on:
-  # Every Friday at 12:00 PM PST (20:00 UTC)
+  # Every day at 12:00 PM PST (20:00 UTC)
   schedule:
-    - cron: '0 20 * * 5'
+    - cron: '0 20 * * *'
 
   # Allow manual trigger from the Actions tab for testing
   workflow_dispatch:
@@ -49,7 +49,8 @@ jobs:
           ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
           GMAIL_ADDRESS:      ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          RECIPIENT_EMAIL:    ${{ secrets.RECIPIENT_EMAIL }}
+          RECIPIENT_EMAIL:             ${{ secrets.RECIPIENT_EMAIL }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: python scripts/generate_report.py
 
       # 6. Commit the updated HTML report for GitHub Pages
