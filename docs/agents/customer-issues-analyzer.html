@@ -136,7 +136,7 @@
 <!-- Nav -->
 <nav class="topnav">
   <div style="display:flex;align-items:center;gap:20px;">
-    <a href="../../index.html" class="back-btn">
+    <a href="../index.html" class="back-btn">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
         <path d="M7.78 12.53a.75.75 0 01-1.06 0L2.47 8.28a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L4.81 7h7.44a.75.75 0 010 1.5H4.81l2.97 2.97a.75.75 0 010 1.06z"/>
       </svg>
@@ -285,7 +285,7 @@
 
   const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Retrieves Amazon in-box flyer return and issue form submissions that customers have filed through HubSpot.", "impact": "Captures every product return and issue report automatically, ensuring no customer feedback is lost and creating a complete dataset for trend analysis.", "dataLabel": "Data collected", "chips": ["Submission date", "Customer info", "Order number", "Issue type", "Return reason", "Product SKU"]}, {"name": "Google Sheets API", "role": "Spreadsheet", "color": "#4285F4", "text": "Syncs each submission into a structured Google Sheet with categorized columns for issue type, product, date, and resolution status.", "impact": "Provides the operations team with a real-time, filterable dashboard of customer issues, enabling rapid identification of recurring product defects or fulfillment problems.", "dataLabel": "Records updated", "chips": ["Issue log rows", "Product categories", "Trend indicators", "Date stamps", "Resolution status"]}];
+  const stepData = [{"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Pulls Amazon in-box flyer return and issue form submissions captured as HubSpot form entries, extracting customer details, issue types, and product references.", "impact": "Aggregates all Amazon return and issue data from HubSpot in one place, eliminating the need to manually search and export scattered form submissions.", "dataLabel": "Data collected", "chips": ["Customer name", "Order ID", "Issue type", "Product SKU", "Submission date", "Return reason"]}, {"name": "Google Sheets API", "role": "Spreadsheet", "color": "#4285F4", "text": "Syncs the extracted issue data into a structured Google Sheet with categorized columns for trend analysis, filtering, and team review.", "impact": "Gives the team a live, filterable dashboard of customer issues that enables quick pattern detection (e.g., recurring defects or shipping problems) and data-driven decision-making.", "dataLabel": "Records updated", "chips": ["Issue log rows", "Category columns", "Date filters", "SKU breakdown", "Return trends"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
