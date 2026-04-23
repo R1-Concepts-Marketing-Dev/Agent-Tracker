@@ -206,7 +206,7 @@
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Microsoft Teams</div>
+                  <div class="step-platform">Teams</div>
                   <div class="step-role">Communication</div>
                 </div>
               </div>
@@ -274,6 +274,18 @@
   </div>
 
   
+  <!-- Metrics -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-label">&#128200; &nbsp;Metrics</div>
+      <span style="font-size:10px;color:#4d5561;">1 data point</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;">
+        <div style="background:#0d1117;border:1px solid #21262d;border-left:3px solid #3fb950;border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;"><div style="width:42px;height:42px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;background:rgba(63,185,80,0.08);border:1px solid rgba(63,185,80,0.2);">📈</div><div style="flex:1;min-width:0;"><div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#4d5561;margin-bottom:3px;">Tasks Created</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;"><div style="font-size:26px;font-weight:800;color:#3fb950;white-space:nowrap;line-height:1;">17</div></div></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Connections -->
   <div class="card">
@@ -309,7 +321,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Microsoft Teams", "role": "Communication", "color": "#6264A7", "text": "Captures meeting transcripts and notes from media-related Teams meetings, extracting discussion points and decisions.", "impact": "Ensures nothing discussed in media meetings is lost or forgotten, eliminating reliance on manual note-taking during fast-paced calls.", "dataLabel": "Data collected", "chips": ["Meeting Transcript", "Attendees", "Discussion Topics", "Decisions Made", "Meeting Date"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Forwards the raw meeting notes and any supplementary context via email to the processing pipeline.", "impact": "Creates a reliable handoff of meeting content into the automation workflow, ensuring all context is preserved for task extraction.", "dataLabel": "Data forwarded", "chips": ["Meeting Notes", "Email Thread Context", "Follow-Up Mentions", "Participant Names"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Analyzes the meeting content to identify action items, assign owners, set deadlines, and format them as structured tasks.", "impact": "Automatically converts meeting discussions into clearly defined tasks with owners and due dates, removing the bottleneck of someone manually writing up follow-ups.", "dataLabel": "Analysis produced", "chips": ["Extracted Action Items", "Assigned Owners", "Suggested Deadlines", "Task Descriptions", "Priority Levels"]}, {"name": "Asana", "role": "Project Management", "color": "#F06A6A", "text": "Creates new tasks in Asana with the extracted action items, assignees, due dates, and relevant meeting context.", "impact": "Meeting follow-ups are instantly tracked in Asana with full accountability, ensuring nothing slips through the cracks between discussion and execution.", "dataLabel": "Records created", "chips": ["New Tasks", "Assignee Fields", "Due Dates", "Task Descriptions", "Project Assignment"]}];
+  const stepData = [{"name": "Teams", "role": "Communication", "color": "#6264A7", "text": "Captures meeting notes, transcripts, or recordings from media team meetings in Microsoft Teams.", "impact": "Ensures no action items or decisions are lost by automatically pulling meeting content right after it happens.", "dataLabel": "Data collected", "chips": ["Meeting Transcript", "Attendees", "Discussion Topics", "Decisions Made"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Forwards the meeting content to the processing pipeline for AI analysis.", "impact": "Bridges the Teams and AI systems seamlessly so the workflow continues without manual file transfers.", "dataLabel": "Data relayed", "chips": ["Raw Notes", "Meeting Metadata", "Participant List", "Agenda Items"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Extracts action items, owners, and deadlines from the meeting content and structures them as tasks.", "impact": "Converts unstructured meeting discussions into clear, assignable tasks in seconds instead of requiring someone to manually parse notes.", "dataLabel": "Analysis produced", "chips": ["Action Items", "Assigned Owners", "Due Dates", "Priority Levels"]}, {"name": "Asana", "role": "Project Management", "color": "#F06A6A", "text": "Creates new tasks in Asana with the extracted action items, assignees, and deadlines.", "impact": "Guarantees every meeting commitment is tracked and assigned, closing the gap between discussion and execution.", "dataLabel": "Records updated", "chips": ["New Tasks Created", "Assignees Set", "Due Dates Applied", "Project Linked"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
