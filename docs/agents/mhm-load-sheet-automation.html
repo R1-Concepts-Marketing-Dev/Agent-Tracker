@@ -214,24 +214,24 @@
                 <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#6264A7;--glow-color:rgba(98,100,167,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Microsoft Teams</div>
-                  <div class="step-role">Communication</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#6264A7;--t-color:#6264A7;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">HubSpot API</div>
                   <div class="step-role">Email Platform</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#FF7A59;--t-color:#FF7A59;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#6264A7;--glow-color:rgba(98,100,167,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Microsoft Teams</div>
+                  <div class="step-role">Communication</div>
                 </div>
               </div>
           </div>
@@ -297,7 +297,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Pulls MHM vehicle data and the New Availability Guide, then matches vehicle part numbers against available inventory to identify eligible products.", "impact": "Eliminates hours of manual VLOOKUP matching each week, ensuring no eligible parts are missed and the load sheet is always accurate.", "dataLabel": "Data collected", "chips": ["MHM vehicle list", "Part numbers", "Availability Guide", "Matched products", "Pricing data"]}, {"name": "Microsoft Teams", "role": "Communication", "color": "#6264A7", "text": "Monitors Teams channels for updated vehicle data or sales sheet files needed for the weekly load sheet build.", "impact": "Removes the need to manually check Teams for new files, ensuring the automation always uses the latest inputs without human intervention.", "dataLabel": "Files received", "chips": ["Sales sheet uploads", "Vehicle updates", "File timestamps"]}, {"name": "HubSpot API", "role": "Email Platform", "color": "#FF7A59", "text": "Generates the Must Have Monday marketing email in HubSpot, attaches the formatted load sheet and sales sheet, and schedules the send.", "impact": "Delivers a polished, data-driven MHM email to the distribution list every Monday without manual email creation, saving 1-2 hours per week.", "dataLabel": "Email contains", "chips": ["Load sheet attachment", "Sales sheet PDF", "Vehicle highlights", "Send schedule", "Recipient list"]}];
+  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Pulls MHM vehicle data and the New Availability Guide, then matches vehicle part numbers against available inventory to identify qualifying products.", "impact": "Eliminates hours of manual cross-referencing between vehicle data and availability guides, ensuring accurate weekly load sheets every time.", "dataLabel": "Data collected", "chips": ["MHM vehicle list", "Part numbers", "New Availability Guide", "Matched products", "Inventory status"]}, {"name": "HubSpot API", "role": "Email Platform", "color": "#FF7A59", "text": "Generates the weekly Must Have Monday email in HubSpot, attaching the formatted load sheet and corresponding sales sheet, then schedules and sends the campaign.", "impact": "Automates the entire email creation and distribution process, guaranteeing consistent Monday sends with accurate product data and professional formatting.", "dataLabel": "Email contains", "chips": ["Load sheet attachment", "Sales sheet PDF", "Vehicle product details", "Recipient list", "Send schedule"]}, {"name": "Microsoft Teams", "role": "Communication", "color": "#6264A7", "text": "Posts a confirmation notification to the relevant Teams channel with a summary of the load sheet and email send status.", "impact": "Keeps the sales and marketing team informed in real time without manual follow-up, enabling quick review and issue escalation.", "dataLabel": "Notification sent", "chips": ["Send confirmation", "Load sheet summary", "Vehicle count", "Email status"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
