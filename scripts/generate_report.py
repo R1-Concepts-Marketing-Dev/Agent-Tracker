@@ -1360,6 +1360,10 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
                     f'Total: <span style="color:#6e7681;font-weight:500;">{total}</span></div>'
                 )
 
+            # Scale font size based on value length so long numbers don't overflow
+            vlen = len(str(value))
+            val_font = "26px" if vlen <= 5 else ("21px" if vlen <= 8 else "17px")
+
             # Right side: big current value + small "This Month" label if total present
             value_label = (
                 '<div style="font-size:9px;color:#4d5561;font-weight:600;'
@@ -1381,9 +1385,9 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
                 f'{delta_html}'
                 f'{total_html}'
                 f'</div>'
-                f'<div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;">'
-                f'<div style="font-size:26px;font-weight:800;color:{accent};'
-                f'white-space:nowrap;line-height:1;">{value}</div>'
+                f'<div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;max-width:45%;">'
+                f'<div style="font-size:{val_font};font-weight:800;color:{accent};'
+                f'white-space:nowrap;line-height:1;text-align:right;">{value}</div>'
                 f'{value_label}'
                 f'</div>'
                 f'</div>'
