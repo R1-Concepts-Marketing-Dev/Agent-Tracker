@@ -21,11 +21,12 @@ from email.mime.text import MIMEText
 import anthropic
 
 # ── Configuration ──────────────────────────────────────────────────────────────
+# Use .get() for keys not required in all modes (e.g. SELF_METRICS_ONLY skips Claude + email)
 SHEET_ID           = os.environ["GOOGLE_SHEET_ID"]
-ANTHROPIC_API_KEY  = os.environ["ANTHROPIC_API_KEY"]
-GMAIL_ADDRESS      = os.environ["GMAIL_ADDRESS"]
-GMAIL_APP_PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
-RECIPIENT_EMAIL    = os.environ.get("RECIPIENT_EMAIL", os.environ["GMAIL_ADDRESS"])
+ANTHROPIC_API_KEY  = os.environ.get("ANTHROPIC_API_KEY", "")
+GMAIL_ADDRESS      = os.environ.get("GMAIL_ADDRESS", "")
+GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
+RECIPIENT_EMAIL    = os.environ.get("RECIPIENT_EMAIL", GMAIL_ADDRESS)
 SHEET_GIDS         = os.environ.get("SHEET_GIDS", "0")
 
 # How many days back counts as "this week"
