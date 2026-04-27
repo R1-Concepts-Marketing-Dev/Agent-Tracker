@@ -214,28 +214,28 @@
                 <div class="travel-dot" id="dot-0" style="background:#6264A7;--t-color:#6264A7;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Claude AI</div>
-                  <div class="step-role">AI Model</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#7C3AED;--t-color:#7C3AED;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Gmail</div>
                   <div class="step-role">Email</div>
                 </div>
               </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#EA4335;--t-color:#EA4335;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Claude AI</div>
+                  <div class="step-role">AI Model</div>
+                </div>
+              </div>
               <div class="arrow-wrap" id="arrow-2"><div class="arrow-track">
-                <div class="travel-dot" id="dot-2" style="background:#EA4335;--t-color:#EA4335;"></div>
+                <div class="travel-dot" id="dot-2" style="background:#7C3AED;--t-color:#7C3AED;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-3" style="--dot-color:#F06A6A;--glow-color:rgba(240,106,106,0.12);" onclick="goToStep(3)">
@@ -321,7 +321,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Microsoft Teams", "role": "Communication", "color": "#6264A7", "text": "Captures meeting transcripts and notes from media team meetings held in Teams.", "impact": "Ensures every discussion point and action item is recorded automatically, eliminating reliance on manual note-taking during meetings.", "dataLabel": "Data collected", "chips": ["Meeting transcript", "Attendees", "Discussion topics", "Meeting date", "Action items mentioned"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Analyzes the meeting transcript to extract action items, assignees, deadlines, and key decisions.", "impact": "Converts unstructured meeting conversation into clearly defined tasks in seconds, ensuring nothing discussed falls through the cracks.", "dataLabel": "Analysis produced", "chips": ["Extracted action items", "Assigned owners", "Suggested deadlines", "Key decisions", "Follow-up notes"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends a meeting summary email with extracted action items to all attendees for confirmation.", "impact": "Gives the team an immediate written record and chance to verify tasks before they are created, reducing miscommunication.", "dataLabel": "Email contains", "chips": ["Meeting summary", "Action item list", "Owner assignments", "Deadline proposals"]}, {"name": "Asana", "role": "Project Management", "color": "#F06A6A", "text": "Creates new Asana tasks for each extracted action item with assignees and due dates populated automatically.", "impact": "Bridges the gap between meeting discussions and project execution instantly, ensuring every commitment becomes a tracked, accountable task.", "dataLabel": "Records updated", "chips": ["New tasks created", "Assignees set", "Due dates applied", "Project linked", "Task descriptions"]}];
+  const stepData = [{"name": "Microsoft Teams", "role": "Communication", "color": "#6264A7", "text": "Captures media meeting transcripts, notes, and action items discussed during Teams calls.", "impact": "Ensures nothing discussed in media meetings is lost or forgotten, creating a reliable record of decisions and commitments made during the call.", "dataLabel": "Data collected", "chips": ["Meeting transcript", "Attendees", "Discussion topics", "Verbal action items", "Meeting date"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Receives or forwards meeting notes and supplementary context via email to feed into the AI processing pipeline.", "impact": "Bridges the gap between Teams meetings and task management by consolidating all meeting output into a single processing stream.", "dataLabel": "Data collected", "chips": ["Email notes", "Follow-up requests", "Attachments", "Participant details"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Parses meeting transcripts and notes to extract discrete action items, assign owners, estimate priorities, and format them as Asana-ready tasks.", "impact": "Converts unstructured meeting conversations into structured, assignable tasks in seconds — eliminating the manual effort of post-meeting task creation.", "dataLabel": "Analysis produced", "chips": ["Extracted tasks", "Assigned owners", "Priority levels", "Due date suggestions", "Task descriptions"]}, {"name": "Asana", "role": "Project Management", "color": "#F06A6A", "text": "Automatically creates new tasks in the appropriate Asana project with assigned owners, descriptions, and due dates derived from the meeting.", "impact": "Guarantees every action item from media meetings is tracked and assigned immediately, dramatically reducing follow-through gaps and improving team execution.", "dataLabel": "Records updated", "chips": ["New tasks created", "Project assignment", "Owner tagged", "Due date set", "Task description"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
