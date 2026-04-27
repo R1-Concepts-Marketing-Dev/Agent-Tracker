@@ -151,7 +151,8 @@ Return this exact structure:
   "Metric Name": {{
     "value": "most recent or current value as a clean human-readable string",
     "total": "YTD or cumulative total if present or calculable, else null",
-    "delta": "MoM or period-over-period change if available (e.g. '+12%' or '-3%'), else null"
+    "delta": "MoM or period-over-period change if available (e.g. '+12%' or '-3%'), else null",
+    "history": [{{"period": "Apr", "value": 24310}}, ...] or null
   }}
 }}
 
@@ -164,6 +165,11 @@ Rules:
 - Format numbers cleanly: "24,310" not "24310.0", "7.6%" not "0.076"
 - Keep metric names concise and human-readable (strip redundant words like "Est.")
 - For rate/average metrics (CTR, Avg Position, etc.) "total" should be the period average, not a sum
+- For "history": include all available non-empty data points as raw numbers (no commas/units)
+  - "period" should be a short label e.g. "Apr", "Q1", "Week 3"
+  - "value" must be a plain number for charting (e.g. 24310 not "24,310")
+  - Only include history if 2 or more data points exist; otherwise set null
+  - For non-time-series sheets set history to null
 
 CSV data:
 {csv_text}"""
@@ -1352,7 +1358,7 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
                     f'margin-top:3px;">{arrow} {delta} MoM</div>'
                 )
 
-            # Total display (below delta in the middle column)
+            # Total display
             total_html = ""
             if total:
                 total_html = (
@@ -1360,11 +1366,11 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
                     f'Total: <span style="color:#6e7681;font-weight:500;">{total}</span></div>'
                 )
 
-            # Scale font size based on value length so long numbers don't overflow
+            # Scale font size for long values
             vlen = len(str(value))
             val_font = "26px" if vlen <= 5 else ("21px" if vlen <= 8 else "17px")
 
-            # Right side: big current value + small "This Month" label if total present
+            # Right side label
             value_label = (
                 '<div style="font-size:9px;color:#4d5561;font-weight:600;'
                 'letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;'
@@ -1372,10 +1378,32 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
                 if total else ""
             )
 
+            # History / expand chart
+            history = entry.get("history") if isinstance(entry, dict) else None
+            has_chart = isinstance(history, list) and len(history) >= 2
+            history_json = json.dumps(history, ensure_ascii=False) if has_chart else "[]"
+            history_attr = history_json.replace("&", "&amp;").replace('"', "&quot;")
+
+            chevron_html = (
+                f'<button onclick="mcToggle(this)" style="background:none;border:none;'
+                f'cursor:pointer;padding:0 0 0 8px;display:flex;align-items:center;'
+                f'flex-shrink:0;color:#4d5561;transition:color 0.2s;" '
+                f'title="Show history">'
+                f'<svg style="transition:transform 0.25s;" width="14" height="14" viewBox="0 0 16 16">'
+                f'<path d="M4 6l4 4 4-4" stroke="#4d5561" stroke-width="1.5" fill="none" stroke-linecap="round"/>'
+                f'</svg></button>'
+            ) if has_chart else ""
+
+            chart_panel_html = (
+                f'<div class="mc-panel" data-history="{history_attr}" data-color="{accent}" '
+                f'style="display:none;border-top:1px solid #161b22;padding:12px 14px 10px;">'
+                f'</div>'
+            ) if has_chart else ""
+
             metric_tiles += (
-                f'<div style="background:#0d1117;border:1px solid #21262d;'
-                f'border-left:3px solid {accent};border-radius:10px;'
-                f'padding:14px 16px;display:flex;align-items:center;gap:14px;">'
+                f'<div class="mc-wrap" style="background:#0d1117;border:1px solid #21262d;'
+                f'border-left:3px solid {accent};border-radius:10px;overflow:hidden;">'
+                f'<div style="padding:14px 16px;display:flex;align-items:center;gap:14px;">'
                 f'<div style="width:42px;height:42px;border-radius:10px;flex-shrink:0;'
                 f'display:flex;align-items:center;justify-content:center;font-size:19px;'
                 f'background:{tint};border:1px solid {accent_dim};">{icon}</div>'
@@ -1390,6 +1418,9 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
                 f'white-space:nowrap;line-height:1;text-align:right;">{value}</div>'
                 f'{value_label}'
                 f'</div>'
+                f'{chevron_html}'
+                f'</div>'
+                f'{chart_panel_html}'
                 f'</div>'
             )
         metrics_section = f"""
@@ -1487,6 +1518,114 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
   function prev() {{ if (traveling || current <= 0) return; render(--current); }}
 
   if (STEPS > 0) render(0);
+
+  // ── Metric chart expand / collapse ────────────────────────────────────────
+  (function() {{
+    var tt = document.createElement("div");
+    tt.id = "mc-tt";
+    tt.style.cssText = "position:fixed;background:#161b22;border:1px solid #30363d;border-radius:6px;padding:6px 10px;font-size:11px;color:#c9d1d9;pointer-events:none;display:none;white-space:nowrap;z-index:9999;";
+    document.body.appendChild(tt);
+  }})();
+
+  function mcToggle(btn) {{
+    var wrap = btn.closest(".mc-wrap");
+    var panel = wrap.querySelector(".mc-panel");
+    var svg = btn.querySelector("svg");
+    var open = panel.style.display === "block";
+    panel.style.display = open ? "none" : "block";
+    svg.style.transform = open ? "" : "rotate(180deg)";
+    btn.style.color = open ? "#4d5561" : "#8b949e";
+    if (!open && !panel.dataset.drawn) {{ mcDraw(panel); }}
+  }}
+
+  function mcFmt(v) {{
+    var a = Math.abs(v);
+    if (a === 0) return "0";
+    if (a >= 1000000) return (v/1000000).toFixed(1) + "M";
+    if (a >= 1000)    return (v/1000).toFixed(1) + "k";
+    if (a < 1 && a > 0) return v.toFixed(2);
+    return v % 1 === 0 ? v.toString() : v.toFixed(1);
+  }}
+
+  function mcDraw(panel) {{
+    var history = JSON.parse(panel.dataset.history || "[]");
+    var color   = panel.dataset.color || "#a371f7";
+    if (history.length < 2) return;
+
+    var W=260, H=100, LP=38, RP=6, TP=8, BP=4;
+    var cW=W-LP-RP, cH=H-TP-BP;
+    var vals = history.map(function(h){{ return parseFloat(h.value)||0; }});
+    var labels = history.map(function(h){{ return h.period||""; }});
+    var min=Math.min.apply(null,vals), max=Math.max.apply(null,vals);
+    var pad=(max-min)*0.15||Math.abs(max)*0.1||1;
+    var lo=min-pad, hi=max+pad, range=hi-lo;
+
+    function px(i){{ return LP + (i/(vals.length-1))*cW; }}
+    function py(v){{ return TP + (1-(v-lo)/range)*cH; }}
+
+    var ticks=[lo+range*0.85, lo+range*0.5, lo+range*0.15];
+    var gridLines="", yLabels="";
+    ticks.forEach(function(t){{
+      var y=py(t);
+      gridLines+='<line x1="'+LP+'" y1="'+y+'" x2="'+(W-RP)+'" y2="'+y+'" stroke="#21262d" stroke-width="1"/>';
+      yLabels+='<text x="'+(LP-4)+'" y="'+(y+3.5)+'" text-anchor="end" font-size="8" fill="#4d5561">'+mcFmt(t)+'</text>';
+    }});
+
+    var pts = vals.map(function(v,i){{ return {{x:px(i), y:py(v), v:v, i:i}}; }});
+    var poly = pts.map(function(p){{ return p.x.toFixed(1)+","+p.y.toFixed(1); }}).join(" ");
+    var area = "M"+pts[0].x.toFixed(1)+","+(TP+cH)+" "+
+      pts.map(function(p){{ return "L"+p.x.toFixed(1)+","+p.y.toFixed(1); }}).join(" ")+
+      " L"+pts[pts.length-1].x.toFixed(1)+","+(TP+cH)+" Z";
+
+    var r=parseInt(color.slice(1,3),16), g=parseInt(color.slice(3,5),16), b=parseInt(color.slice(5,7),16);
+    var uid="mc"+Math.random().toString(36).slice(2);
+
+    var dots = pts.map(function(p){{
+      var pct = p.i>0 ? ((vals[p.i]-vals[p.i-1])/Math.abs(vals[p.i-1]||1)*100) : null;
+      var pctStr = pct!==null ? (pct>=0?"+":"")+pct.toFixed(1)+"%" : "";
+      return '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3" '+
+        'fill="#0d1117" stroke="'+color+'" stroke-width="1.5" style="cursor:pointer" '+
+        'data-label="'+labels[p.i]+'" data-val="'+mcFmt(p.v)+'" data-pct="'+pctStr+'" data-up="'+(pct===null?"":pct>=0)+'"/>';
+    }}).join("");
+
+    var xMid = Math.floor(labels.length/2);
+    panel.innerHTML =
+      '<svg width="100%" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="overflow:visible">'+
+      '<defs><linearGradient id="'+uid+'" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="'+color+'" stop-opacity="0.12"/>'+
+      '<stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'+
+      gridLines+
+      '<line x1="'+LP+'" y1="'+TP+'" x2="'+LP+'" y2="'+(TP+cH)+'" stroke="#21262d" stroke-width="1"/>'+
+      yLabels+
+      '<path d="'+area+'" fill="url(#'+uid+')"/>'+
+      '<polyline points="'+poly+'" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'+
+      dots+'</svg>'+
+      '<div style="display:flex;justify-content:space-between;padding-left:'+LP+'px;margin-top:4px;">'+
+      '<span style="font-size:9px;color:#4d5561;">'+labels[0]+'</span>'+
+      '<span style="font-size:9px;color:#4d5561;">'+labels[xMid]+'</span>'+
+      '<span style="font-size:9px;color:#4d5561;">'+labels[labels.length-1]+'</span></div>';
+
+    panel.querySelectorAll("circle").forEach(function(dot){{
+      dot.addEventListener("mouseenter", function(e){{
+        var tt=document.getElementById("mc-tt");
+        var pct=dot.dataset.pct, isUp=dot.dataset.up==="true";
+        var arrow=pct?(isUp?"▲":"▼"):"";
+        var dc=pct?(isUp?"#3fb950":"#f78166"):"#6e7681";
+        tt.innerHTML='<span style="color:#c9d1d9;font-weight:600;">'+dot.dataset.label+'</span>: '+dot.dataset.val+
+          (pct?' &nbsp;<span style="color:'+dc+';font-size:10px;">'+arrow+' '+pct+'</span>':"");
+        tt.style.display="block";
+        var r2=dot.getBoundingClientRect();
+        tt.style.left=(r2.left+r2.width/2-tt.offsetWidth/2)+"px";
+        tt.style.top=(r2.top-36)+"px";
+        dot.setAttribute("r","4.5");
+      }});
+      dot.addEventListener("mouseleave", function(){{
+        document.getElementById("mc-tt").style.display="none";
+        dot.setAttribute("r","3");
+      }});
+    }});
+    panel.dataset.drawn="1";
+  }}
 """
 
     return f"""<!DOCTYPE html>
