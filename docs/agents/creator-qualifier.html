@@ -210,6 +210,18 @@
                   <div class="step-role">AI Model</div>
                 </div>
               </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#64748B;--t-color:#64748B;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Gemini API</div>
+                  <div class="step-role">AI Model</div>
+                </div>
+              </div>
           </div>
           <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
           <div class="detail-panel" id="detailPanel">
@@ -231,7 +243,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 1</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -271,9 +283,9 @@
 
 <script>
 
-  const STEPS = 1, TRAVEL_MS = 700;
+  const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Scores each discovered creator against customizable weighted criteria including audience relevance, engagement quality, content alignment, reach, and brand safety.", "impact": "Objectively ranks creators using consistent, repeatable scoring, eliminating subjective bias and ensuring marketing budget is directed toward the highest-value partnerships.", "dataLabel": "Analysis produced", "chips": ["Overall score", "Engagement weight", "Audience relevance weight", "Content alignment score", "Brand safety flag", "Tier ranking"]}];
+  const stepData = [{"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Evaluates discovered creators against customizable scoring weights including audience size, engagement quality, content relevance, and brand alignment.", "impact": "Replaces hours of manual creator vetting with instant AI-powered scoring, ensuring only the highest-potential creators advance to outreach and preventing wasted partnership efforts.", "dataLabel": "Analysis produced", "chips": ["Overall score", "Engagement score", "Relevance score", "Audience quality", "Brand fit rating", "Ranking tier"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Generates a prioritized shortlist of qualified creators with scoring breakdowns and recommended outreach priority based on configurable weight thresholds.", "impact": "Gives the marketing team a data-driven, rank-ordered creator list ready for outreach, eliminating subjective decision-making and focusing resources on the best-fit partnerships.", "dataLabel": "Report generated", "chips": ["Ranked creator list", "Score breakdown", "Priority tier", "Weight config", "Qualification status"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
