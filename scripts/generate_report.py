@@ -1316,17 +1316,25 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
             'None configured</span>'
         )
 
-    # ── Time saved chip ───────────────────────────────────────────────────────
-    time_saved     = agent.get("time_saved")
-    ts_estimated   = agent.get("time_saved_estimated", False)
+    # ── Time saved + value chips ──────────────────────────────────────────────
+    time_saved      = agent.get("time_saved")
+    ts_estimated    = agent.get("time_saved_estimated", False)
     time_saved_chip = ""
+    value_saved_chip = ""
     if time_saved is not None:
-        ts_label = f"~{time_saved:.0f}h" if time_saved != int(time_saved) else f"{int(time_saved)}h"
+        ts_label  = f"{time_saved:.1f}h".rstrip("0").rstrip(".")
         est_note  = " est." if ts_estimated else ""
         time_saved_chip = (
             f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
             f'background:#0a1e12;border:1px solid #196130;color:#3fb950;">'
-            f'&#9203; {ts_label} saved/mo{est_note}</span>'
+            f'&#9203; {ts_label}h saved/mo{est_note}</span>'
+        )
+        value_gen  = time_saved * HOURLY_RATE
+        v_str      = f"${value_gen:,.0f}"
+        value_saved_chip = (
+            f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
+            f'background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">'
+            f'&#128142; {v_str} value/mo</span>'
         )
 
     # ── Trigger badge (frequency) ──────────────────────────────────────────────
@@ -1825,6 +1833,7 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
         &#128279; {platform_count} platform{"s" if platform_count != 1 else ""} connected
       </span>
       {time_saved_chip}
+      {value_saved_chip}
     </div>
   </div>
 </div>
@@ -1912,6 +1921,7 @@ def save_workflow_cache(
     metrics_map: dict = None,
     time_saved_history: list = None,
     time_saved_per_agent: dict = None,
+    summary: str = "",
 ) -> None:
     os.makedirs("docs", exist_ok=True)
     cache = {
@@ -1919,6 +1929,7 @@ def save_workflow_cache(
         "metrics":              metrics_map or {},
         "time_saved_history":   time_saved_history or [],
         "time_saved_per_agent": time_saved_per_agent or {},
+        "summary":              summary or "",
     }
     with open(WORKFLOW_CACHE_PATH, "w", encoding="utf-8") as f:
         json.dump(cache, f, indent=2)
@@ -1927,7 +1938,7 @@ def save_workflow_cache(
           f"{len(time_saved_history or [])} time-saved months)")
 
 
-def load_workflow_cache() -> tuple[dict, dict, list, dict]:
+def load_workflow_cache() -> tuple[dict, dict, list, dict, str]:
     if os.path.exists(WORKFLOW_CACHE_PATH):
         with open(WORKFLOW_CACHE_PATH, encoding="utf-8") as f:
             data = json.load(f)
@@ -1937,17 +1948,19 @@ def load_workflow_cache() -> tuple[dict, dict, list, dict]:
             metrics              = data.get("metrics", {})
             time_saved_history   = data.get("time_saved_history", list(SEED_TIME_HISTORY))
             time_saved_per_agent = data.get("time_saved_per_agent", {})
+            summary              = data.get("summary", "")
         else:
             workflows            = data
             metrics              = {}
             time_saved_history   = list(SEED_TIME_HISTORY)
             time_saved_per_agent = {}
+            summary              = ""
         print(f"   📂 Loaded cache ({len(workflows)} workflows, "
               f"{len(metrics)} metrics, "
               f"{len(time_saved_history)} time-saved months)")
-        return workflows, metrics, time_saved_history, time_saved_per_agent
+        return workflows, metrics, time_saved_history, time_saved_per_agent, summary
     print("   ⚠️  No cache found — pages will show placeholder workflow")
-    return {}, {}, list(SEED_TIME_HISTORY), {}
+    return {}, {}, list(SEED_TIME_HISTORY), {}, ""
 
 
 # ── Time Saved ────────────────────────────────────────────────────────────────
@@ -1963,20 +1976,42 @@ SEED_TIME_HISTORY = [
 TIME_SAVED_KEYWORDS = [
     "time saved", "hours saved", "hour saved", "hrs saved",
     "time save", "hours reclaimed", "time reclaimed", "hours freed",
-    "est. hours", "estimated hours",
+    "est. hours", "estimated hours", "time efficiency",
+    "saved", "reclaimed", "freed",   # broader fallbacks
 ]
 
 
 def _extract_time_saved(metrics: dict) -> float | None:
-    """Find a time-saved metric in a parsed metrics dict. Returns float hours or None."""
+    """
+    Find a time-saved metric in a parsed metrics dict. Returns float hours or None.
+    Checks both the metric key name and the history array (uses most recent history
+    value if available, otherwise falls back to the 'value' field).
+    """
     import re as _re
+
+    def _parse_num(s: str) -> float | None:
+        m = _re.search(r'[\d.]+', str(s).replace(",", ""))
+        return float(m.group()) if m else None
+
     for key, entry in metrics.items():
         kl = key.lower()
-        if any(kw in kl for kw in TIME_SAVED_KEYWORDS):
-            val = entry.get("value", "") if isinstance(entry, dict) else str(entry)
-            m = _re.search(r'[\d.]+', str(val).replace(",", ""))
-            if m:
-                return float(m.group())
+        if not any(kw in kl for kw in TIME_SAVED_KEYWORDS):
+            continue
+        # Prefer the most recent value from history (time-series sheets)
+        if isinstance(entry, dict):
+            history = entry.get("history")
+            if isinstance(history, list) and history:
+                last = history[-1].get("value", 0)
+                try:
+                    return float(last)
+                except (TypeError, ValueError):
+                    pass
+            val = entry.get("value", "")
+        else:
+            val = str(entry)
+        n = _parse_num(val)
+        if n is not None:
+            return n
     return None
 
 
@@ -2198,7 +2233,7 @@ def main() -> None:
         print("🔄 Refresh-only mode — skipping Claude calls and email")
 
         print("📂 Loading cached workflow steps and metrics...")
-        workflow_map, metrics_map, time_saved_history, time_saved_per_agent = load_workflow_cache()
+        workflow_map, metrics_map, time_saved_history, time_saved_per_agent, cached_summary = load_workflow_cache()
 
         # Apply cached data to agents
         for agent in agents:
@@ -2210,7 +2245,7 @@ def main() -> None:
         print("🏗️  Building full report (GitHub Pages)...")
         new_rows, stage_changes = detect_changes(agents)
         full_html = build_full_report_html(
-            agents, new_rows, stage_changes, "", week_str, workflow_map, time_saved_history
+            agents, new_rows, stage_changes, cached_summary, week_str, workflow_map, time_saved_history
         )
 
         print("💾 Saving full report to docs/index.html...")
@@ -2287,7 +2322,7 @@ def main() -> None:
         print(f"   Total this month: {total_this_month}h across {len(time_saved_per_agent)} agent(s)")
 
         # Load existing history from cache (or seed if first run), update current month
-        _, _, time_saved_history, _ = load_workflow_cache()
+        _, _, time_saved_history, _, _ = load_workflow_cache()
         month_periods = [h["period"] for h in time_saved_history]
         if current_month in month_periods:
             for h in time_saved_history:
@@ -2296,8 +2331,8 @@ def main() -> None:
         else:
             time_saved_history.append({"period": current_month, "hours": total_this_month})
 
-        print("💾 Saving cache (workflows + metrics + time saved) for refresh runs...")
-        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent)
+        print("💾 Saving cache (workflows + metrics + time saved + summary)...")
+        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary)
 
         print("🏗️  Building email (simplified)...")
         email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
