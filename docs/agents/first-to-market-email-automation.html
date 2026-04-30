@@ -177,8 +177,8 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 2 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 8.0hh saved/mo</span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $160 value/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 7.0hh saved/mo est.</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $140 value/mo</span>
     </div>
   </div>
 </div>
@@ -204,24 +204,36 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">HubSpot API</div>
+                  <div class="step-role">CRM</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#FF7A59;--t-color:#FF7A59;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Anthropic API</div>
                   <div class="step-role">AI Model</div>
                 </div>
               </div>
-              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#7C3AED;--t-color:#7C3AED;"></div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#7C3AED;--t-color:#7C3AED;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(1)">
-                <div class="step-num">2</div>
+              <div class="step-box" id="step-2" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">HubSpot API</div>
-                  <div class="step-role">Email Platform</div>
+                  <div class="step-role">CRM</div>
                 </div>
               </div>
           </div>
@@ -245,7 +257,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -285,9 +297,9 @@
 
 <script>
 
-  const STEPS = 2, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Anthropic API", "role": "AI Model", "color": "#7C3AED", "text": "Generates compelling First to Market email copy and monthly recap content tailored to new DFC product launches using product details and launch context.", "impact": "Produces high-quality marketing copy in seconds, freeing the content team from repetitive writing tasks for every new product drop.", "dataLabel": "Content produced", "chips": ["Product launch copy", "Feature highlights", "Recap summaries", "CTA text", "Subject lines"]}, {"name": "HubSpot API", "role": "Email Platform", "color": "#FF7A59", "text": "Creates draft First to Market and monthly recap emails in HubSpot, populating them with AI-generated copy, sales sheets, and product imagery.", "impact": "Reduces email production time from hours to minutes per launch, ensuring DFC is consistently first to announce new products to their audience.", "dataLabel": "Email contains", "chips": ["Product sales sheets", "Launch announcement", "Monthly recap data", "Draft email HTML", "Product images"]}];
+  const stepData = [{"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Retrieves new product launch data, contact lists, and existing sales sheet assets from HubSpot for First to Market and monthly recap campaigns.", "impact": "Ensures every new product launch email targets the right audience with accurate product data, reducing setup time from hours to minutes.", "dataLabel": "Data collected", "chips": ["Product launch details", "Sales sheets", "Contact segments", "Past campaign data", "Recap metrics"]}, {"name": "Anthropic API", "role": "AI Model", "color": "#7C3AED", "text": "Generates compelling First to Market email copy and monthly recap content tailored to each product launch using Claude AI.", "impact": "Produces polished, on-brand email drafts instantly, freeing the marketing team from repetitive copywriting for every new product drop.", "dataLabel": "Content generated", "chips": ["Email subject line", "Product description", "Feature highlights", "Recap summary", "CTA copy"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Creates the email drafts in HubSpot with the AI-generated content, embedded sales sheets, and proper contact list targeting.", "impact": "Delivers ready-to-review email drafts directly inside HubSpot, cutting the campaign creation workflow down to a single approval step.", "dataLabel": "Records updated", "chips": ["Draft email created", "Sales sheet embedded", "Audience assigned", "Send schedule set"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

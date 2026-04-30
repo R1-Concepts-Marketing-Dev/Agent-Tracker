@@ -204,16 +204,16 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">HubSpot API</div>
-                  <div class="step-role">CRM & Tracking</div>
+                  <div class="step-platform">Google Search Console</div>
+                  <div class="step-role">Analytics</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#FF7A59;--t-color:#FF7A59;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-1" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(1)">
@@ -221,19 +221,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">HubSpot API</div>
-                  <div class="step-role">Email Automation</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#FF7A59;--t-color:#FF7A59;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Google Search Console</div>
-                  <div class="step-role">SEO Analytics</div>
+                  <div class="step-role">CRM & Automation</div>
                 </div>
               </div>
           </div>
@@ -257,7 +245,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -297,9 +285,9 @@
 
 <script>
 
-  const STEPS = 3, TRAVEL_MS = 700;
+  const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "HubSpot API", "role": "CRM & Tracking", "color": "#FF7A59", "text": "Tracks DFC prospect page visits across 6 Phase 1 trigger pages and enrolls visitors into corresponding automated email workflows based on the specific page viewed.", "impact": "Delivers highly relevant follow-up emails within minutes of a prospect showing intent, dramatically increasing engagement and conversion rates from site traffic.", "dataLabel": "Data collected", "chips": ["Page visited", "Contact ID", "Visit timestamp", "Trigger page", "Enrollment status", "Visit count"]}, {"name": "HubSpot API", "role": "Email Automation", "color": "#FF7A59", "text": "Sends targeted, page-specific email sequences to enrolled prospects with relevant content, product information, and sales CTAs tailored to each of the 6 trigger pages.", "impact": "Turns anonymous website visits into active sales conversations by automatically nurturing prospects with contextually relevant messaging—no manual sales outreach required.", "dataLabel": "Email contains", "chips": ["Personalized subject", "Page-specific content", "Product details", "Sales CTA", "Rep notification"]}, {"name": "Google Search Console", "role": "SEO Analytics", "color": "#4285F4", "text": "Feeds search query and landing page data back to validate which organic keywords are driving traffic to the 6 trigger pages, informing workflow optimization.", "impact": "Connects upstream search intent to downstream email performance, enabling continuous refinement of both SEO strategy and trigger page targeting.", "dataLabel": "Analysis produced", "chips": ["Search queries", "Landing page CTR", "Impression trends", "Keyword intent", "Page ranking"]}];
+  const stepData = [{"name": "Google Search Console", "role": "Analytics", "color": "#4285F4", "text": "Monitors DFC prospect page visits and identifies which pages trigger engagement across the 6 Phase 1 trigger points.", "impact": "Ensures no high-intent prospect visit goes unnoticed, capturing behavioral signals that indicate buying readiness.", "dataLabel": "Data collected", "chips": ["Page URL visited", "Visit timestamp", "Prospect source", "Session duration", "Trigger phase matched", "Search query"]}, {"name": "HubSpot API", "role": "CRM & Automation", "color": "#FF7A59", "text": "Receives visit trigger data and executes the corresponding workflow to send a personalized automated email to the identified prospect.", "impact": "Prospects receive timely, relevant follow-up emails within moments of visiting key pages, dramatically increasing conversion rates and eliminating manual outreach effort.", "dataLabel": "Records updated", "chips": ["Contact record", "Workflow trigger ID", "Email template selected", "Send timestamp", "Phase 1 trigger type", "Engagement status"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
