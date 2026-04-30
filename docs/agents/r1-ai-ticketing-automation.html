@@ -177,8 +177,8 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 1 platform connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 1.0hh saved/mo est.</span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $20 value/mo</span>
+      
+      
     </div>
   </div>
 </div>
@@ -204,16 +204,16 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#DC2626;--glow-color:rgba(220,38,38,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Ticketing Platform</div>
-                  <div class="step-role">Support System</div>
+                  <div class="step-platform">R1 Ticketing System</div>
+                  <div class="step-role">Support Platform</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#DC2626;--t-color:#DC2626;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-1" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(1)">
@@ -222,6 +222,18 @@
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">AI Engine</div>
                   <div class="step-role">AI Model</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#4B5563;--t-color:#4B5563;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#DC2626;--glow-color:rgba(220,38,38,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">R1 Ticketing System</div>
+                  <div class="step-role">Support Platform</div>
                 </div>
               </div>
           </div>
@@ -245,7 +257,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -285,9 +297,9 @@
 
 <script>
 
-  const STEPS = 2, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Ticketing Platform", "role": "Support System", "color": "#4B5563", "text": "Ingests incoming customer support tickets from R1 Concepts' support channels and captures ticket details.", "impact": "Centralizes all customer inquiries in one place so no tickets are lost or delayed, ensuring faster initial response times.", "dataLabel": "Data collected", "chips": ["Customer name", "Ticket subject", "Issue description", "Order number", "Priority level"]}, {"name": "AI Engine", "role": "AI Model", "color": "#4B5563", "text": "Classifies each ticket by intent and urgency, then drafts or auto-sends an appropriate response based on the issue type.", "impact": "Resolves routine inquiries instantly and routes complex issues to the right team, reducing average response time and freeing support agents to focus on high-value cases.", "dataLabel": "Analysis produced", "chips": ["Ticket category", "Sentiment score", "Suggested response", "Escalation flag", "Resolution confidence", "Auto-reply status"]}];
+  const stepData = [{"name": "R1 Ticketing System", "role": "Support Platform", "color": "#DC2626", "text": "Ingests incoming customer support tickets submitted to R1 Concepts, capturing issue details and customer information.", "impact": "Centralizes all incoming support requests so no customer inquiry is lost, providing a structured queue for AI-driven resolution.", "dataLabel": "Data collected", "chips": ["Ticket ID", "Customer name", "Issue description", "Order number", "Priority level", "Submission date"]}, {"name": "AI Engine", "role": "AI Model", "color": "#4B5563", "text": "Classifies each ticket by category and urgency, drafts an appropriate response or routes to the correct support team.", "impact": "Reduces average ticket response time significantly by automating triage and first-response drafting, freeing human agents to focus on complex cases.", "dataLabel": "Analysis produced", "chips": ["Ticket category", "Urgency score", "Suggested response", "Routing destination", "Resolution confidence"]}, {"name": "R1 Ticketing System", "role": "Support Platform", "color": "#DC2626", "text": "Sends the AI-generated response to the customer or assigns the ticket to the appropriate human agent with context notes.", "impact": "Closes routine tickets automatically and accelerates complex ticket resolution by providing agents with pre-analyzed context and draft replies.", "dataLabel": "Records updated", "chips": ["Response sent", "Agent assignment", "Resolution status", "Customer notification", "Ticket history log"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
