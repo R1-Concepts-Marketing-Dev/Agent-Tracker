@@ -2231,13 +2231,69 @@ def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> N
 def main() -> None:
     # REFRESH_ONLY=true       → rebuild pages only, no Claude calls, no email
     # SELF_METRICS_ONLY=true  → update agent counts in tracking sheet only, nothing else
+    # MONTHLY_SNAPSHOT=true   → lock in previous month's time-saved total, update cache only
     refresh_only       = os.environ.get("REFRESH_ONLY",       "false").lower() == "true"
     self_metrics_only  = os.environ.get("SELF_METRICS_ONLY",  "false").lower() == "true"
+    monthly_snapshot   = os.environ.get("MONTHLY_SNAPSHOT",   "false").lower() == "true"
     week_str = datetime.datetime.now().strftime("%B %d, %Y")
 
     print("📥 Fetching Google Sheet data...")
     agents = fetch_sheet_data()
     print(f"   Found {len(agents)} agents")
+
+    if monthly_snapshot:
+        # ── Month-end snapshot: lock in previous month's time-saved total ──
+        today          = datetime.date.today()
+        last_month     = (today.replace(day=1) - datetime.timedelta(days=1))
+        prev_month_str = last_month.strftime("%b")
+        print(f"📅 Monthly snapshot mode — recording {prev_month_str} final total...")
+
+        # Load existing cache for metrics + history
+        _, metrics_map, time_saved_history, _, cached_summary = load_workflow_cache()
+        for agent in agents:
+            if agent["name"] in metrics_map:
+                agent["metrics"] = metrics_map[agent["name"]]
+
+        # Compute time saved for completed agents
+        ts_map, needs_estimate = {}, []
+        for agent in agents:
+            ts = _extract_time_saved(agent.get("metrics", {}))
+            if ts is not None:
+                ts_map[agent["name"]] = ts
+            elif agent["stage"] == "Completed":
+                needs_estimate.append(agent)
+
+        if needs_estimate:
+            snap_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+            estimates   = _estimate_time_saved_batch(needs_estimate, snap_client)
+            for agent in needs_estimate:
+                est = estimates.get(agent["name"])
+                try:
+                    est = float(est)
+                    if est >= 2:
+                        ts_map[agent["name"]] = est
+                except (TypeError, ValueError):
+                    pass
+
+        total = round(sum(ts_map.values()), 1)
+        print(f"   Total for {prev_month_str}: {total}h across {len(ts_map)} agent(s)")
+
+        # Update or insert the previous month entry, mark as finalized
+        periods = [h["period"] for h in time_saved_history]
+        if prev_month_str in periods:
+            for h in time_saved_history:
+                if h["period"] == prev_month_str:
+                    h["hours"]     = total
+                    h["finalized"] = True
+        else:
+            time_saved_history.append({"period": prev_month_str, "hours": total, "finalized": True})
+
+        # Reload full cache to preserve workflows + metrics, just update history
+        wf_map, m_map, _, old_ts_per_agent, _ = load_workflow_cache()
+        save_workflow_cache(wf_map, m_map, time_saved_history, old_ts_per_agent, cached_summary)
+        print(f"   ✅ {prev_month_str} locked in at {total}h")
+        print("✅ Done!")
+        return
 
     if self_metrics_only:
         # ── Daily self-metrics mode: counts only, no email increment ───────
