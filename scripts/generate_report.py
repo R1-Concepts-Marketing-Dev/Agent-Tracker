@@ -1099,10 +1099,12 @@ def build_full_report_html(
     summary: str,
     week_str: str,
     workflow_map: dict = None,
+    time_saved_history: list = None,
 ) -> str:
     """Full card-based report for GitHub Pages."""
     if workflow_map is None:
         workflow_map = {}
+    time_saved_section = _build_time_saved_section(time_saved_history or [])
     completed   = [a for a in agents if a["stage"] == "Completed"]
     in_progress = [a for a in agents if a["stage"] == "In Progress"]
     planned     = [a for a in agents if a["stage"] == "Planned"]
@@ -1165,6 +1167,8 @@ def build_full_report_html(
   </tr>
 
   <tr><td style="height:28px;"></td></tr>
+
+  {time_saved_section}
 
   <tr>
     <td style="padding-bottom:24px;">
@@ -1310,6 +1314,19 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
         connections_html = (
             '<span style="font-size:12px;color:#4d5561;font-style:italic;">'
             'None configured</span>'
+        )
+
+    # ── Time saved chip ───────────────────────────────────────────────────────
+    time_saved     = agent.get("time_saved")
+    ts_estimated   = agent.get("time_saved_estimated", False)
+    time_saved_chip = ""
+    if time_saved is not None:
+        ts_label = f"~{time_saved:.0f}h" if time_saved != int(time_saved) else f"{int(time_saved)}h"
+        est_note  = " est." if ts_estimated else ""
+        time_saved_chip = (
+            f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
+            f'background:#0a1e12;border:1px solid #196130;color:#3fb950;">'
+            f'&#9203; {ts_label} saved/mo{est_note}</span>'
         )
 
     # ── Trigger badge (frequency) ──────────────────────────────────────────────
@@ -1807,6 +1824,7 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; {platform_count} platform{"s" if platform_count != 1 else ""} connected
       </span>
+      {time_saved_chip}
     </div>
   </div>
 </div>
@@ -1889,32 +1907,205 @@ def send_email(html: str, week_str: str) -> None:
 # ── Workflow cache (save/load so refresh runs don't need Claude) ───────────────
 WORKFLOW_CACHE_PATH = "docs/workflow_cache.json"
 
-def save_workflow_cache(workflow_map: dict, metrics_map: dict = None) -> None:
+def save_workflow_cache(
+    workflow_map: dict,
+    metrics_map: dict = None,
+    time_saved_history: list = None,
+    time_saved_per_agent: dict = None,
+) -> None:
     os.makedirs("docs", exist_ok=True)
     cache = {
-        "workflows": workflow_map,
-        "metrics":   metrics_map or {},
+        "workflows":            workflow_map,
+        "metrics":              metrics_map or {},
+        "time_saved_history":   time_saved_history or [],
+        "time_saved_per_agent": time_saved_per_agent or {},
     }
     with open(WORKFLOW_CACHE_PATH, "w", encoding="utf-8") as f:
         json.dump(cache, f, indent=2)
-    print(f"   💾 Cache saved ({len(workflow_map)} workflows, {len(metrics_map or {})} metrics)")
+    print(f"   💾 Cache saved ({len(workflow_map)} workflows, "
+          f"{len(metrics_map or {})} metrics, "
+          f"{len(time_saved_history or [])} time-saved months)")
 
 
-def load_workflow_cache() -> tuple[dict, dict]:
+def load_workflow_cache() -> tuple[dict, dict, list, dict]:
     if os.path.exists(WORKFLOW_CACHE_PATH):
         with open(WORKFLOW_CACHE_PATH, encoding="utf-8") as f:
             data = json.load(f)
         # Backward-compat: old format was a flat {agent_name: [steps]} dict
         if "workflows" in data:
-            workflows = data["workflows"]
-            metrics   = data.get("metrics", {})
+            workflows            = data["workflows"]
+            metrics              = data.get("metrics", {})
+            time_saved_history   = data.get("time_saved_history", list(SEED_TIME_HISTORY))
+            time_saved_per_agent = data.get("time_saved_per_agent", {})
         else:
-            workflows = data
-            metrics   = {}
-        print(f"   📂 Loaded cache ({len(workflows)} workflows, {len(metrics)} metrics)")
-        return workflows, metrics
+            workflows            = data
+            metrics              = {}
+            time_saved_history   = list(SEED_TIME_HISTORY)
+            time_saved_per_agent = {}
+        print(f"   📂 Loaded cache ({len(workflows)} workflows, "
+              f"{len(metrics)} metrics, "
+              f"{len(time_saved_history)} time-saved months)")
+        return workflows, metrics, time_saved_history, time_saved_per_agent
     print("   ⚠️  No cache found — pages will show placeholder workflow")
-    return {}, {}
+    return {}, {}, list(SEED_TIME_HISTORY), {}
+
+
+# ── Time Saved ────────────────────────────────────────────────────────────────
+HOURLY_RATE = 20.0   # $ per hour for value calculation
+
+# Seed history — months before tracking began
+SEED_TIME_HISTORY = [
+    {"period": "Jan", "hours": 0},
+    {"period": "Feb", "hours": 0},
+    {"period": "Mar", "hours": 5},
+]
+
+TIME_SAVED_KEYWORDS = [
+    "time saved", "hours saved", "hour saved", "hrs saved",
+    "time save", "hours reclaimed", "time reclaimed", "hours freed",
+    "est. hours", "estimated hours",
+]
+
+
+def _extract_time_saved(metrics: dict) -> float | None:
+    """Find a time-saved metric in a parsed metrics dict. Returns float hours or None."""
+    import re as _re
+    for key, entry in metrics.items():
+        kl = key.lower()
+        if any(kw in kl for kw in TIME_SAVED_KEYWORDS):
+            val = entry.get("value", "") if isinstance(entry, dict) else str(entry)
+            m = _re.search(r'[\d.]+', str(val).replace(",", ""))
+            if m:
+                return float(m.group())
+    return None
+
+
+def _estimate_time_saved_batch(agents: list[dict], client) -> dict:
+    """
+    Ask Claude to estimate monthly hours saved for a list of agents in one call.
+    Returns {agent_name: hours_float}.
+    """
+    blocks = "\n\n".join(
+        f'Agent: {a["name"]}\n'
+        f'Description: {a["description"] or "N/A"}\n'
+        f'Frequency: {a["frequency"] or "Unknown"}\n'
+        f'Connections: {a["connections"] or "N/A"}'
+        for a in agents
+    )
+    prompt = f"""For each AI automation agent below, estimate how many hours per month
+it saves a human from doing the same work manually.
+Consider the task type, frequency, and typical manual effort.
+Return ONLY valid JSON: {{"Agent Name": hours_number, ...}}
+No explanation, no markdown, no units — numbers only.
+
+{blocks}"""
+    try:
+        msg = client.messages.create(
+            model="claude-opus-4-6",
+            max_tokens=500,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = msg.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = "\n".join(raw.split("\n")[1:])
+        if raw.endswith("```"):
+            raw = "\n".join(raw.split("\n")[:-1])
+        return json.loads(raw.strip())
+    except Exception as e:
+        print(f"   ⚠️  Time saved batch estimate failed ({e})")
+        return {}
+
+
+def _build_time_saved_section(history: list[dict]) -> str:
+    """
+    Build the time saved stat squares + chart HTML for the main GitHub Pages report.
+    Inserted between the page header and the weekly summary.
+    """
+    if not history:
+        return ""
+
+    total_hours    = sum(h.get("hours", 0) for h in history)
+    value_gen      = total_hours * HOURLY_RATE
+    hours_str      = f"{total_hours:,.1f}".rstrip("0").rstrip(".")
+    value_str      = f"${value_gen:,.0f}"
+
+    # ── SVG chart ──────────────────────────────────────────────────────────────
+    W, H, LP, RP, TP, BP = 500, 110, 36, 8, 8, 18
+    cW, cH = W - LP - RP, H - TP - BP
+    vals   = [h.get("hours", 0) for h in history]
+    labels = [h.get("period", "") for h in history]
+    max_v  = max(vals) if max(vals) > 0 else 1
+    hi     = max_v * 1.25
+
+    def px(i):  return LP + (i / max(len(vals) - 1, 1)) * cW
+    def py(v):  return TP + (1 - v / hi) * cH
+
+    ticks = [0, hi / 2, hi]
+    grid, ylabels = "", ""
+    for t in ticks:
+        y = py(t)
+        grid    += f'<line x1="{LP}" y1="{y:.1f}" x2="{W-RP}" y2="{y:.1f}" stroke="#21262d" stroke-width="1"/>'
+        ylabels += f'<text x="{LP-4}" y="{y+3:.1f}" text-anchor="end" font-size="8" fill="#4d5561">{t:.0f}h</text>'
+
+    pts      = [(px(i), py(v)) for i, v in enumerate(vals)]
+    polyline = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+    area     = (f"M{pts[0][0]:.1f},{TP+cH} "
+                + " ".join(f"L{x:.1f},{y:.1f}" for x, y in pts)
+                + f" L{pts[-1][0]:.1f},{TP+cH} Z")
+
+    dots, xlabels = "", ""
+    for i, (x, y) in enumerate(pts):
+        dots += (f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.5" '
+                 f'fill="#0d1117" stroke="#3fb950" stroke-width="1.5"/>')
+        if vals[i] > 0:
+            dots += (f'<text x="{x:.1f}" y="{y-8:.1f}" text-anchor="middle" '
+                     f'font-size="8" font-weight="700" fill="#3fb950">{vals[i]:.0f}h</text>')
+        xlabels += (f'<text x="{x:.1f}" y="{H:.1f}" text-anchor="middle" '
+                    f'font-size="8" fill="#4d5561">{labels[i]}</text>')
+
+    chart_svg = (
+        f'<svg width="100%" height="{H}" viewBox="0 0 {W} {H}" '
+        f'style="overflow:visible;display:block;">'
+        f'{grid}'
+        f'<line x1="{LP}" y1="{TP}" x2="{LP}" y2="{TP+cH:.1f}" stroke="#21262d" stroke-width="1"/>'
+        f'{ylabels}'
+        f'<path d="{area}" fill="rgba(63,185,80,0.07)"/>'
+        f'<polyline points="{polyline}" fill="none" stroke="#3fb950" stroke-width="2" '
+        f'stroke-linejoin="round" stroke-linecap="round"/>'
+        f'{dots}{xlabels}'
+        f'</svg>'
+    )
+
+    return f"""
+  <tr><td style="padding-bottom:20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
+      <tr>
+        <td width="50%" style="padding-right:6px;">
+          <div style="background:#0a1e12;border:1px solid #196130;border-radius:10px;
+            padding:16px 20px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
+              text-transform:uppercase;color:#3fb950;margin-bottom:6px;">&#9203; Time Reclaimed</div>
+            <div style="font-size:32px;font-weight:800;color:#3fb950;line-height:1;">{hours_str}h</div>
+            <div style="font-size:10px;color:#238636;margin-top:4px;">Total hours saved YTD</div>
+          </div>
+        </td>
+        <td width="50%" style="padding-left:6px;">
+          <div style="background:#130d2a;border:1px solid #3b2d6e;border-radius:10px;
+            padding:16px 20px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
+              text-transform:uppercase;color:#a371f7;margin-bottom:6px;">&#128142; Value Generated</div>
+            <div style="font-size:32px;font-weight:800;color:#a371f7;line-height:1;">{value_str}</div>
+            <div style="font-size:10px;color:#6e3eb5;margin-top:4px;">@ $20/hr equivalent</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div style="background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:16px 16px 10px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+        color:#4d5561;margin-bottom:10px;">&#128200; Time Reclaimed — Monthly</div>
+      {chart_svg}
+    </div>
+  </td></tr>"""
 
 
 # ── Self-metrics writer ────────────────────────────────────────────────────────
@@ -2007,16 +2198,20 @@ def main() -> None:
         print("🔄 Refresh-only mode — skipping Claude calls and email")
 
         print("📂 Loading cached workflow steps and metrics...")
-        workflow_map, metrics_map = load_workflow_cache()
+        workflow_map, metrics_map, time_saved_history, time_saved_per_agent = load_workflow_cache()
 
-        # Apply cached metrics to agents
+        # Apply cached data to agents
         for agent in agents:
             if agent["name"] in metrics_map:
                 agent["metrics"] = metrics_map[agent["name"]]
+            if agent["name"] in time_saved_per_agent:
+                agent["time_saved"] = time_saved_per_agent[agent["name"]]
 
         print("🏗️  Building full report (GitHub Pages)...")
         new_rows, stage_changes = detect_changes(agents)
-        full_html = build_full_report_html(agents, new_rows, stage_changes, "", week_str, workflow_map)
+        full_html = build_full_report_html(
+            agents, new_rows, stage_changes, "", week_str, workflow_map, time_saved_history
+        )
 
         print("💾 Saving full report to docs/index.html...")
         os.makedirs("docs", exist_ok=True)
@@ -2067,14 +2262,50 @@ def main() -> None:
                     print(f"   {agent['name']}: {len(parsed)} metric(s)")
         print(f"   ✅ Metrics parsed for {len(metrics_map)} agent(s)")
 
-        print("💾 Saving cache (workflows + metrics) for refresh runs...")
-        save_workflow_cache(workflow_map, metrics_map)
+        print("⏱  Computing time saved per agent...")
+        time_saved_per_agent = {}
+        agents_needing_estimate = []
+        for agent in agents:
+            ts = _extract_time_saved(agent.get("metrics", {}))
+            if ts is not None:
+                time_saved_per_agent[agent["name"]] = ts
+                agent["time_saved"] = ts
+            else:
+                agents_needing_estimate.append(agent)
+
+        if agents_needing_estimate:
+            print(f"   Estimating time saved for {len(agents_needing_estimate)} agent(s)...")
+            estimates = _estimate_time_saved_batch(agents_needing_estimate, metrics_client)
+            for agent in agents_needing_estimate:
+                est = float(estimates.get(agent["name"], 1.0))
+                time_saved_per_agent[agent["name"]] = est
+                agent["time_saved"]           = est
+                agent["time_saved_estimated"] = True
+
+        total_this_month = round(sum(time_saved_per_agent.values()), 1)
+        current_month    = datetime.datetime.now().strftime("%b")
+        print(f"   Total this month: {total_this_month}h across {len(time_saved_per_agent)} agent(s)")
+
+        # Load existing history from cache (or seed if first run), update current month
+        _, _, time_saved_history, _ = load_workflow_cache()
+        month_periods = [h["period"] for h in time_saved_history]
+        if current_month in month_periods:
+            for h in time_saved_history:
+                if h["period"] == current_month:
+                    h["hours"] = total_this_month
+        else:
+            time_saved_history.append({"period": current_month, "hours": total_this_month})
+
+        print("💾 Saving cache (workflows + metrics + time saved) for refresh runs...")
+        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent)
 
         print("🏗️  Building email (simplified)...")
         email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
 
         print("🏗️  Building full report (GitHub Pages)...")
-        full_html = build_full_report_html(agents, new_rows, stage_changes, summary, week_str, workflow_map)
+        full_html = build_full_report_html(
+            agents, new_rows, stage_changes, summary, week_str, workflow_map, time_saved_history
+        )
 
         print("💾 Saving full report to docs/index.html...")
         os.makedirs("docs", exist_ok=True)
