@@ -2027,23 +2027,30 @@ def _estimate_time_saved_batch(agents: list[dict], client) -> dict:
         f'Connections: {a["connections"] or "N/A"}'
         for a in agents
     )
-    prompt = f"""For each AI automation agent below, estimate how many hours per FULL MONTH
-it saves a human from doing the same work manually — including research, data pulling,
-writing, formatting, sending, and any follow-up that the agent now handles.
+    prompt = f"""You are estimating monthly hours saved for completed AI automation agents at a marketing company.
+These are real, deployed agents that run automatically. Each one replaces work a human used to do manually.
 
-Calibration guide (use as reference):
-- A weekly report compiled manually: ~2h each × 4 weeks = 8h/month
-- Daily monitoring + summary: ~30min/day × 20 workdays = 10h/month
-- Ad performance analysis (weekly): ~1.5h × 4 = 6h/month
-- Writing + scheduling a blog post: ~3h each; if weekly = 12h/month
-- CRM data enrichment (daily): ~45min/day × 20 = 15h/month
-- Monthly report or newsletter: ~4–6h once = 4–6h/month
-- Automated email sequence setup + management: ~5–8h/month
+Think carefully about the FULL monthly effort that was previously manual:
+- How long did this task take a person each time it ran?
+- How many times per month does it run?
+- Multiply those together for the monthly total.
 
-Typical range is 3–20h/month. Only go below 3 if the task is genuinely trivial.
-Return ONLY valid JSON: {{"Agent Name": hours_number, ...}}
-No explanation, no markdown, numbers only (integer or one decimal).
+Real-world examples to calibrate your estimates:
+- Weekly ad performance report (pull data, analyze, format, send): 2.5h × 4 = 10h/month
+- Daily lead monitoring + CRM update: 45min × 20 workdays = 15h/month
+- Weekly blog post (research, write, format, schedule): 3h × 4 = 12h/month
+- Monthly email newsletter (copy, design review, QA, send): 6h × 1 = 6h/month
+- Weekly competitor tracking + summary: 1.5h × 4 = 6h/month
+- Daily social media scheduling: 20min × 20 = 7h/month
+- Bi-weekly analytics dashboard update: 2h × 2 = 4h/month
 
+MINIMUM is 3h/month. Most marketing automation agents save 5–20h/month.
+Do NOT return 1. Do NOT return 0. Anything under 3 is wrong.
+
+Return ONLY valid JSON — no explanation, no markdown:
+{{"Agent Name": hours_as_number, ...}}
+
+Agents to estimate:
 {blocks}"""
     try:
         msg = client.messages.create(
@@ -2316,14 +2323,23 @@ def main() -> None:
             if ts is not None:
                 time_saved_per_agent[agent["name"]] = ts
                 agent["time_saved"] = ts
-            else:
+            elif agent["stage"] == "Completed":
+                # Only estimate for completed agents — In Progress / Planned aren't saving time yet
                 agents_needing_estimate.append(agent)
 
         if agents_needing_estimate:
-            print(f"   Estimating time saved for {len(agents_needing_estimate)} agent(s)...")
+            print(f"   Estimating time saved for {len(agents_needing_estimate)} completed agent(s)...")
             estimates = _estimate_time_saved_batch(agents_needing_estimate, metrics_client)
             for agent in agents_needing_estimate:
-                est = float(estimates.get(agent["name"], 1.0))
+                est = estimates.get(agent["name"])
+                if est is not None:
+                    try:
+                        est = float(est)
+                    except (TypeError, ValueError):
+                        est = None
+                if est is None or est < 2:
+                    print(f"   ⚠️  Implausible estimate for {agent['name']} ({est}h) — skipping")
+                    continue
                 time_saved_per_agent[agent["name"]] = est
                 agent["time_saved"]           = est
                 agent["time_saved_estimated"] = True
