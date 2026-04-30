@@ -2027,11 +2027,22 @@ def _estimate_time_saved_batch(agents: list[dict], client) -> dict:
         f'Connections: {a["connections"] or "N/A"}'
         for a in agents
     )
-    prompt = f"""For each AI automation agent below, estimate how many hours per month
-it saves a human from doing the same work manually.
-Consider the task type, frequency, and typical manual effort.
+    prompt = f"""For each AI automation agent below, estimate how many hours per FULL MONTH
+it saves a human from doing the same work manually — including research, data pulling,
+writing, formatting, sending, and any follow-up that the agent now handles.
+
+Calibration guide (use as reference):
+- A weekly report compiled manually: ~2h each × 4 weeks = 8h/month
+- Daily monitoring + summary: ~30min/day × 20 workdays = 10h/month
+- Ad performance analysis (weekly): ~1.5h × 4 = 6h/month
+- Writing + scheduling a blog post: ~3h each; if weekly = 12h/month
+- CRM data enrichment (daily): ~45min/day × 20 = 15h/month
+- Monthly report or newsletter: ~4–6h once = 4–6h/month
+- Automated email sequence setup + management: ~5–8h/month
+
+Typical range is 3–20h/month. Only go below 3 if the task is genuinely trivial.
 Return ONLY valid JSON: {{"Agent Name": hours_number, ...}}
-No explanation, no markdown, no units — numbers only.
+No explanation, no markdown, numbers only (integer or one decimal).
 
 {blocks}"""
     try:
