@@ -2072,81 +2072,14 @@ Agents to estimate:
 def _build_time_saved_section(history: list[dict]) -> str:
     """
     Build the time saved stat squares + chart HTML for the main GitHub Pages report.
-    Inserted between the page header and the weekly summary.
-
-    The current month's value is prorated by day (hours × day/days_in_month)
-    so the chart shows real progress through the month rather than the full estimate.
-    Finalized past months always show their locked total.
+    Proration of the current month happens in JavaScript at view time, so the numbers
+    update every day automatically without rebuilding the page.
     """
     if not history:
         return ""
 
-    import calendar as _cal
-    today           = datetime.date.today()
-    current_mon_str = today.strftime("%b")
-    day_of_month    = today.day
-    days_in_month   = _cal.monthrange(today.year, today.month)[1]
-    prorate_factor  = day_of_month / days_in_month
-
-    # Build display values — prorate current month, keep past months as-is
-    display_history = []
-    for h in history:
-        hours = h.get("hours", 0)
-        if h.get("period") == current_mon_str and not h.get("finalized"):
-            hours = round(hours * prorate_factor, 1)
-        display_history.append({**h, "display_hours": hours})
-
-    total_hours = sum(h["display_hours"] for h in display_history)
-    value_gen   = total_hours * HOURLY_RATE
-    hours_str   = f"{total_hours:,.1f}".rstrip("0").rstrip(".")
-    value_str   = f"${value_gen:,.0f}"
-
-    # ── SVG chart ──────────────────────────────────────────────────────────────
-    W, H, LP, RP, TP, BP = 500, 110, 36, 8, 8, 18
-    cW, cH = W - LP - RP, H - TP - BP
-    vals   = [h["display_hours"] for h in display_history]
-    labels = [h.get("period", "") for h in display_history]
-    max_v  = max(vals) if max(vals) > 0 else 1
-    hi     = max_v * 1.25
-
-    def px(i):  return LP + (i / max(len(vals) - 1, 1)) * cW
-    def py(v):  return TP + (1 - v / hi) * cH
-
-    ticks = [0, hi / 2, hi]
-    grid, ylabels = "", ""
-    for t in ticks:
-        y = py(t)
-        grid    += f'<line x1="{LP}" y1="{y:.1f}" x2="{W-RP}" y2="{y:.1f}" stroke="#21262d" stroke-width="1"/>'
-        ylabels += f'<text x="{LP-4}" y="{y+3:.1f}" text-anchor="end" font-size="8" fill="#4d5561">{t:.0f}h</text>'
-
-    pts      = [(px(i), py(v)) for i, v in enumerate(vals)]
-    polyline = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
-    area     = (f"M{pts[0][0]:.1f},{TP+cH} "
-                + " ".join(f"L{x:.1f},{y:.1f}" for x, y in pts)
-                + f" L{pts[-1][0]:.1f},{TP+cH} Z")
-
-    dots, xlabels = "", ""
-    for i, (x, y) in enumerate(pts):
-        dots += (f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.5" '
-                 f'fill="#0d1117" stroke="#3fb950" stroke-width="1.5"/>')
-        if vals[i] > 0:
-            dots += (f'<text x="{x:.1f}" y="{y-8:.1f}" text-anchor="middle" '
-                     f'font-size="8" font-weight="700" fill="#3fb950">{vals[i]:.0f}h</text>')
-        xlabels += (f'<text x="{x:.1f}" y="{H:.1f}" text-anchor="middle" '
-                    f'font-size="8" fill="#4d5561">{labels[i]}</text>')
-
-    chart_svg = (
-        f'<svg width="100%" height="{H}" viewBox="0 0 {W} {H}" '
-        f'style="overflow:visible;display:block;">'
-        f'{grid}'
-        f'<line x1="{LP}" y1="{TP}" x2="{LP}" y2="{TP+cH:.1f}" stroke="#21262d" stroke-width="1"/>'
-        f'{ylabels}'
-        f'<path d="{area}" fill="rgba(63,185,80,0.07)"/>'
-        f'<polyline points="{polyline}" fill="none" stroke="#3fb950" stroke-width="2" '
-        f'stroke-linejoin="round" stroke-linecap="round"/>'
-        f'{dots}{xlabels}'
-        f'</svg>'
-    )
+    history_json = json.dumps(history, ensure_ascii=False).replace("&", "&amp;").replace('"', "&quot;")
+    hourly_rate  = HOURLY_RATE
 
     return f"""
   <tr><td style="padding-bottom:20px;">
@@ -2157,7 +2090,7 @@ def _build_time_saved_section(history: list[dict]) -> str:
             padding:16px 20px;text-align:center;">
             <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
               text-transform:uppercase;color:#3fb950;margin-bottom:6px;">&#9203; Time Reclaimed</div>
-            <div style="font-size:32px;font-weight:800;color:#3fb950;line-height:1;">{hours_str}h</div>
+            <div id="ts-hours" style="font-size:32px;font-weight:800;color:#3fb950;line-height:1;">—</div>
             <div style="font-size:10px;color:#238636;margin-top:4px;">Total hours saved YTD</div>
           </div>
         </td>
@@ -2166,7 +2099,7 @@ def _build_time_saved_section(history: list[dict]) -> str:
             padding:16px 20px;text-align:center;">
             <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
               text-transform:uppercase;color:#a371f7;margin-bottom:6px;">&#128142; Value Generated</div>
-            <div style="font-size:32px;font-weight:800;color:#a371f7;line-height:1;">{value_str}</div>
+            <div id="ts-value" style="font-size:32px;font-weight:800;color:#a371f7;line-height:1;">—</div>
             <div style="font-size:10px;color:#6e3eb5;margin-top:4px;">@ $20/hr equivalent</div>
           </div>
         </td>
@@ -2174,10 +2107,69 @@ def _build_time_saved_section(history: list[dict]) -> str:
     </table>
     <div style="background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:16px 16px 10px;">
       <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-        color:#4d5561;margin-bottom:10px;">&#128200; Time Reclaimed — Monthly</div>
-      {chart_svg}
+        color:#4d5561;margin-bottom:10px;">&#128200; Time Reclaimed &#8212; Monthly</div>
+      <svg id="ts-chart" width="100%" height="110" style="overflow:visible;display:block;"></svg>
     </div>
-  </td></tr>"""
+  </td></tr>
+  <script>
+  (function() {{
+    var RAW   = JSON.parse("{history_json}".replace(/&quot;/g,'\"').replace(/&amp;/g,'&'));
+    var RATE  = {hourly_rate};
+    var today = new Date();
+    var curMon = today.toLocaleString("en-US", {{month:"short"}});
+    var day    = today.getDate();
+    var daysInMonth = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+    var factor = day / daysInMonth;
+
+    var data = RAW.map(function(h) {{
+      var hrs = h.hours || 0;
+      if (h.period === curMon && !h.finalized) hrs = Math.round(hrs * factor * 10) / 10;
+      return {{period: h.period, hours: hrs}};
+    }});
+
+    var total = data.reduce(function(s,h){{return s+h.hours;}}, 0);
+    document.getElementById("ts-hours").textContent = Math.round(total) + "h";
+    document.getElementById("ts-value").textContent = "$" + Math.round(total * RATE).toLocaleString();
+
+    var W=500, H=100, LP=36, RP=8, TP=8, BP=18, cW=W-LP-RP, cH=H-TP-BP;
+    var vals   = data.map(function(h){{return h.hours;}});
+    var labels = data.map(function(h){{return h.period;}});
+    var maxV   = Math.max.apply(null, vals) || 1;
+    var hi     = maxV * 1.3;
+    function px(i){{return LP+(i/Math.max(vals.length-1,1))*cW;}}
+    function py(v){{return TP+(1-v/hi)*cH;}}
+
+    var ticks=[0, Math.round(hi/2), Math.round(hi)], grid="", ylbls="";
+    ticks.forEach(function(t){{
+      var y=py(t);
+      grid +='<line x1="'+LP+'" y1="'+y.toFixed(1)+'" x2="'+(W-RP)+'" y2="'+y.toFixed(1)+'" stroke="#21262d" stroke-width="1"/>';
+      ylbls+='<text x="'+(LP-4)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-size="8" fill="#4d5561">'+t+'h</text>';
+    }});
+
+    var pts=vals.map(function(v,i){{return [px(i),py(v)];}});
+    var poly=pts.map(function(p){{return p[0].toFixed(1)+","+p[1].toFixed(1);}}).join(" ");
+    var area="M"+pts[0][0].toFixed(1)+","+(TP+cH)+" "+pts.map(function(p){{return "L"+p[0].toFixed(1)+","+p[1].toFixed(1);}}).join(" ")+" L"+pts[pts.length-1][0].toFixed(1)+","+(TP+cH)+" Z";
+
+    var dots="", xlbls="";
+    pts.forEach(function(p,i){{
+      dots+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.5" fill="#0d1117" stroke="#3fb950" stroke-width="1.5"/>';
+      if(vals[i]>0) dots+='<text x="'+p[0].toFixed(1)+'" y="'+(p[1]-8).toFixed(1)+'" text-anchor="middle" font-size="8" font-weight="700" fill="#3fb950">'+Math.round(vals[i])+'h</text>';
+      xlbls+='<text x="'+p[0].toFixed(1)+'" y="'+H+'" text-anchor="middle" font-size="8" fill="#4d5561">'+labels[i]+'</text>';
+    }});
+
+    var uid="tsg"+Math.random().toString(36).slice(2);
+    document.getElementById("ts-chart").innerHTML=
+      '<defs><linearGradient id="'+uid+'" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="#3fb950" stop-opacity="0.12"/>'+
+      '<stop offset="100%" stop-color="#3fb950" stop-opacity="0"/></linearGradient></defs>'+
+      grid+
+      '<line x1="'+LP+'" y1="'+TP+'" x2="'+LP+'" y2="'+(TP+cH)+'" stroke="#21262d" stroke-width="1"/>'+
+      ylbls+
+      '<path d="'+area+'" fill="url(#'+uid+')"/>'+
+      '<polyline points="'+poly+'" fill="none" stroke="#3fb950" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+
+      dots+xlbls;
+  }})();
+  </script>"""
 
 
 # ── Self-metrics writer ────────────────────────────────────────────────────────
