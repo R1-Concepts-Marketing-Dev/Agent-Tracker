@@ -2073,20 +2073,39 @@ def _build_time_saved_section(history: list[dict]) -> str:
     """
     Build the time saved stat squares + chart HTML for the main GitHub Pages report.
     Inserted between the page header and the weekly summary.
+
+    The current month's value is prorated by day (hours × day/days_in_month)
+    so the chart shows real progress through the month rather than the full estimate.
+    Finalized past months always show their locked total.
     """
     if not history:
         return ""
 
-    total_hours    = sum(h.get("hours", 0) for h in history)
-    value_gen      = total_hours * HOURLY_RATE
-    hours_str      = f"{total_hours:,.1f}".rstrip("0").rstrip(".")
-    value_str      = f"${value_gen:,.0f}"
+    import calendar as _cal
+    today           = datetime.date.today()
+    current_mon_str = today.strftime("%b")
+    day_of_month    = today.day
+    days_in_month   = _cal.monthrange(today.year, today.month)[1]
+    prorate_factor  = day_of_month / days_in_month
+
+    # Build display values — prorate current month, keep past months as-is
+    display_history = []
+    for h in history:
+        hours = h.get("hours", 0)
+        if h.get("period") == current_mon_str and not h.get("finalized"):
+            hours = round(hours * prorate_factor, 1)
+        display_history.append({**h, "display_hours": hours})
+
+    total_hours = sum(h["display_hours"] for h in display_history)
+    value_gen   = total_hours * HOURLY_RATE
+    hours_str   = f"{total_hours:,.1f}".rstrip("0").rstrip(".")
+    value_str   = f"${value_gen:,.0f}"
 
     # ── SVG chart ──────────────────────────────────────────────────────────────
     W, H, LP, RP, TP, BP = 500, 110, 36, 8, 8, 18
     cW, cH = W - LP - RP, H - TP - BP
-    vals   = [h.get("hours", 0) for h in history]
-    labels = [h.get("period", "") for h in history]
+    vals   = [h["display_hours"] for h in display_history]
+    labels = [h.get("period", "") for h in display_history]
     max_v  = max(vals) if max(vals) > 0 else 1
     hi     = max_v * 1.25
 
