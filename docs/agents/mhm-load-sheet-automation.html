@@ -177,7 +177,7 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 3 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 8.0hh saved/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 8.0hh saved/mo est.</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $160 value/mo</span>
     </div>
   </div>
@@ -245,7 +245,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Microsoft Teams</div>
-                  <div class="step-role">Messaging</div>
+                  <div class="step-role">Notifications</div>
                 </div>
               </div>
           </div>
@@ -311,7 +311,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Reads MHM vehicle data and the New Availability Guide, then matches vehicle part numbers to generate a formatted weekly DFC load sheet.", "impact": "Replaces hours of manual part-number matching and spreadsheet formatting, eliminating human error in weekly load sheet creation.", "dataLabel": "Data collected", "chips": ["MHM vehicle list", "Part numbers", "Availability status", "Pricing data", "Fitment details"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Generates the final formatted load sheet and sales sheet documents ready for distribution.", "impact": "Produces distribution-ready files automatically, ensuring consistent formatting every week without manual cleanup.", "dataLabel": "Records updated", "chips": ["Load sheet rows", "Sales sheet data", "Matched parts", "Week identifier"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Creates and sends a HubSpot marketing email to the distribution list with the sales sheet and load sheet attached.", "impact": "Automates the entire email campaign creation and send process, ensuring dealers receive MHM updates on schedule every Monday.", "dataLabel": "Email contains", "chips": ["Load sheet attachment", "Sales sheet attachment", "Dealer recipient list", "Send schedule"]}, {"name": "Microsoft Teams", "role": "Messaging", "color": "#6264A7", "text": "Posts a notification to the relevant Teams channel confirming the load sheet was generated and the email was sent.", "impact": "Keeps the team informed in real time, providing instant visibility into weekly automation status without checking multiple systems.", "dataLabel": "Notification sent", "chips": ["Completion status", "Email confirmation", "File links", "Timestamp"]}];
+  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Ingests MHM vehicle data and the New Availability Guide, then cross-references part numbers to identify matching products for the weekly Must Have Monday load sheet.", "impact": "Replaces hours of manual VLOOKUP matching and data formatting, ensuring accurate and complete load sheets every week without human error.", "dataLabel": "Data matched", "chips": ["MHM vehicle list", "Part numbers", "Availability status", "Price points", "Fitment data", "Match results"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Generates the formatted DFC load sheet and sales sheet documents ready for distribution.", "impact": "Produces print-ready and email-ready documents automatically, saving the team from repetitive formatting work each Monday cycle.", "dataLabel": "Documents generated", "chips": ["Load sheet file", "Sales sheet file", "Vehicle specs", "Product highlights"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Creates and sends the weekly MHM email campaign in HubSpot with the generated sales sheet and load sheet attached.", "impact": "Delivers the complete Must Have Monday email to the dealer network on schedule without manual HubSpot campaign setup or attachment handling.", "dataLabel": "Email campaign sent", "chips": ["Recipient list", "Email template", "Attached load sheet", "Attached sales sheet", "Send schedule"]}, {"name": "Microsoft Teams", "role": "Notifications", "color": "#6264A7", "text": "Posts a confirmation notification to the team channel with a summary of the weekly MHM load sheet and email status.", "impact": "Keeps stakeholders instantly informed of campaign completion, enabling quick review and eliminating the need to check HubSpot manually.", "dataLabel": "Notification sent", "chips": ["Completion status", "Vehicle count", "Email metrics link", "Team mention"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
