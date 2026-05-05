@@ -2177,17 +2177,18 @@ SELF_METRICS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1j5xWfZOo8wgC1E
 
 def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> None:
     """
-    Write Agent Tracker self-metrics to the tracking sheet.
-    Writes to fixed cells:
-      B2 — Total agents tracked
-      B3 — Total completed
-      B4 — Total in progress
-      B5 — Total planned
-      B6 — Reports created (running total; only incremented when increment_reports=True,
-           i.e. on full weekly runs when an email is actually sent)
+    Write Agent Tracker self-metrics to the tracking sheet, one column per month.
 
-    Requires GOOGLE_SERVICE_ACCOUNT_JSON secret (service account with
-    Editor access to the metrics sheet).
+    Sheet layout:
+      Row 1  — headers: col A = "Metric", col B = "Apr", col C = "May", …
+      Row 2  — Total Agents
+      Row 3  — Completed
+      Row 4  — In Progress
+      Row 5  — Planned
+      Row 6  — Reports Created (running count within each month's column)
+
+    Each month gets its own column, discovered or created automatically.
+    Requires GOOGLE_SERVICE_ACCOUNT_JSON secret.
     """
     sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
     if not sa_json:
@@ -2209,28 +2210,56 @@ def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> N
         sheet_id = match.group(1) if match else ""
         ws       = gc.open_by_key(sheet_id).get_worksheet(0)
 
+        month_header = datetime.datetime.now().strftime("%b")   # e.g. "May"
+
+        # ── Find or create this month's column ────────────────────────────────
+        row1 = ws.row_values(1)
+        if month_header in row1:
+            col = row1.index(month_header) + 1          # 1-indexed
+        else:
+            col = max(len(row1) + 1, 2)                 # at least column B
+            ws.update_cell(1, col, month_header)
+
+        # ── Ensure row labels in column A (only on first run) ─────────────────
+        col_a = ws.col_values(1)
+        if not any(v.strip() for v in col_a[1:6]):      # rows 2-6 empty
+            row_labels = ["Total Agents", "Completed", "In Progress", "Planned", "Reports Created"]
+            ws.update("A2:A6", [[l] for l in row_labels])
+            if not col_a or not col_a[0].strip():
+                ws.update_cell(1, 1, "Metric")
+
+        # ── Compute metric values ─────────────────────────────────────────────
         total     = len(agents)
         completed = sum(1 for a in agents if a["stage"] == "Completed")
         in_prog   = sum(1 for a in agents if a["stage"] == "In Progress")
         planned   = sum(1 for a in agents if a["stage"] == "Planned")
 
+        def _col_a1(c: int) -> str:
+            """Convert 1-indexed column number to A1 letter notation."""
+            result = ""
+            while c > 0:
+                c, r = divmod(c - 1, 26)
+                result = chr(65 + r) + result
+            return result
+
+        c = _col_a1(col)
         updates = [
-            {"range": "B2", "values": [[total]]},
-            {"range": "B3", "values": [[completed]]},
-            {"range": "B4", "values": [[in_prog]]},
-            {"range": "B5", "values": [[planned]]},
+            {"range": f"{c}2", "values": [[total]]},
+            {"range": f"{c}3", "values": [[completed]]},
+            {"range": f"{c}4", "values": [[in_prog]]},
+            {"range": f"{c}5", "values": [[planned]]},
         ]
 
         if increment_reports:
-            raw = ws.acell("B6").value or "0"
+            raw = ws.cell(6, col).value or "0"
             try:
                 reports = int(str(raw).replace(",", "").strip()) + 1
             except ValueError:
                 reports = 1
-            updates.append({"range": "B6", "values": [[reports]]})
-            print(f"   ✅ Self-metrics written — {total} agents, {reports} reports total")
+            updates.append({"range": f"{c}6", "values": [[reports]]})
+            print(f"   ✅ Self-metrics written to col {c} ({month_header}) — {total} agents, {reports} reports")
         else:
-            print(f"   ✅ Self-metrics written — {total} agents (counts only, B6 unchanged)")
+            print(f"   ✅ Self-metrics written to col {c} ({month_header}) — {total} agents")
 
         ws.batch_update(updates)
 
