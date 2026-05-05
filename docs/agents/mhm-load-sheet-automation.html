@@ -177,7 +177,7 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 3 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 8.0hh saved/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 8.0hh saved/mo est.</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $160 value/mo</span>
     </div>
   </div>
@@ -216,36 +216,24 @@
                 <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Google Sheets</div>
-                  <div class="step-role">Spreadsheet</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#4285F4;--t-color:#4285F4;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">HubSpot API</div>
                   <div class="step-role">CRM</div>
                 </div>
               </div>
-              <div class="arrow-wrap" id="arrow-2"><div class="arrow-track">
-                <div class="travel-dot" id="dot-2" style="background:#FF7A59;--t-color:#FF7A59;"></div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#FF7A59;--t-color:#FF7A59;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-3" style="--dot-color:#6264A7;--glow-color:rgba(98,100,167,0.12);" onclick="goToStep(3)">
-                <div class="step-num">4</div>
+              <div class="step-box" id="step-2" style="--dot-color:#6264A7;--glow-color:rgba(98,100,167,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Microsoft Teams</div>
-                  <div class="step-role">Notifications</div>
+                  <div class="step-role">Notification</div>
                 </div>
               </div>
           </div>
@@ -269,7 +257,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 4</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -309,9 +297,9 @@
 
 <script>
 
-  const STEPS = 4, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Ingests MHM vehicle data and the New Availability Guide, then cross-references part numbers to identify matching products for the weekly Must Have Monday load sheet.", "impact": "Replaces hours of manual VLOOKUP matching and data formatting, ensuring accurate and complete load sheets every week without human error.", "dataLabel": "Data matched", "chips": ["MHM vehicle list", "Part numbers", "Availability status", "Price points", "Fitment data", "Match results"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Generates the formatted DFC load sheet and sales sheet documents ready for distribution.", "impact": "Produces print-ready and email-ready documents automatically, saving the team from repetitive formatting work each Monday cycle.", "dataLabel": "Documents generated", "chips": ["Load sheet file", "Sales sheet file", "Vehicle specs", "Product highlights"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Creates and sends the weekly MHM email campaign in HubSpot with the generated sales sheet and load sheet attached.", "impact": "Delivers the complete Must Have Monday email to the dealer network on schedule without manual HubSpot campaign setup or attachment handling.", "dataLabel": "Email campaign sent", "chips": ["Recipient list", "Email template", "Attached load sheet", "Attached sales sheet", "Send schedule"]}, {"name": "Microsoft Teams", "role": "Notifications", "color": "#6264A7", "text": "Posts a confirmation notification to the team channel with a summary of the weekly MHM load sheet and email status.", "impact": "Keeps stakeholders instantly informed of campaign completion, enabling quick review and eliminating the need to check HubSpot manually.", "dataLabel": "Notification sent", "chips": ["Completion status", "Vehicle count", "Email metrics link", "Team mention"]}];
+  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Pulls MHM vehicle data and the New Availability Guide, then matches part numbers to generate a formatted weekly DFC Must Have Monday load sheet.", "impact": "Eliminates hours of manual VLOOKUP and cross-referencing between vehicle lists and availability data, ensuring accuracy and consistency every week.", "dataLabel": "Data processed", "chips": ["MHM vehicle list", "Part numbers", "Availability matches", "Load sheet rows", "Pricing data", "Fitment details"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Creates and sends the weekly MHM email campaign in HubSpot, attaching the generated sales sheet and load sheet to the email.", "impact": "Automates the full email build-and-send workflow so the sales team receives a polished, ready-to-use MHM package every week without manual intervention.", "dataLabel": "Email contains", "chips": ["Sales sheet attachment", "Load sheet attachment", "Vehicle highlights", "Recipient list", "Send schedule"]}, {"name": "Microsoft Teams", "role": "Notification", "color": "#6264A7", "text": "Posts a confirmation message to the designated Teams channel with a summary of the load sheet and email send status.", "impact": "Keeps the team instantly informed of weekly completion status, enabling quick review and reducing back-and-forth status check messages.", "dataLabel": "Notification sent", "chips": ["Completion status", "Vehicle count", "Email send confirmation", "Sheet link"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
