@@ -216,16 +216,16 @@
                 <div class="travel-dot" id="dot-0" style="background:#FF7A59;--t-color:#FF7A59;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Dream API</div>
+                  <div class="step-platform">Dream Inventory</div>
                   <div class="step-role">Inventory System</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#64748B;--t-color:#64748B;"></div>
+                <div class="travel-dot" id="dot-1" style="background:#4B5563;--t-color:#4B5563;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-2" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(2)">
@@ -311,7 +311,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "HubSpot Form", "role": "Data Collection", "color": "#FF7A59", "text": "Mark submits a vehicle specification including make, model, year, and other attributes through a HubSpot intake form.", "impact": "Standardizes every catalog request into a structured format, eliminating back-and-forth emails and ensuring no spec details are missed.", "dataLabel": "Data collected", "chips": ["Vehicle Make", "Vehicle Model", "Year", "Trim/Engine", "Part Category", "Requestor Info"]}, {"name": "Dream API", "role": "Inventory System", "color": "#64748B", "text": "Queries DFC's inventory database to pull all parts currently stocked for the submitted vehicle spec and identifies gaps where no matching part exists.", "impact": "Replaces manual inventory lookups across multiple systems, delivering a complete stock-vs-gap picture in seconds instead of hours.", "dataLabel": "Records retrieved", "chips": ["Stocked Part Numbers", "Part Descriptions", "Inventory Levels", "Missing Coverage Gaps", "Vehicle Fitment Data"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Structures the raw inventory results into a formatted catalog layout, organizing stocked items and missing items into clearly labeled sections.", "impact": "Automates the formatting and analysis work that previously required manual spreadsheet assembly, ensuring consistent and professional output every time.", "dataLabel": "Analysis produced", "chips": ["Formatted Catalog Table", "In-Stock Items", "Missing Items", "Coverage Summary"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends Mark an email with the finished Excel file attached, showing DFC's current stock for the requested vehicles and highlighting what's missing from inventory.", "impact": "Delivers the completed catalog directly to Mark's inbox within minutes of submission, enabling faster quoting and decision-making for special markets opportunities.", "dataLabel": "Email contains", "chips": ["Excel Attachment", "Stock Coverage Report", "Gap Analysis", "Vehicle Spec Summary"]}];
+  const stepData = [{"name": "HubSpot Form", "role": "Data Collection", "color": "#FF7A59", "text": "Mark submits a vehicle specification including make, model, year, and any special requirements through a HubSpot intake form.", "impact": "Standardizes every catalog request into a structured format, eliminating back-and-forth emails and ensuring no vehicle details are missed.", "dataLabel": "Data collected", "chips": ["Vehicle Make", "Vehicle Model", "Year", "Spec Requirements", "Requestor Info"]}, {"name": "Dream Inventory", "role": "Inventory System", "color": "#4B5563", "text": "Queries DFC's inventory database to pull all parts currently stocked for the submitted vehicle spec and identifies gaps where parts are not available.", "impact": "Instant inventory matching replaces manual catalog lookups, giving Mark a complete picture of stock availability and coverage gaps in seconds.", "dataLabel": "Records matched", "chips": ["Stocked Parts List", "Missing Parts List", "Part Numbers", "Coverage Gaps", "Inventory Quantities"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Formats the raw inventory match and gap data into a clean, organized Excel catalog layout with stocked items and missing items clearly separated.", "impact": "Produces a professional, ready-to-use catalog document automatically, saving hours of manual spreadsheet formatting per request.", "dataLabel": "Analysis produced", "chips": ["Formatted Catalog", "Stock vs. Gap Summary", "Vehicle-Part Mapping", "Excel Structure"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends the completed Excel catalog file directly to Mark's email with a summary of what DFC stocks and what's missing for the requested vehicles.", "impact": "Mark receives a finished deliverable in his inbox without any manual intervention, turning a multi-step research task into a single form submission.", "dataLabel": "Email contains", "chips": ["Excel Attachment", "Stock Summary", "Gap Highlights", "Vehicle Spec Recap"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
