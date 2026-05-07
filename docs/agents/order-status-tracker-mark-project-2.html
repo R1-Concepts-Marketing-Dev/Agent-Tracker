@@ -179,6 +179,7 @@
       </span>
       
       
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.34 run cost/mo</span>
     </div>
   </div>
 </div>
@@ -209,7 +210,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Dream</div>
-                  <div class="step-role">Automation</div>
+                  <div class="step-role">Workflow Engine</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -299,7 +300,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream", "role": "Automation", "color": "#4B5563", "text": "Pulls the weekly backorder report and enriches each line item with live inventory status including on-hand quantity, on-order status, and in-transit data.", "impact": "Replaces a fragmented process where a dozen team members perform independent lookups, consolidating all status data into one enriched report in minutes.", "dataLabel": "Inventory data retrieved", "chips": ["Part Numbers", "On Hand Qty", "On Order Status", "In Transit Status", "Dead-End Flag", "Backorder Lines"]}, {"name": "Backorder Report", "role": "Spreadsheet", "color": "#4B5563", "text": "Updates the weekly report with enriched status fields and applies flags to parts that have no available source or replenishment path.", "impact": "Gives the team a single source of truth for all backorder visibility, surfacing dead-end parts immediately so decisions can be made without further investigation.", "dataLabel": "Records updated", "chips": ["Enriched Status", "Dead-End Flags", "Source Availability", "Updated Report", "Priority Parts"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends draft customer communications pre-written for each flagged or delayed order, ready for review and send.", "impact": "Accelerates customer communication turnaround and ensures consistent messaging across all backorder situations without requiring manual drafting.", "dataLabel": "Email contains", "chips": ["Draft Message", "Order Status Summary", "Flagged Parts", "Expected Timeline", "Customer Name"]}];
+  const stepData = [{"name": "Dream", "role": "Workflow Engine", "color": "#4B5563", "text": "Pulls the weekly backorder report and enriches each line item by querying live inventory data sources to append on-hand quantities, on-order status, and in-transit information.", "impact": "Consolidates what currently requires a dozen people doing independent manual lookups into a single automated process, eliminating duplicate effort and data inconsistencies across the team.", "dataLabel": "Enriched backorder data", "chips": ["Part Numbers", "On Hand Qty", "On Order Qty", "In Transit Status", "Dead-End Flag", "Source Availability"]}, {"name": "Backorder Report", "role": "Spreadsheet", "color": "#4B5563", "text": "Receives the enriched data and updates each backorder line with live inventory status columns, with dead-end parts flagged clearly where no supply source exists.", "impact": "Gives the entire team a single source of truth that is always current, replacing static spreadsheets that go stale the moment they are created.", "dataLabel": "Records updated", "chips": ["Updated Status Columns", "Dead-End Flags", "ETA Estimates", "Source Notes", "Backorder Line Items"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications pre-populated with the relevant backorder status, estimated availability, and any dead-end part notifications for each affected customer.", "impact": "Eliminates the manual work of writing individual customer updates, ensuring customers receive timely and accurate order status communications without staff intervention.", "dataLabel": "Email contains", "chips": ["Customer Name", "Part Status Update", "ETA Information", "Dead-End Notice", "Draft Communication", "Order Reference"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

@@ -179,6 +179,7 @@
       </span>
       
       
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.34 run cost/mo</span>
     </div>
   </div>
 </div>
@@ -209,7 +210,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Dream ERP</div>
-                  <div class="step-role">ERP System</div>
+                  <div class="step-role">ERP Source</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -287,7 +288,7 @@
 
   const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream ERP", "role": "ERP System", "color": "#6A0DAD", "text": "Exports DFC customer records including Dream CustomerIDs, contact details, and account data for mapping to HubSpot.", "impact": "Creates the foundational data bridge between DFC's ERP and CRM, enabling sales automation workflows to fire based on real customer purchase and account history.", "dataLabel": "Data collected", "chips": ["Dream CustomerID", "Contact Name", "Email Address", "Account Type", "Purchase History", "Export Timestamp"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Matches Dream CustomerIDs to existing HubSpot contacts and writes the CustomerID as a mapped property on each contact record.", "impact": "Unlocks ERP-powered segmentation and workflow triggers in HubSpot, allowing DFC sales automations to reference real customer data and personalize outreach at scale.", "dataLabel": "Records updated", "chips": ["HubSpot Contact ID", "Dream CustomerID", "Mapped Property", "Match Status", "Segment Tag", "Sync Timestamp"]}];
+  const stepData = [{"name": "Dream ERP", "role": "ERP Source", "color": "#6A0DAD", "text": "Exports customer records including Dream CustomerIDs, contact details, and purchase history for all active DFC accounts.", "impact": "Provides the authoritative customer identity data needed to correctly link ERP accounts to CRM contacts, preventing duplicates and mismatches.", "dataLabel": "Data collected", "chips": ["CustomerID", "Contact Name", "Email", "Purchase History", "Account Status", "Export Date"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Matches Dream CustomerIDs to existing HubSpot contacts and writes the CustomerID as a custom property on each matched record.", "impact": "Unlocks ERP-triggered sales automation by giving HubSpot a reliable key to sync order data, enabling purchase-based workflow triggers and segmentation.", "dataLabel": "Records updated", "chips": ["CustomerID Mapped", "Custom Property", "Contact Match", "Sync Status", "Unmatched Flags", "Workflow Ready"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;

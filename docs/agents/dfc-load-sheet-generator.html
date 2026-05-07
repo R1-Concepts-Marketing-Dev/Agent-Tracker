@@ -177,8 +177,9 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 1 platform connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 6.0hh saved/mo est.</span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $120 value/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 5.0hh saved/mo est.</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $100 value/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.34 run cost/mo</span>
     </div>
   </div>
 </div>
@@ -204,8 +205,20 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#F16529;--glow-color:rgba(241,101,41,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#E34C26;--glow-color:rgba(227,76,38,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Local browser tool (standalone HTML)</div>
+                  <div class="step-role">Browser Tool</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
+                <div class="travel-dot" id="dot-0" style="background:#E34C26;--t-color:#E34C26;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-1" style="--dot-color:#E34C26;--glow-color:rgba(227,76,38,0.12);" onclick="goToStep(1)">
+                <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Local browser tool (standalone HTML)</div>
@@ -233,7 +246,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 1</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -245,7 +258,7 @@
   <div class="card">
     <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#F16529;display:inline-block;"></span>Local browser tool (standalone HTML)</span></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#E34C26;display:inline-block;"></span>Local browser tool (standalone HTML)</span></div>
     </div>
   </div>
 
@@ -273,9 +286,9 @@
 
 <script>
 
-  const STEPS = 1, TRAVEL_MS = 700;
+  const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Local browser tool (standalone HTML)", "role": "Browser Tool", "color": "#F16529", "text": "Accepts uploaded MHM vehicle data and New Availability Guide files, matches part numbers in-browser, and generates a formatted DFC load sheet.", "impact": "Gives the team an instant, no-login tool to produce accurate load sheets on demand without relying on external systems or technical support.", "dataLabel": "Data collected", "chips": ["Uploaded Vehicle Data", "Availability Guide", "Matched Part Numbers", "Load Sheet Output", "Excel Export"]}];
+  const stepData = [{"name": "Local browser tool (standalone HTML)", "role": "Browser Tool", "color": "#E34C26", "text": "Accepts uploaded MHM vehicle part number data and New Availability Guide, then matches records client-side in the browser.", "impact": "Gives sales and ops staff an instant, no-login load sheet matching tool that requires no backend infrastructure or IT support.", "dataLabel": "Data matched locally", "chips": ["Part Numbers", "Availability Status", "Matched SKUs", "Unmatched Flags", "Vehicle Description"]}, {"name": "Local browser tool (standalone HTML)", "role": "Browser Tool", "color": "#E34C26", "text": "Exports the matched and formatted load sheet as a downloadable Excel file ready for distribution.", "impact": "Delivers a formatted, distribution-ready load sheet in seconds, eliminating manual Excel formatting and reducing errors in the weekly process.", "dataLabel": "Excel file exported", "chips": ["Formatted Load Sheet", "Matched Part List", "Excel File", "Export Timestamp", "Row Count"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
