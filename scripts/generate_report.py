@@ -43,18 +43,25 @@ CLAUDE_CACHE_READ_COST_PER_MTOK     =  0.30   # cache read (0.1× input rate)
 # Accumulates across the full run; passed to _write_self_metrics at the end
 _run_cost_usd: float = 0.0
 
-def _add_cost(msg) -> None:
-    """Add the USD cost of a Claude API response to the run total."""
-    global _run_cost_usd
+def _call_cost(msg) -> float:
+    """Return the USD cost of a Claude API response."""
     usage = getattr(msg, "usage", None)
     if not usage:
-        return
-    _run_cost_usd += (
+        return 0.0
+    return (
         getattr(usage, "input_tokens",               0) * CLAUDE_INPUT_COST_PER_MTOK       / 1_000_000
       + getattr(usage, "output_tokens",              0) * CLAUDE_OUTPUT_COST_PER_MTOK      / 1_000_000
       + getattr(usage, "cache_creation_input_tokens",0) * CLAUDE_CACHE_WRITE_COST_PER_MTOK / 1_000_000
       + getattr(usage, "cache_read_input_tokens",    0) * CLAUDE_CACHE_READ_COST_PER_MTOK  / 1_000_000
     )
+
+
+def _add_cost(msg) -> float:
+    """Add the USD cost of a Claude API response to the run total. Returns cost added."""
+    global _run_cost_usd
+    cost = _call_cost(msg)
+    _run_cost_usd += cost
+    return cost
 
 # ── Google Sheets ───────────────────────────────────────────────────────────────
 def _normalize_stage(raw: str) -> str:
@@ -204,16 +211,16 @@ CSV data:
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
-        _add_cost(msg)
+        cost = _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
         if raw.endswith("```"):
             raw = "\n".join(raw.split("\n")[:-1])
-        return json.loads(raw.strip())
+        return json.loads(raw.strip()), cost
     except Exception as e:
         print(f"   ⚠️  Claude could not parse metrics ({e})")
-        return {}
+        return {}, 0.0
 
 
 def fetch_sheet_data() -> list[dict]:
@@ -361,25 +368,26 @@ Agents:
         max_tokens=8000,
         messages=[{"role": "user", "content": prompt}],
     )
-    _add_cost(msg)
+    cost = _add_cost(msg)
     raw = msg.content[0].text.strip()
     if raw.startswith("```"):
         raw = "\n".join(raw.split("\n")[1:])
     if raw.endswith("```"):
         raw = "\n".join(raw.split("\n")[:-1])
     try:
-        return json.loads(raw.strip())
+        return json.loads(raw.strip()), cost
     except json.JSONDecodeError:
         print(f"⚠️  Could not parse workflow JSON for batch, skipping {len(batch)} agent(s)")
-        return {}
+        return {}, cost
 
 
-def generate_workflow_steps(agents: list[dict]) -> dict[str, list[dict]]:
+def generate_workflow_steps(agents: list[dict], cost_per_agent: dict) -> dict[str, list[dict]]:
     """
     Ask Claude to generate step-by-step workflow descriptions for each agent.
     Returns a dict: { agent_name: [ {platform, role, action, impact, dataLabel, chips}, ... ] }
     Agents with no connections get an empty list.
     Processes in batches of 10 to stay within token limits.
+    Updates cost_per_agent in place with each agent's share of batch cost.
     """
     agents_with_connections = [a for a in agents if a["connections"].strip()]
     if not agents_with_connections:
@@ -396,8 +404,11 @@ def generate_workflow_steps(agents: list[dict]) -> dict[str, list[dict]]:
     print(f"   Processing {len(agents_with_connections)} agent(s) in {len(batches)} batch(es)...")
     for idx, batch in enumerate(batches):
         print(f"   Batch {idx + 1}/{len(batches)}: {[a['name'] for a in batch]}")
-        batch_result = _workflow_batch(batch, client)
+        batch_result, batch_cost = _workflow_batch(batch, client)
         results.update(batch_result)
+        per_agent = batch_cost / len(batch) if batch else 0
+        for a in batch:
+            cost_per_agent[a["name"]] = round(cost_per_agent.get(a["name"], 0) + per_agent, 6)
 
     return results
 
@@ -1232,7 +1243,7 @@ def build_full_report_html(
 
 
 # ── Individual Agent Page Builder ─────────────────────────────────────────────
-def build_agent_page_html(agent: dict, steps: list[dict], week_str: str, monthly_run_cost: float = 0.0) -> str:
+def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
     """Build a standalone HTML page for a single agent with v4 animated workflow."""
     accent         = CARD_BORDER.get(agent["stage"], "#30363d")
     freq           = agent["frequency"] or "Schedule TBD"
@@ -1365,14 +1376,17 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str, monthly
             f'&#128142; {v_str} value/mo</span>'
         )
 
-    # ── Run cost badge ────────────────────────────────────────────────────────
+    # ── Per-agent run cost badge ──────────────────────────────────────────────
     run_cost_chip = ""
-    if monthly_run_cost > 0:
-        cost_str = f"${monthly_run_cost:.2f}" if monthly_run_cost < 10 else f"${monthly_run_cost:,.2f}"
+    agent_run_cost = agent.get("run_cost")
+    if agent_run_cost:
+        cost_str = f"${agent_run_cost:.4f}" if agent_run_cost < 0.01 else (
+                   f"${agent_run_cost:.2f}"  if agent_run_cost < 10   else
+                   f"${agent_run_cost:,.2f}")
         run_cost_chip = (
             f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
             f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
-            f'&#128184; {cost_str} run cost/mo</span>'
+            f'&#128184; {cost_str}/run</span>'
         )
 
     # ── Trigger badge (frequency) ──────────────────────────────────────────────
@@ -1961,6 +1975,7 @@ def save_workflow_cache(
     time_saved_history: list = None,
     time_saved_per_agent: dict = None,
     summary: str = "",
+    cost_per_agent: dict = None,
 ) -> None:
     os.makedirs("docs", exist_ok=True)
     cache = {
@@ -1969,6 +1984,7 @@ def save_workflow_cache(
         "time_saved_history":   time_saved_history or [],
         "time_saved_per_agent": time_saved_per_agent or {},
         "summary":              summary or "",
+        "cost_per_agent":       cost_per_agent or {},
     }
     with open(WORKFLOW_CACHE_PATH, "w", encoding="utf-8") as f:
         json.dump(cache, f, indent=2)
@@ -1977,7 +1993,7 @@ def save_workflow_cache(
           f"{len(time_saved_history or [])} time-saved months)")
 
 
-def load_workflow_cache() -> tuple[dict, dict, list, dict, str]:
+def load_workflow_cache() -> tuple[dict, dict, list, dict, str, dict]:
     if os.path.exists(WORKFLOW_CACHE_PATH):
         with open(WORKFLOW_CACHE_PATH, encoding="utf-8") as f:
             data = json.load(f)
@@ -1988,18 +2004,20 @@ def load_workflow_cache() -> tuple[dict, dict, list, dict, str]:
             time_saved_history   = data.get("time_saved_history", list(SEED_TIME_HISTORY))
             time_saved_per_agent = data.get("time_saved_per_agent", {})
             summary              = data.get("summary", "")
+            cost_per_agent       = data.get("cost_per_agent", {})
         else:
             workflows            = data
             metrics              = {}
             time_saved_history   = list(SEED_TIME_HISTORY)
             time_saved_per_agent = {}
             summary              = ""
+            cost_per_agent       = {}
         print(f"   📂 Loaded cache ({len(workflows)} workflows, "
               f"{len(metrics)} metrics, "
               f"{len(time_saved_history)} time-saved months)")
-        return workflows, metrics, time_saved_history, time_saved_per_agent, summary
+        return workflows, metrics, time_saved_history, time_saved_per_agent, summary, cost_per_agent
     print("   ⚠️  No cache found — pages will show placeholder workflow")
-    return {}, {}, list(SEED_TIME_HISTORY), {}, ""
+    return {}, {}, list(SEED_TIME_HISTORY), {}, "", {}
 
 
 # ── Time Saved ────────────────────────────────────────────────────────────────
@@ -2097,16 +2115,16 @@ Agents to estimate:
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
-        _add_cost(msg)
+        cost = _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
         if raw.endswith("```"):
             raw = "\n".join(raw.split("\n")[:-1])
-        return json.loads(raw.strip())
+        return json.loads(raw.strip()), cost
     except Exception as e:
         print(f"   ⚠️  Time saved batch estimate failed ({e})")
-        return {}
+        return {}, 0.0
 
 
 def _build_time_saved_section(history: list[dict]) -> str:
@@ -2177,10 +2195,16 @@ def _build_time_saved_section(history: list[dict]) -> str:
     }});
 
     var total     = data.reduce(function(s,h){{return s+h.hours;}}, 0);
-    var totalCost = RAW.reduce(function(s,h){{return s+(h.cost||0);}}, 0);
+    var totalCost = RAW.reduce(function(s,h){{return s+(typeof h.cost==="number"?h.cost:0);}}, 0);
     document.getElementById("ts-hours").textContent = Math.round(total) + "h";
     document.getElementById("ts-value").textContent = "$" + Math.round(total * RATE).toLocaleString();
-    document.getElementById("ts-cost").textContent  = "$" + totalCost.toFixed(2);
+    var costEl = document.getElementById("ts-cost");
+    if (totalCost > 0) {{
+      costEl.textContent = "$" + totalCost.toFixed(2);
+    }} else {{
+      costEl.textContent = "—";
+      costEl.style.opacity = "0.3";
+    }}
 
     var W=500, H=100, LP=36, RP=8, TP=8, BP=18, cW=W-LP-RP, cH=H-TP-BP;
     var vals   = data.map(function(h){{return h.hours;}});
@@ -2351,7 +2375,7 @@ def main() -> None:
         print(f"📅 Monthly snapshot mode — recording {prev_month_str} final total...")
 
         # Load existing cache for metrics + history
-        _, metrics_map, time_saved_history, _, cached_summary = load_workflow_cache()
+        _, metrics_map, time_saved_history, _, cached_summary, cached_cost_per_agent = load_workflow_cache()
         for agent in agents:
             if agent["name"] in metrics_map:
                 agent["metrics"] = metrics_map[agent["name"]]
@@ -2392,7 +2416,7 @@ def main() -> None:
             time_saved_history.append({"period": prev_month_str, "hours": total, "cost": 0, "finalized": True})
 
         # Reload full cache to preserve workflows + metrics, just update history
-        wf_map, m_map, _, old_ts_per_agent, _ = load_workflow_cache()
+        wf_map, m_map, _, old_ts_per_agent, _, _ = load_workflow_cache()
         save_workflow_cache(wf_map, m_map, time_saved_history, old_ts_per_agent, cached_summary)
         print(f"   ✅ {prev_month_str} locked in at {total}h")
         print("✅ Done!")
@@ -2410,7 +2434,7 @@ def main() -> None:
         print("🔄 Refresh-only mode — skipping Claude calls and email")
 
         print("📂 Loading cached workflow steps and metrics...")
-        workflow_map, metrics_map, time_saved_history, time_saved_per_agent, cached_summary = load_workflow_cache()
+        workflow_map, metrics_map, time_saved_history, time_saved_per_agent, cached_summary, cached_cost_per_agent = load_workflow_cache()
 
         # Apply cached data to agents
         for agent in agents:
@@ -2418,6 +2442,8 @@ def main() -> None:
                 agent["metrics"] = metrics_map[agent["name"]]
             if agent["name"] in time_saved_per_agent:
                 agent["time_saved"] = time_saved_per_agent[agent["name"]]
+            if agent["name"] in cached_cost_per_agent:
+                agent["run_cost"] = cached_cost_per_agent[agent["name"]]
 
         print("🏗️  Building full report (GitHub Pages)...")
         new_rows, stage_changes = detect_changes(agents)
@@ -2430,15 +2456,13 @@ def main() -> None:
         with open("docs/index.html", "w", encoding="utf-8") as f:
             f.write(full_html)
 
-        cur_mon = datetime.datetime.now().strftime("%b")
-        monthly_run_cost = next((h.get("cost", 0) for h in time_saved_history if h["period"] == cur_mon), 0)
 
         print("📄 Building individual agent pages...")
         os.makedirs("docs/agents", exist_ok=True)
         for agent in agents:
             slug      = _slugify(agent["name"])
             steps     = workflow_map.get(agent["name"], [])
-            page_html = build_agent_page_html(agent, steps, week_str, monthly_run_cost)
+            page_html = build_agent_page_html(agent, steps, week_str)
             with open(f"docs/agents/{slug}.html", "w", encoding="utf-8") as f:
                 f.write(page_html)
         print(f"   ✅ Refreshed {len(agents)} agent page(s)")
@@ -2460,8 +2484,10 @@ def main() -> None:
         print("🤖 Generating Claude summary...")
         summary = generate_summary(agents, new_rows, stage_changes)
 
+        cost_per_agent: dict = {}
+
         print("🤖 Generating workflow steps for full report...")
-        workflow_map = generate_workflow_steps(agents)
+        workflow_map = generate_workflow_steps(agents, cost_per_agent)
         print(f"   Generated workflows for {len(workflow_map)} agent(s)")
 
         print("📊 Fetching and parsing agent metrics with Claude...")
@@ -2470,10 +2496,11 @@ def main() -> None:
         for agent in agents:
             link = agent.get("metric_link", "")
             if link:
-                parsed = _fetch_and_parse_metrics(link, metrics_client)
+                parsed, m_cost = _fetch_and_parse_metrics(link, metrics_client)
                 if parsed:
                     agent["metrics"] = parsed
                     metrics_map[agent["name"]] = parsed
+                    cost_per_agent[agent["name"]] = round(cost_per_agent.get(agent["name"], 0) + m_cost, 6)
                     print(f"   {agent['name']}: {len(parsed)} metric(s)")
         print(f"   ✅ Metrics parsed for {len(metrics_map)} agent(s)")
 
@@ -2491,7 +2518,10 @@ def main() -> None:
 
         if agents_needing_estimate:
             print(f"   Estimating time saved for {len(agents_needing_estimate)} completed agent(s)...")
-            estimates = _estimate_time_saved_batch(agents_needing_estimate, metrics_client)
+            estimates, est_cost = _estimate_time_saved_batch(agents_needing_estimate, metrics_client)
+            est_per_agent = est_cost / len(agents_needing_estimate) if agents_needing_estimate else 0
+            for agent in agents_needing_estimate:
+                cost_per_agent[agent["name"]] = round(cost_per_agent.get(agent["name"], 0) + est_per_agent, 6)
             for agent in agents_needing_estimate:
                 est = estimates.get(agent["name"])
                 if est is not None:
@@ -2511,7 +2541,7 @@ def main() -> None:
         print(f"   Total this month: {total_this_month}h across {len(time_saved_per_agent)} agent(s)")
 
         # Load existing history from cache (or seed if first run), update current month
-        _, _, time_saved_history, _, _ = load_workflow_cache()
+        _, _, time_saved_history, _, _, _ = load_workflow_cache()
         month_periods = [h["period"] for h in time_saved_history]
         if current_month in month_periods:
             for h in time_saved_history:
@@ -2525,8 +2555,13 @@ def main() -> None:
                 "cost":   round(_run_cost_usd, 4),
             })
 
+        # Attach per-agent cost to agent dicts for page building
+        for agent in agents:
+            if agent["name"] in cost_per_agent:
+                agent["run_cost"] = cost_per_agent[agent["name"]]
+
         print("💾 Saving cache (workflows + metrics + time saved + summary)...")
-        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary)
+        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary, cost_per_agent)
 
         print("🏗️  Building email (simplified)...")
         email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
@@ -2541,15 +2576,13 @@ def main() -> None:
         with open("docs/index.html", "w", encoding="utf-8") as f:
             f.write(full_html)
 
-        cur_mon_full = datetime.datetime.now().strftime("%b")
-        monthly_run_cost = next((h.get("cost", 0) for h in time_saved_history if h["period"] == cur_mon_full), 0)
 
         print("📄 Building individual agent pages...")
         os.makedirs("docs/agents", exist_ok=True)
         for agent in agents:
             slug      = _slugify(agent["name"])
             steps     = workflow_map.get(agent["name"], [])
-            page_html = build_agent_page_html(agent, steps, week_str, monthly_run_cost)
+            page_html = build_agent_page_html(agent, steps, week_str)
             with open(f"docs/agents/{slug}.html", "w", encoding="utf-8") as f:
                 f.write(page_html)
         print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
