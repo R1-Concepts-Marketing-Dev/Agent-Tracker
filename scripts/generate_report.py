@@ -32,6 +32,24 @@ SHEET_GIDS         = os.environ.get("SHEET_GIDS", "0")
 # How many days back counts as "this week"
 LOOKBACK_DAYS = 7
 
+# ── Claude cost tracking ───────────────────────────────────────────────────────
+# Pricing for claude-opus-4-6 (USD per million tokens)
+CLAUDE_INPUT_COST_PER_MTOK  = 15.00
+CLAUDE_OUTPUT_COST_PER_MTOK = 75.00
+
+# Accumulates across the full run; passed to _write_self_metrics at the end
+_run_cost_usd: float = 0.0
+
+def _add_cost(msg) -> None:
+    """Add the cost of a Claude API response to the run total."""
+    global _run_cost_usd
+    usage = getattr(msg, "usage", None)
+    if usage:
+        _run_cost_usd += (
+            getattr(usage, "input_tokens",  0) * CLAUDE_INPUT_COST_PER_MTOK  / 1_000_000
+          + getattr(usage, "output_tokens", 0) * CLAUDE_OUTPUT_COST_PER_MTOK / 1_000_000
+        )
+
 # ── Google Sheets ───────────────────────────────────────────────────────────────
 def _normalize_stage(raw: str) -> str:
     s = raw.strip().lower()
@@ -180,6 +198,7 @@ CSV data:
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
+        _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
@@ -284,6 +303,7 @@ No bullet points. Plain paragraph prose only."""
         max_tokens=400,
         messages=[{"role": "user", "content": prompt}],
     )
+    _add_cost(msg)
     return msg.content[0].text.strip()
 
 
@@ -335,6 +355,7 @@ Agents:
         max_tokens=8000,
         messages=[{"role": "user", "content": prompt}],
     )
+    _add_cost(msg)
     raw = msg.content[0].text.strip()
     if raw.startswith("```"):
         raw = "\n".join(raw.split("\n")[1:])
@@ -550,6 +571,7 @@ Platforms:
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
+        _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
@@ -2058,6 +2080,7 @@ Agents to estimate:
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
+        _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
@@ -2175,7 +2198,7 @@ def _build_time_saved_section(history: list[dict]) -> str:
 # ── Self-metrics writer ────────────────────────────────────────────────────────
 SELF_METRICS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1j5xWfZOo8wgC1E-yoiQlTikz2ateGQ1SYjgtKGLfRPA/edit?gid=0#gid=0"
 
-def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> None:
+def _write_self_metrics(agents: list[dict], increment_reports: bool = True, run_cost_usd: float = 0.0) -> None:
     """
     Write Agent Tracker self-metrics to the tracking sheet, one column per month.
 
@@ -2222,9 +2245,9 @@ def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> N
 
         # ── Ensure row labels in column A (only on first run) ─────────────────
         col_a = ws.col_values(1)
-        if not any(v.strip() for v in col_a[1:6]):      # rows 2-6 empty
-            row_labels = ["Total Agents", "Completed", "In Progress", "Planned", "Reports Created"]
-            ws.update("A2:A6", [[l] for l in row_labels])
+        if not any(v.strip() for v in col_a[1:7]):      # rows 2-7 empty
+            row_labels = ["Total Agents", "Completed", "In Progress", "Planned", "Reports Created", "API Cost ($)"]
+            ws.update("A2:A7", [[l] for l in row_labels])
             if not col_a or not col_a[0].strip():
                 ws.update_cell(1, 1, "Metric")
 
@@ -2257,11 +2280,22 @@ def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> N
             except ValueError:
                 reports = 1
             updates.append({"range": f"{c}6", "values": [[reports]]})
-            print(f"   ✅ Self-metrics written to col {c} ({month_header}) — {total} agents, {reports} reports")
-        else:
-            print(f"   ✅ Self-metrics written to col {c} ({month_header}) — {total} agents")
+
+        if run_cost_usd > 0:
+            # Accumulate cost within the month (add to whatever's already there)
+            existing_cost = ws.cell(7, col).value or "0"
+            try:
+                existing_cost = float(str(existing_cost).replace("$", "").replace(",", "").strip())
+            except ValueError:
+                existing_cost = 0.0
+            new_cost = round(existing_cost + run_cost_usd, 4)
+            updates.append({"range": f"{c}7", "values": [[new_cost]]})
 
         ws.batch_update(updates)
+
+        cost_str = f", ${run_cost_usd:.4f} this run" if run_cost_usd > 0 else ""
+        reports_str = f", {reports} reports" if increment_reports else ""
+        print(f"   ✅ Self-metrics written to col {c} ({month_header}) — {total} agents{reports_str}{cost_str}")
 
     except Exception as e:
         print(f"   ⚠️  Could not write self-metrics ({e})")
@@ -2480,8 +2514,8 @@ def main() -> None:
                 f.write(page_html)
         print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
 
-        print("📊 Writing self-metrics to Agent Tracker sheet...")
-        _write_self_metrics(agents)
+        print(f"📊 Writing self-metrics to Agent Tracker sheet (run cost: ${_run_cost_usd:.4f})...")
+        _write_self_metrics(agents, increment_reports=True, run_cost_usd=_run_cost_usd)
 
         print("📧 Sending email...")
         send_email(email_html, week_str)
