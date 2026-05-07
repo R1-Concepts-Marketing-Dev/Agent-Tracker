@@ -1131,11 +1131,12 @@ def build_full_report_html(
     week_str: str,
     workflow_map: dict = None,
     time_saved_history: list = None,
+    total_cost_usd: float = 0.0,
 ) -> str:
     """Full card-based report for GitHub Pages."""
     if workflow_map is None:
         workflow_map = {}
-    time_saved_section = _build_time_saved_section(time_saved_history or [])
+    time_saved_section = _build_time_saved_section(time_saved_history or [], total_cost_usd)
     completed   = [a for a in agents if a["stage"] == "Completed"]
     in_progress = [a for a in agents if a["stage"] == "In Progress"]
     planned     = [a for a in agents if a["stage"] == "Planned"]
@@ -1970,6 +1971,7 @@ def save_workflow_cache(
     time_saved_per_agent: dict = None,
     summary: str = "",
     cost_per_agent: dict = None,
+    total_cost_usd: float = 0.0,
 ) -> None:
     os.makedirs("docs", exist_ok=True)
     cache = {
@@ -1979,6 +1981,7 @@ def save_workflow_cache(
         "time_saved_per_agent": time_saved_per_agent or {},
         "summary":              summary or "",
         "cost_per_agent":       cost_per_agent or {},
+        "total_cost_usd":       total_cost_usd or 0.0,
     }
     with open(WORKFLOW_CACHE_PATH, "w", encoding="utf-8") as f:
         json.dump(cache, f, indent=2)
@@ -1987,7 +1990,7 @@ def save_workflow_cache(
           f"{len(time_saved_history or [])} time-saved months)")
 
 
-def load_workflow_cache() -> tuple[dict, dict, list, dict, str, dict]:
+def load_workflow_cache() -> tuple[dict, dict, list, dict, str, dict, float]:
     if os.path.exists(WORKFLOW_CACHE_PATH):
         with open(WORKFLOW_CACHE_PATH, encoding="utf-8") as f:
             data = json.load(f)
@@ -1999,6 +2002,7 @@ def load_workflow_cache() -> tuple[dict, dict, list, dict, str, dict]:
             time_saved_per_agent = data.get("time_saved_per_agent", {})
             summary              = data.get("summary", "")
             cost_per_agent       = data.get("cost_per_agent", {})
+            total_cost_usd       = float(data.get("total_cost_usd", 0.0))
         else:
             workflows            = data
             metrics              = {}
@@ -2006,12 +2010,13 @@ def load_workflow_cache() -> tuple[dict, dict, list, dict, str, dict]:
             time_saved_per_agent = {}
             summary              = ""
             cost_per_agent       = {}
+            total_cost_usd       = 0.0
         print(f"   📂 Loaded cache ({len(workflows)} workflows, "
               f"{len(metrics)} metrics, "
               f"{len(time_saved_history)} time-saved months)")
-        return workflows, metrics, time_saved_history, time_saved_per_agent, summary, cost_per_agent
+        return workflows, metrics, time_saved_history, time_saved_per_agent, summary, cost_per_agent, total_cost_usd
     print("   ⚠️  No cache found — pages will show placeholder workflow")
-    return {}, {}, list(SEED_TIME_HISTORY), {}, "", {}
+    return {}, {}, list(SEED_TIME_HISTORY), {}, "", {}, 0.0
 
 
 # ── Time Saved ────────────────────────────────────────────────────────────────
@@ -2121,7 +2126,7 @@ Agents to estimate:
         return {}, 0.0
 
 
-def _build_time_saved_section(history: list[dict]) -> str:
+def _build_time_saved_section(history: list[dict], total_cost_usd: float = 0.0) -> str:
     """
     Build the time saved stat squares + chart HTML for the main GitHub Pages report.
     Proration of the current month happens in JavaScript at view time, so the numbers
@@ -2189,7 +2194,7 @@ def _build_time_saved_section(history: list[dict]) -> str:
     }});
 
     var total     = data.reduce(function(s,h){{return s+h.hours;}}, 0);
-    var totalCost = RAW.reduce(function(s,h){{return s+(typeof h.cost==="number"?h.cost:0);}}, 0);
+    var totalCost = {total_cost_usd};
     document.getElementById("ts-hours").textContent = Math.round(total) + "h";
     document.getElementById("ts-value").textContent = "$" + Math.round(total * RATE).toLocaleString();
     var costEl = document.getElementById("ts-cost");
@@ -2369,7 +2374,7 @@ def main() -> None:
         print(f"📅 Monthly snapshot mode — recording {prev_month_str} final total...")
 
         # Load existing cache for metrics + history
-        _, metrics_map, time_saved_history, _, cached_summary, cached_cost_per_agent = load_workflow_cache()
+        _, metrics_map, time_saved_history, _, cached_summary, cached_cost_per_agent, cached_total_cost = load_workflow_cache()
         for agent in agents:
             if agent["name"] in metrics_map:
                 agent["metrics"] = metrics_map[agent["name"]]
@@ -2410,8 +2415,8 @@ def main() -> None:
             time_saved_history.append({"period": prev_month_str, "hours": total, "cost": 0, "finalized": True})
 
         # Reload full cache to preserve workflows + metrics, just update history
-        wf_map, m_map, _, old_ts_per_agent, _, _ = load_workflow_cache()
-        save_workflow_cache(wf_map, m_map, time_saved_history, old_ts_per_agent, cached_summary)
+        wf_map, m_map, _, old_ts_per_agent, _, _, old_total_cost = load_workflow_cache()
+        save_workflow_cache(wf_map, m_map, time_saved_history, old_ts_per_agent, cached_summary, {}, old_total_cost)
         print(f"   ✅ {prev_month_str} locked in at {total}h")
         print("✅ Done!")
         return
@@ -2428,7 +2433,7 @@ def main() -> None:
         print("🔄 Refresh-only mode — skipping Claude calls and email")
 
         print("📂 Loading cached workflow steps and metrics...")
-        workflow_map, metrics_map, time_saved_history, time_saved_per_agent, cached_summary, cached_cost_per_agent = load_workflow_cache()
+        workflow_map, metrics_map, time_saved_history, time_saved_per_agent, cached_summary, cached_cost_per_agent, cached_total_cost = load_workflow_cache()
 
         # Apply cached data to agents
         for agent in agents:
@@ -2441,7 +2446,7 @@ def main() -> None:
         print("🏗️  Building full report (GitHub Pages)...")
         new_rows, stage_changes = detect_changes(agents)
         full_html = build_full_report_html(
-            agents, new_rows, stage_changes, cached_summary, week_str, workflow_map, time_saved_history
+            agents, new_rows, stage_changes, cached_summary, week_str, workflow_map, time_saved_history, cached_total_cost
         )
 
         print("💾 Saving full report to docs/index.html...")
@@ -2534,7 +2539,7 @@ def main() -> None:
         print(f"   Total this month: {total_this_month}h across {len(time_saved_per_agent)} agent(s)")
 
         # Load existing history from cache (or seed if first run), update current month
-        _, _, time_saved_history, _, _, _ = load_workflow_cache()
+        _, _, time_saved_history, _, _, _, _prev_total_cost = load_workflow_cache()
         month_periods = [h["period"] for h in time_saved_history]
         if current_month in month_periods:
             for h in time_saved_history:
@@ -2548,16 +2553,18 @@ def main() -> None:
                 "cost":   round(_run_cost_usd, 4),
             })
 
-        # Attach per-agent cost to agent dicts for page building
+        # new_total_cost = prev total (loaded when we fetched history) + this run
+        new_total_cost = round(_prev_total_cost + _run_cost_usd, 4)
+
         print("💾 Saving cache (workflows + metrics + time saved + summary)...")
-        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary, cost_per_agent)
+        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary, cost_per_agent, new_total_cost)
 
         print("🏗️  Building email (simplified)...")
         email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
 
         print("🏗️  Building full report (GitHub Pages)...")
         full_html = build_full_report_html(
-            agents, new_rows, stage_changes, summary, week_str, workflow_map, time_saved_history
+            agents, new_rows, stage_changes, summary, week_str, workflow_map, time_saved_history, new_total_cost
         )
 
         print("💾 Saving full report to docs/index.html...")
