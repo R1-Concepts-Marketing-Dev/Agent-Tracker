@@ -1368,18 +1368,20 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
             f'&#128142; {v_str} value/mo</span>'
         )
 
-    # ── Per-agent run cost badge ──────────────────────────────────────────────
+    # ── Run cost badge — only from agent's own metrics sheet ─────────────────
     run_cost_chip = ""
-    agent_run_cost = agent.get("run_cost")
-    if agent_run_cost:
-        cost_str = f"${agent_run_cost:.4f}" if agent_run_cost < 0.01 else (
-                   f"${agent_run_cost:.2f}"  if agent_run_cost < 10   else
-                   f"${agent_run_cost:,.2f}")
-        run_cost_chip = (
-            f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
-            f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
-            f'&#128184; {cost_str}/run</span>'
-        )
+    _cost_keywords = ["api cost", "run cost", "monthly cost", "cost", "spend", "api spend"]
+    _agent_metrics = agent.get("metrics", {})
+    for _mk, _mv in _agent_metrics.items():
+        if any(kw in _mk.lower() for kw in _cost_keywords):
+            _cost_val = _mv.get("value", "") if isinstance(_mv, dict) else str(_mv)
+            if _cost_val:
+                run_cost_chip = (
+                    f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
+                    f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
+                    f'&#128184; {_cost_val}/mo</span>'
+                )
+            break
 
     # ── Trigger badge (frequency) ──────────────────────────────────────────────
     trigger_badge = (
@@ -2434,8 +2436,7 @@ def main() -> None:
                 agent["metrics"] = metrics_map[agent["name"]]
             if agent["name"] in time_saved_per_agent:
                 agent["time_saved"] = time_saved_per_agent[agent["name"]]
-            if agent["name"] in cached_cost_per_agent:
-                agent["run_cost"] = cached_cost_per_agent[agent["name"]]
+            # run_cost badge comes from agent's own metrics sheet, not tracker attribution
 
         print("🏗️  Building full report (GitHub Pages)...")
         new_rows, stage_changes = detect_changes(agents)
@@ -2548,10 +2549,6 @@ def main() -> None:
             })
 
         # Attach per-agent cost to agent dicts for page building
-        for agent in agents:
-            if agent["name"] in cost_per_agent:
-                agent["run_cost"] = cost_per_agent[agent["name"]]
-
         print("💾 Saving cache (workflows + metrics + time saved + summary)...")
         save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary, cost_per_agent)
 
