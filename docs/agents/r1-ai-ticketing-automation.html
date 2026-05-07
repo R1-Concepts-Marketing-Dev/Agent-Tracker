@@ -204,24 +204,36 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#808080;--glow-color:rgba(128,128,128,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">TBD (Ticketing Platform)</div>
-                  <div class="step-role">Support Ticketing</div>
+                  <div class="step-platform">Support Inbox</div>
+                  <div class="step-role">Ticketing</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#808080;--t-color:#808080;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-1" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">AI Engine</div>
+                  <div class="step-platform">AI Model</div>
                   <div class="step-role">AI Model</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#4B5563;--t-color:#4B5563;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Ticketing Platform</div>
+                  <div class="step-role">Ticketing</div>
                 </div>
               </div>
           </div>
@@ -245,7 +257,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -257,7 +269,7 @@
   <div class="card">
     <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#808080;display:inline-block;"></span>TBD</span></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#999999;display:inline-block;"></span>TBD</span></div>
     </div>
   </div>
 
@@ -285,9 +297,9 @@
 
 <script>
 
-  const STEPS = 2, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "TBD (Ticketing Platform)", "role": "Support Ticketing", "color": "#808080", "text": "Ingests incoming customer support tickets from R1 Concepts' support channels.", "impact": "Captures every customer inquiry automatically, ensuring no tickets are missed or delayed in the queue.", "dataLabel": "Data collected", "chips": ["Ticket subject", "Customer email", "Issue category", "Order number", "Submission timestamp"]}, {"name": "AI Engine", "role": "AI Model", "color": "#4B5563", "text": "Classifies ticket priority, identifies the issue type, and generates an appropriate response or routes the ticket to the correct team.", "impact": "Dramatically reduces first-response time and frees support staff to focus on complex cases requiring human attention.", "dataLabel": "Analysis produced", "chips": ["Priority level", "Issue classification", "Suggested response", "Routing destination", "Confidence score", "Resolution action"]}];
+  const stepData = [{"name": "Support Inbox", "role": "Ticketing", "color": "#4B5563", "text": "Receives incoming customer support tickets and queues them for AI classification and response drafting.", "impact": "Centralizes all inbound support requests into a single automated pipeline, reducing manual triage time and ensuring no ticket is missed.", "dataLabel": "Data collected", "chips": ["Customer Name", "Issue Type", "Ticket Timestamp", "Message Content"]}, {"name": "AI Model", "role": "AI Model", "color": "#4B5563", "text": "Classifies the ticket by issue category, assesses urgency, and drafts an appropriate response or resolution path.", "impact": "Cuts average ticket response time significantly by handling routine inquiries without human intervention and routing complex cases to the right agent.", "dataLabel": "Analysis produced", "chips": ["Issue Category", "Urgency Score", "Draft Response", "Escalation Flag", "Suggested Resolution"]}, {"name": "Ticketing Platform", "role": "Ticketing", "color": "#4B5563", "text": "Updates the ticket with the AI-generated response, assigns it to the appropriate queue, and notifies the customer or support rep.", "impact": "Ensures every ticket gets a fast, consistent first response and is routed correctly, improving customer satisfaction and agent efficiency.", "dataLabel": "Records updated", "chips": ["Ticket Status", "Assigned Agent", "Response Sent", "Resolution Type"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
