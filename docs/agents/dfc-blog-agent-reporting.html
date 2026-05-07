@@ -179,7 +179,7 @@
       </span>
       
       
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.0060/run</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.0061/run</span>
     </div>
   </div>
 </div>
@@ -237,18 +237,6 @@
                   <div class="step-role">CMS</div>
                 </div>
               </div>
-              <div class="arrow-wrap" id="arrow-2"><div class="arrow-track">
-                <div class="travel-dot" id="dot-2" style="background:#21759B;--t-color:#21759B;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-3" style="--dot-color:#A4286A;--glow-color:rgba(164,40,106,0.12);" onclick="goToStep(3)">
-                <div class="step-num">4</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Yoast</div>
-                  <div class="step-role">SEO Plugin</div>
-                </div>
-              </div>
           </div>
           <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
           <div class="detail-panel" id="detailPanel">
@@ -270,7 +258,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 4</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -310,9 +298,9 @@
 
 <script>
 
-  const STEPS = 4, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Google Search Console", "role": "SEO Data", "color": "#4285F4", "text": "Pulls weekly keyword rankings, impressions, clicks, and average position data for all DFC blog URLs.", "impact": "Surfaces which blog topics are gaining search traction, allowing the content strategy to double down on what's working.", "dataLabel": "Data collected", "chips": ["Keyword Rankings", "Impressions", "Click-Through Rate", "Avg Position", "Blog URLs", "Week-over-Week Delta"]}, {"name": "GA4", "role": "Analytics", "color": "#E37400", "text": "Pulls session counts, engagement rates, time on page, and conversion events for DFC blog traffic.", "impact": "Connects SEO performance to actual user behavior and business outcomes, showing which posts drive real engagement beyond just rankings.", "dataLabel": "Analysis produced", "chips": ["Sessions", "Engagement Rate", "Time on Page", "Conversion Events", "Traffic Source", "New vs Returning"]}, {"name": "WordPress", "role": "CMS", "color": "#21759B", "text": "Retrieves post publish dates, word counts, categories, and Yoast SEO scores for all blog entries in the reporting period.", "impact": "Provides operational efficiency metrics showing publishing cadence and content quality scores alongside traffic data.", "dataLabel": "Records updated", "chips": ["Publish Date", "Word Count", "Post Category", "Yoast Score", "Author", "Post Status"]}, {"name": "Yoast", "role": "SEO Plugin", "color": "#A4286A", "text": "Supplies on-page SEO readiness scores, focus keyword grades, and readability scores for each published DFC blog post.", "impact": "Gives the reporting dashboard a quality-control layer that ties content optimization scores to real ranking and traffic outcomes.", "dataLabel": "Analysis produced", "chips": ["SEO Score", "Readability Grade", "Focus Keyword", "Meta Status", "Internal Links", "Schema Status"]}];
+  const stepData = [{"name": "Google Search Console", "role": "SEO Data", "color": "#4285F4", "text": "Pulls weekly impressions, clicks, average position, and keyword ranking data for all DFC blog posts.", "impact": "Provides clear visibility into which blog content is gaining search traction, enabling data-driven decisions on topics and optimization priorities.", "dataLabel": "Data collected", "chips": ["Impressions", "Clicks", "Avg Position", "Keyword Rankings", "Indexed URLs", "CTR"]}, {"name": "GA4", "role": "Analytics", "color": "#E37400", "text": "Retrieves session data, traffic sources, engagement rates, and conversion events tied to DFC blog content.", "impact": "Connects SEO performance to actual business outcomes by showing how blog traffic converts into leads or sales-qualified behavior.", "dataLabel": "Analysis produced", "chips": ["Sessions", "Traffic Source", "Engagement Rate", "Conversions", "Bounce Rate", "New Users"]}, {"name": "WordPress", "role": "CMS", "color": "#21759B", "text": "Reads post metadata including publish dates, word counts, categories, and Yoast SEO scores across all blog entries.", "impact": "Adds content quality and publishing efficiency metrics to the dashboard, showing how agent output volume correlates with SEO gains.", "dataLabel": "Records reviewed", "chips": ["Posts Published", "Word Count", "Publish Date", "Yoast SEO Score", "Category Breakdown", "Agent Output Rate"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
