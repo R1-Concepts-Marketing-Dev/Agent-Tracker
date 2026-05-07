@@ -179,7 +179,7 @@
       </span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 6.0hh saved/mo</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $120 value/mo</span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.34 run cost/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.02/run</span>
     </div>
   </div>
 </div>
@@ -205,7 +205,7 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#FF6600;--glow-color:rgba(255,102,0,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
@@ -214,7 +214,7 @@
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#FF6600;--t-color:#FF6600;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-1" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(1)">
@@ -222,7 +222,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">HubSpot API</div>
-                  <div class="step-role">CRM / Email</div>
+                  <div class="step-role">CRM</div>
                 </div>
               </div>
           </div>
@@ -270,7 +270,7 @@
   <div class="card">
     <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#4B5563;display:inline-block;"></span>Dream ERP</span><span style="color:#30363d;font-size:16px;padding:0 4px;">&#8594;</span><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#FF7A59;display:inline-block;"></span>HubSpot API</span></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#FF6600;display:inline-block;"></span>Dream ERP</span><span style="color:#30363d;font-size:16px;padding:0 4px;">&#8594;</span><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#FF7A59;display:inline-block;"></span>HubSpot API</span></div>
     </div>
   </div>
 
@@ -300,7 +300,7 @@
 
   const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream ERP", "role": "ERP System", "color": "#4B5563", "text": "Exports open vendor purchase order data including overdue items, vendor contacts, and expected delivery dates.", "impact": "Provides a structured, current view of all outstanding POs without manual ERP navigation, forming the basis for automated vendor follow-up.", "dataLabel": "PO data exported", "chips": ["PO Number", "Vendor Name", "Due Date", "Overdue Status", "Item Description", "Order Value"]}, {"name": "HubSpot API", "role": "CRM / Email", "color": "#FF7A59", "text": "Uploads transformed PO data into HubSpot and triggers personalized vendor chase emails for each overdue purchase order.", "impact": "Automates what was previously a manual daily follow-up task, ensuring every overdue PO gets a timely vendor nudge without staff intervention.", "dataLabel": "Vendor emails triggered", "chips": ["Vendor Contact", "PO Reference", "Overdue Days", "Chase Email Body", "Follow-Up Stage", "HubSpot Deal Record"]}];
+  const stepData = [{"name": "Dream ERP", "role": "ERP System", "color": "#FF6600", "text": "Exports vendor purchase order data including PO numbers, due dates, outstanding quantities, and vendor contact details.", "impact": "Replaces manual ERP report pulls with an automated data feed, ensuring PO follow-up is triggered on time without relying on someone remembering to export.", "dataLabel": "Data collected", "chips": ["PO Numbers", "Vendor Names", "Due Dates", "Outstanding Qty", "Order Status"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Uploads transformed PO data into HubSpot records and triggers vendor chase email sequences for overdue or pending purchase orders.", "impact": "Automates vendor follow-up communication at scale, reducing the time spent on manual PO chasing and improving vendor response rates through timely, consistent outreach.", "dataLabel": "Records updated", "chips": ["Vendor Records", "PO Status Updated", "Chase Email Triggered", "Follow-Up Sequence", "Contact Linked"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
