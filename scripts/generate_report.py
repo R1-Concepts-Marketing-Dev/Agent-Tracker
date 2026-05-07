@@ -140,38 +140,30 @@ def _sheet_url_to_csv(sheet_url: str) -> str | None:
     )
 
 
-def _fetch_and_parse_metrics(sheet_url: str, client) -> dict:
+def _fetch_and_parse_metrics(sheet_url: str, client) -> tuple:
     """
     Fetch a metrics Google Sheet and use Claude to parse it into a normalized dict.
     Works with any sheet layout — two-column, time-series, or anything else.
 
-    Returns:
-        {
-          "Metric Name": {
-            "value": "current/most recent value",
-            "total": "YTD or cumulative total, or null",
-            "delta": "MoM change e.g. '+12%', or null"
-          },
-          ...
-        }
+    Returns (metrics_dict, cost_usd). Both values always present.
     """
     if not sheet_url:
-        return {}
+        return {}, 0.0
 
     csv_url = _sheet_url_to_csv(sheet_url)
     if not csv_url:
         print(f"   ⚠️  Could not parse sheet ID from: {sheet_url}")
-        return {}
+        return {}, 0.0
 
     try:
         with urllib.request.urlopen(csv_url) as resp:
             csv_text = resp.read().decode("utf-8")
     except Exception as e:
         print(f"   ⚠️  Could not fetch metrics sheet ({e})")
-        return {}
+        return {}, 0.0
 
     if not csv_text.strip():
-        return {}
+        return {}, 0.0
 
     prompt = f"""You are parsing a metrics spreadsheet for an AI automation agent.
 The sheet may use any layout — two-column list, time-series by month, or anything else.
