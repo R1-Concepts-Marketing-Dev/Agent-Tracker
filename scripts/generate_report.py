@@ -33,22 +33,28 @@ SHEET_GIDS         = os.environ.get("SHEET_GIDS", "0")
 LOOKBACK_DAYS = 7
 
 # ── Claude cost tracking ───────────────────────────────────────────────────────
-# Pricing for claude-opus-4-6 (USD per million tokens)
-CLAUDE_INPUT_COST_PER_MTOK  = 15.00
-CLAUDE_OUTPUT_COST_PER_MTOK = 75.00
+# Pricing for claude-sonnet-4-6 (USD per million tokens).
+# UPDATE THESE to match the exact rates shown in your Anthropic console.
+CLAUDE_INPUT_COST_PER_MTOK          =  3.00   # standard input tokens
+CLAUDE_OUTPUT_COST_PER_MTOK         = 15.00   # output tokens
+CLAUDE_CACHE_WRITE_COST_PER_MTOK    =  3.75   # cache creation (1.25× input rate)
+CLAUDE_CACHE_READ_COST_PER_MTOK     =  0.30   # cache read (0.1× input rate)
 
 # Accumulates across the full run; passed to _write_self_metrics at the end
 _run_cost_usd: float = 0.0
 
 def _add_cost(msg) -> None:
-    """Add the cost of a Claude API response to the run total."""
+    """Add the USD cost of a Claude API response to the run total."""
     global _run_cost_usd
     usage = getattr(msg, "usage", None)
-    if usage:
-        _run_cost_usd += (
-            getattr(usage, "input_tokens",  0) * CLAUDE_INPUT_COST_PER_MTOK  / 1_000_000
-          + getattr(usage, "output_tokens", 0) * CLAUDE_OUTPUT_COST_PER_MTOK / 1_000_000
-        )
+    if not usage:
+        return
+    _run_cost_usd += (
+        getattr(usage, "input_tokens",               0) * CLAUDE_INPUT_COST_PER_MTOK       / 1_000_000
+      + getattr(usage, "output_tokens",              0) * CLAUDE_OUTPUT_COST_PER_MTOK      / 1_000_000
+      + getattr(usage, "cache_creation_input_tokens",0) * CLAUDE_CACHE_WRITE_COST_PER_MTOK / 1_000_000
+      + getattr(usage, "cache_read_input_tokens",    0) * CLAUDE_CACHE_READ_COST_PER_MTOK  / 1_000_000
+    )
 
 # ── Google Sheets ───────────────────────────────────────────────────────────────
 def _normalize_stage(raw: str) -> str:
@@ -194,7 +200,7 @@ CSV data:
 
     try:
         msg = client.messages.create(
-            model="claude-opus-4-6",
+            model="claude-sonnet-4-6",
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -299,7 +305,7 @@ Write a 3-5 sentence summary that:
 No bullet points. Plain paragraph prose only."""
 
     msg = client.messages.create(
-        model="claude-opus-4-6",
+        model="claude-sonnet-4-6",
         max_tokens=400,
         messages=[{"role": "user", "content": prompt}],
     )
@@ -351,7 +357,7 @@ Agents:
 {agent_blocks}"""
 
     msg = client.messages.create(
-        model="claude-opus-4-6",
+        model="claude-sonnet-4-6",
         max_tokens=8000,
         messages=[{"role": "user", "content": prompt}],
     )
@@ -567,7 +573,7 @@ Platforms:
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     try:
         msg = client.messages.create(
-            model="claude-opus-4-6",
+            model="claude-sonnet-4-6",
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -2076,7 +2082,7 @@ Agents to estimate:
 {blocks}"""
     try:
         msg = client.messages.create(
-            model="claude-opus-4-6",
+            model="claude-sonnet-4-6",
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
