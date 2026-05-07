@@ -179,7 +179,7 @@
       </span>
       
       
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">&#128184; $0.0080/run</span>
+      
     </div>
   </div>
 </div>
@@ -210,7 +210,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Dream</div>
-                  <div class="step-role">Automation Engine</div>
+                  <div class="step-role">Data Layer</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -300,7 +300,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream", "role": "Automation Engine", "color": "#4B5563", "text": "Ingests the weekly backorder report and enriches each line item with live inventory status including on-hand quantity, on-order quantity, and in-transit stock.", "impact": "Replaces a fragmented process where a dozen people independently look up the same data, consolidating all status checks into one automated pass in minutes.", "dataLabel": "Enriched backorder data", "chips": ["Part Numbers", "On-Hand Qty", "On-Order Qty", "In-Transit Qty", "Source Availability", "Dead-End Flags"]}, {"name": "Backorder Report", "role": "Spreadsheet", "color": "#4B5563", "text": "Receives the enriched data and updates the report with live status columns and dead-end flags highlighting parts that have no available source.", "impact": "Gives the entire team a single source of truth for backorder status, eliminating duplicate effort and reducing the risk of conflicting information reaching customers.", "dataLabel": "Records updated", "chips": ["Updated Status Fields", "Dead-End Part Flags", "Sourcing Status", "Enriched Line Items", "Priority Indicators"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications pre-populated with the relevant order status details for each flagged or dead-end backorder item.", "impact": "Accelerates customer communication by delivering ready-to-send drafts rather than requiring staff to manually write individual status updates for each affected order.", "dataLabel": "Email contains", "chips": ["Draft Customer Message", "Part Number Reference", "Current Status", "Dead-End Notice", "Expected Availability"]}];
+  const stepData = [{"name": "Dream", "role": "Data Layer", "color": "#4B5563", "text": "Pulls live inventory status for every part on the weekly backorder report, including on-hand quantity, on-order quantity, and in-transit status.", "impact": "Consolidates what previously required a dozen people doing independent lookups into a single automated data pull, saving hours of redundant manual research each week.", "dataLabel": "Inventory records retrieved", "chips": ["On Hand Qty", "On Order Qty", "In Transit Status", "Part Numbers", "Expected Dates"]}, {"name": "Backorder Report", "role": "Spreadsheet", "color": "#4B5563", "text": "Enriches the existing backorder report with the live inventory data and automatically flags any parts that have no on-hand, on-order, or in-transit source — marking them as dead-ends.", "impact": "Gives the team an instantly actionable report showing exactly which parts are resolvable versus which require escalation, reducing decision-making time and preventing unnoticed fulfillment failures.", "dataLabel": "Records updated", "chips": ["Enriched Status", "Dead-End Flags", "Source Availability", "Updated ETA", "Backorder Line Items"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications for backordered parts, pre-populated with the relevant status, estimated availability, and any dead-end warnings.", "impact": "Eliminates the manual drafting of customer update emails across the team, ensuring consistent messaging and faster customer communication with no extra effort.", "dataLabel": "Email contains", "chips": ["Draft Customer Message", "Part Status Summary", "ETA Details", "Dead-End Notice", "Order Reference"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
