@@ -1232,7 +1232,7 @@ def build_full_report_html(
 
 
 # ── Individual Agent Page Builder ─────────────────────────────────────────────
-def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
+def build_agent_page_html(agent: dict, steps: list[dict], week_str: str, monthly_run_cost: float = 0.0) -> str:
     """Build a standalone HTML page for a single agent with v4 animated workflow."""
     accent         = CARD_BORDER.get(agent["stage"], "#30363d")
     freq           = agent["frequency"] or "Schedule TBD"
@@ -1363,6 +1363,16 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
             f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
             f'background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">'
             f'&#128142; {v_str} value/mo</span>'
+        )
+
+    # ── Run cost badge ────────────────────────────────────────────────────────
+    run_cost_chip = ""
+    if monthly_run_cost > 0:
+        cost_str = f"${monthly_run_cost:.2f}" if monthly_run_cost < 10 else f"${monthly_run_cost:,.2f}"
+        run_cost_chip = (
+            f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
+            f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
+            f'&#128184; {cost_str} run cost/mo</span>'
         )
 
     # ── Trigger badge (frequency) ──────────────────────────────────────────────
@@ -1862,6 +1872,7 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
       </span>
       {time_saved_chip}
       {value_saved_chip}
+      {run_cost_chip}
     </div>
   </div>
 </div>
@@ -2114,7 +2125,7 @@ def _build_time_saved_section(history: list[dict]) -> str:
   <tr><td style="padding-bottom:20px;">
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
       <tr>
-        <td width="50%" style="padding-right:6px;">
+        <td width="34%" style="padding-right:6px;">
           <div style="background:#0a1e12;border:1px solid #196130;border-radius:10px;
             padding:16px 20px;text-align:center;">
             <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
@@ -2123,13 +2134,22 @@ def _build_time_saved_section(history: list[dict]) -> str:
             <div style="font-size:10px;color:#238636;margin-top:4px;">Total hours saved YTD</div>
           </div>
         </td>
-        <td width="50%" style="padding-left:6px;">
+        <td width="34%" style="padding:0 3px;">
           <div style="background:#130d2a;border:1px solid #3b2d6e;border-radius:10px;
             padding:16px 20px;text-align:center;">
             <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
               text-transform:uppercase;color:#a371f7;margin-bottom:6px;">&#128142; Value Generated</div>
             <div id="ts-value" style="font-size:32px;font-weight:800;color:#a371f7;line-height:1;">—</div>
             <div style="font-size:10px;color:#6e3eb5;margin-top:4px;">@ $20/hr equivalent</div>
+          </div>
+        </td>
+        <td width="32%" style="padding-left:6px;">
+          <div style="background:#1a0a0a;border:1px solid #6e1a1a;border-radius:10px;
+            padding:16px 20px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
+              text-transform:uppercase;color:#f78166;margin-bottom:6px;">&#128184; Run Cost</div>
+            <div id="ts-cost" style="font-size:32px;font-weight:800;color:#f78166;line-height:1;">—</div>
+            <div style="font-size:10px;color:#7a2a1a;margin-top:4px;">Total API spend YTD</div>
           </div>
         </td>
       </tr>
@@ -2156,9 +2176,11 @@ def _build_time_saved_section(history: list[dict]) -> str:
       return {{period: h.period, hours: hrs}};
     }});
 
-    var total = data.reduce(function(s,h){{return s+h.hours;}}, 0);
+    var total     = data.reduce(function(s,h){{return s+h.hours;}}, 0);
+    var totalCost = RAW.reduce(function(s,h){{return s+(h.cost||0);}}, 0);
     document.getElementById("ts-hours").textContent = Math.round(total) + "h";
     document.getElementById("ts-value").textContent = "$" + Math.round(total * RATE).toLocaleString();
+    document.getElementById("ts-cost").textContent  = "$" + totalCost.toFixed(2);
 
     var W=500, H=100, LP=36, RP=8, TP=8, BP=18, cW=W-LP-RP, cH=H-TP-BP;
     var vals   = data.map(function(h){{return h.hours;}});
@@ -2365,8 +2387,9 @@ def main() -> None:
                 if h["period"] == prev_month_str:
                     h["hours"]     = total
                     h["finalized"] = True
+                    # preserve accumulated cost — don't overwrite
         else:
-            time_saved_history.append({"period": prev_month_str, "hours": total, "finalized": True})
+            time_saved_history.append({"period": prev_month_str, "hours": total, "cost": 0, "finalized": True})
 
         # Reload full cache to preserve workflows + metrics, just update history
         wf_map, m_map, _, old_ts_per_agent, _ = load_workflow_cache()
@@ -2407,12 +2430,15 @@ def main() -> None:
         with open("docs/index.html", "w", encoding="utf-8") as f:
             f.write(full_html)
 
+        cur_mon = datetime.datetime.now().strftime("%b")
+        monthly_run_cost = next((h.get("cost", 0) for h in time_saved_history if h["period"] == cur_mon), 0)
+
         print("📄 Building individual agent pages...")
         os.makedirs("docs/agents", exist_ok=True)
         for agent in agents:
             slug      = _slugify(agent["name"])
             steps     = workflow_map.get(agent["name"], [])
-            page_html = build_agent_page_html(agent, steps, week_str)
+            page_html = build_agent_page_html(agent, steps, week_str, monthly_run_cost)
             with open(f"docs/agents/{slug}.html", "w", encoding="utf-8") as f:
                 f.write(page_html)
         print(f"   ✅ Refreshed {len(agents)} agent page(s)")
@@ -2491,8 +2517,13 @@ def main() -> None:
             for h in time_saved_history:
                 if h["period"] == current_month:
                     h["hours"] = total_this_month
+                    h["cost"]  = round(h.get("cost", 0) + _run_cost_usd, 4)
         else:
-            time_saved_history.append({"period": current_month, "hours": total_this_month})
+            time_saved_history.append({
+                "period": current_month,
+                "hours":  total_this_month,
+                "cost":   round(_run_cost_usd, 4),
+            })
 
         print("💾 Saving cache (workflows + metrics + time saved + summary)...")
         save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary)
@@ -2510,12 +2541,15 @@ def main() -> None:
         with open("docs/index.html", "w", encoding="utf-8") as f:
             f.write(full_html)
 
+        cur_mon_full = datetime.datetime.now().strftime("%b")
+        monthly_run_cost = next((h.get("cost", 0) for h in time_saved_history if h["period"] == cur_mon_full), 0)
+
         print("📄 Building individual agent pages...")
         os.makedirs("docs/agents", exist_ok=True)
         for agent in agents:
             slug      = _slugify(agent["name"])
             steps     = workflow_map.get(agent["name"], [])
-            page_html = build_agent_page_html(agent, steps, week_str)
+            page_html = build_agent_page_html(agent, steps, week_str, monthly_run_cost)
             with open(f"docs/agents/{slug}.html", "w", encoding="utf-8") as f:
                 f.write(page_html)
         print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
