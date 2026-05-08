@@ -1136,7 +1136,17 @@ def build_full_report_html(
     """Full card-based report for GitHub Pages."""
     if workflow_map is None:
         workflow_map = {}
-    time_saved_section = _build_time_saved_section(time_saved_history or [], total_cost_usd)
+
+    # Sum cost from all agents' metrics — same source as the per-agent badge
+    metrics_total_cost = 0.0
+    for a in agents:
+        c = _extract_cost_from_metrics(a.get("metrics", {}))
+        if c is not None:
+            metrics_total_cost += c
+    # Use metrics-derived total if available, otherwise fall back to tracked API spend
+    display_cost = metrics_total_cost if metrics_total_cost > 0 else total_cost_usd
+
+    time_saved_section = _build_time_saved_section(time_saved_history or [], display_cost)
     completed   = [a for a in agents if a["stage"] == "Completed"]
     in_progress = [a for a in agents if a["stage"] == "In Progress"]
     planned     = [a for a in agents if a["stage"] == "Planned"]
@@ -2035,6 +2045,19 @@ TIME_SAVED_KEYWORDS = [
     "est. hours", "estimated hours", "time efficiency",
     "saved", "reclaimed", "freed",   # broader fallbacks
 ]
+
+
+def _extract_cost_from_metrics(metrics: dict) -> float | None:
+    """Find a cost/spend metric in an agent's parsed metrics dict. Returns float or None."""
+    import re as _re
+    cost_keywords = ["api cost", "run cost", "monthly cost", "cost", "spend", "api spend"]
+    for key, entry in metrics.items():
+        if any(kw in key.lower() for kw in cost_keywords):
+            val = entry.get("value", "") if isinstance(entry, dict) else str(entry)
+            m = _re.search(r'[\d.]+', str(val).replace(",", "").replace("$", ""))
+            if m:
+                return float(m.group())
+    return None
 
 
 def _extract_time_saved(metrics: dict) -> float | None:
