@@ -195,11 +195,14 @@ Rules:
   - For non-time-series sheets set history to null
 
 COST HANDLING — this is critical:
-- Identify every metric that represents a cost, spend, or fee (ad spend, tool cost, API cost, platform fee, labour cost, etc.)
-- If there are multiple cost components, sum them all and include a "Total Cost" metric with the combined total as both "value" and "total"
-- The "Total Cost" entry must use plain numeric strings stripped of currency symbols so they can be parsed (e.g. "142.50" not "$142.50")
-- Still include the individual cost metrics separately so they are visible on the page
-- If there is only one cost metric, still return it — no need to create a separate total in that case
+- Look at every column and row. Identify anything that represents money spent, a fee, a cost, or expenditure — regardless of what it is named. This includes but is not limited to: ad spend, platform fees, tool subscriptions, API costs, labour costs, production costs, media spend, monthly fees, etc.
+- Sum ALL of those cost values together to produce a single total
+- Always include a top-level "_cost_total" key in your JSON at the same level as other metrics:
+  "_cost_total": {{"value": "142.50", "total": "142.50"}}
+  Use a plain number string with no currency symbol so it can be parsed directly
+- If there are multiple cost components, still return them individually as separate metrics so they are visible on the page, AND include "_cost_total" as their sum
+- If there is only one cost metric, "_cost_total" should equal that value
+- If there are NO cost metrics in the sheet, set "_cost_total" to null
 
 CSV data:
 {csv_text}"""
@@ -1388,22 +1391,15 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
 
     # ── Run cost badge — only from agent's own metrics sheet ─────────────────
     run_cost_chip = ""
-    _cost_keywords = ["api cost", "run cost", "monthly cost", "cost", "spend", "api spend"]
     _agent_metrics = agent.get("metrics", {})
-    for _mk, _mv in _agent_metrics.items():
-        if any(kw in _mk.lower() for kw in _cost_keywords):
-            _cost_val = ""
-            if isinstance(_mv, dict):
-                _cost_val = str(_mv.get("total") or _mv.get("value") or "")
-            else:
-                _cost_val = str(_mv)
-            if _cost_val and _cost_val not in ("None", "null", ""):
-                run_cost_chip = (
-                    f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
-                    f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
-                    f'&#128184; {_cost_val}/mo</span>'
-                )
-            break
+    _cost_num = _extract_cost_from_metrics(_agent_metrics)
+    if _cost_num is not None:
+        _cost_display = f"${_cost_num:,.2f}" if _cost_num >= 1 else f"${_cost_num:.4f}"
+        run_cost_chip = (
+            f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
+            f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
+            f'&#128184; {_cost_display}/mo</span>'
+        )
 
     # ── Trigger badge (frequency) ──────────────────────────────────────────────
     trigger_badge = (
@@ -2060,42 +2056,47 @@ TIME_SAVED_KEYWORDS = [
 
 def _extract_cost_from_metrics(metrics: dict) -> float | None:
     """
-    Find the total cost from an agent's parsed metrics dict.
-    Looks for a Claude-computed 'Total Cost' entry first (which sums all cost
-    components), then falls back to any individual cost/spend metric.
-    Prefers 'total' (YTD cumulative) over 'value' (current period only).
-    Returns float or None.
+    Extract the total cost from an agent's parsed metrics dict.
+
+    Claude always computes a '_cost_total' key when parsing a metrics sheet.
+    That's the primary source — it represents the sum of ALL cost components
+    Claude identified in the sheet regardless of how they were labelled.
+
+    Falls back to any metric whose name contains common cost/spend keywords
+    if '_cost_total' is absent (e.g. older cache entries).
+
+    Prefers 'total' (YTD) over 'value' (current period).
     """
     import re as _re
-    cost_keywords = ["api cost", "run cost", "monthly cost", "cost", "spend", "api spend"]
 
-    def _parse_num(s: str) -> float | None:
+    def _parse_num(s) -> float | None:
+        if s is None or str(s).lower() in ("null", "none", ""):
+            return None
         m = _re.search(r'[\d.]+', str(s).replace(",", "").replace("$", ""))
         return float(m.group()) if m else None
 
-    def _best_value(entry) -> float | None:
+    def _best_val(entry) -> float | None:
         if isinstance(entry, dict):
             for field in ("total", "value"):
-                v = entry.get(field)
-                if v and str(v).lower() not in ("null", "none", ""):
-                    n = _parse_num(str(v))
-                    if n is not None:
-                        return n
+                n = _parse_num(entry.get(field))
+                if n is not None:
+                    return n
         else:
-            return _parse_num(str(entry))
+            return _parse_num(entry)
         return None
 
-    # Pass 1: look for an explicit "Total Cost" entry Claude computed
-    for key, entry in metrics.items():
-        if key.lower().strip() == "total cost":
-            n = _best_value(entry)
-            if n is not None:
-                return n
+    # Primary: Claude-computed total across all cost components
+    if "_cost_total" in metrics:
+        n = _best_val(metrics["_cost_total"])
+        if n is not None:
+            return n
 
-    # Pass 2: fall back to any cost/spend metric
+    # Fallback: keyword scan for older cache entries
+    cost_keywords = ["total cost", "api cost", "run cost", "monthly cost",
+                     "ad spend", "platform fee", "tool cost", "spend", "cost"]
     for key, entry in metrics.items():
         if any(kw in key.lower() for kw in cost_keywords):
-            n = _best_value(entry)
+            n = _best_val(entry)
             if n is not None:
                 return n
 
