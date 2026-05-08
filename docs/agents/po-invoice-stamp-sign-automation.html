@@ -210,7 +210,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Email (Outlook)</div>
-                  <div class="step-role">Email</div>
+                  <div class="step-role">Email Trigger</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -229,12 +229,12 @@
                 <div class="travel-dot" id="dot-1" style="background:#3776AB;--t-color:#3776AB;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#0078D4;--glow-color:rgba(0,120,212,0.12);" onclick="goToStep(2)">
+              <div class="step-box" id="step-2" style="--dot-color:#FF0000;--glow-color:rgba(255,0,0,0.12);" onclick="goToStep(2)">
                 <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Email (Outlook)</div>
-                  <div class="step-role">Email</div>
+                  <div class="step-platform">PDF Tools</div>
+                  <div class="step-role">Document Processor</div>
                 </div>
               </div>
           </div>
@@ -300,7 +300,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Email (Outlook)", "role": "Email", "color": "#0078D4", "text": "Monitors the Outlook inbox for incoming vendor PO invoice PDF attachments and extracts them for processing.", "impact": "Eliminates manual email monitoring and PDF downloading, ensuring every incoming invoice is captured and queued for stamping without human intervention.", "dataLabel": "Data collected", "chips": ["Invoice PDF", "Vendor Name", "Email Received", "Attachment Extracted", "Invoice Date", "PO Number"]}, {"name": "Python", "role": "Automation Engine", "color": "#3776AB", "text": "Runs a PDF processing script that overlays the Harbor Tires stamp and Richard's signature onto the correct pages of each invoice PDF.", "impact": "Processes each invoice in seconds instead of minutes, ensuring consistent stamp and signature placement across all vendor documents and eliminating manual PDF editing.", "dataLabel": "Analysis produced", "chips": ["Stamp Applied", "Signature Placed", "Page Coordinates", "PDF Modified", "Processing Log", "File Output"]}, {"name": "Email (Outlook)", "role": "Email", "color": "#0078D4", "text": "Sends the completed, stamped, and signed invoice PDF back to the appropriate recipient or saves it to the designated output folder.", "impact": "Closes the loop instantly by returning approved invoices without any manual save or send steps, accelerating vendor payment cycles and reducing processing backlog.", "dataLabel": "Email contains", "chips": ["Signed PDF", "Stamped Invoice", "Recipient Address", "Send Confirmation", "File Name", "Completion Timestamp"]}];
+  const stepData = [{"name": "Email (Outlook)", "role": "Email Trigger", "color": "#0078D4", "text": "Monitors the Outlook inbox for incoming vendor PO invoice PDF attachments and extracts them for processing.", "impact": "Eliminates the need to manually download and track invoice PDFs, ensuring every incoming invoice enters the processing pipeline automatically.", "dataLabel": "Data collected", "chips": ["Vendor Email", "PDF Attachment", "Invoice Filename", "Received Timestamp", "Sender Domain"]}, {"name": "Python", "role": "Automation Engine", "color": "#3776AB", "text": "Processes each invoice PDF by programmatically stamping the Harbor Tires company stamp and overlaying Richard's signature at the designated fields.", "impact": "Reduces invoice approval processing time from minutes per document to seconds, eliminating manual stamp-and-sign steps while maintaining consistent professional presentation.", "dataLabel": "Processing applied", "chips": ["Company Stamp Layer", "Signature Overlay", "PDF Coordinates", "Page Detection", "File Modified"]}, {"name": "PDF Tools", "role": "Document Processor", "color": "#FF0000", "text": "Renders the final stamped and signed PDF with proper formatting, resolution, and document integrity preserved.", "impact": "Ensures every processed invoice is a clean, legally presentable document that meets vendor and accounting standards without manual quality checks.", "dataLabel": "Document output", "chips": ["Stamped PDF", "Signed PDF", "Output Filename", "File Size", "PDF/A Compliance", "Render Quality"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
