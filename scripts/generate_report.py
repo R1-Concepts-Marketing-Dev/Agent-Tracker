@@ -194,6 +194,13 @@ Rules:
   - Only include history if 2 or more data points exist; otherwise set null
   - For non-time-series sheets set history to null
 
+COST HANDLING — this is critical:
+- Identify every metric that represents a cost, spend, or fee (ad spend, tool cost, API cost, platform fee, labour cost, etc.)
+- If there are multiple cost components, sum them all and include a "Total Cost" metric with the combined total as both "value" and "total"
+- The "Total Cost" entry must use plain numeric strings stripped of currency symbols so they can be parsed (e.g. "142.50" not "$142.50")
+- Still include the individual cost metrics separately so they are visible on the page
+- If there is only one cost metric, still return it — no need to create a separate total in that case
+
 CSV data:
 {csv_text}"""
 
@@ -1385,8 +1392,12 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
     _agent_metrics = agent.get("metrics", {})
     for _mk, _mv in _agent_metrics.items():
         if any(kw in _mk.lower() for kw in _cost_keywords):
-            _cost_val = _mv.get("value", "") if isinstance(_mv, dict) else str(_mv)
-            if _cost_val:
+            _cost_val = ""
+            if isinstance(_mv, dict):
+                _cost_val = str(_mv.get("total") or _mv.get("value") or "")
+            else:
+                _cost_val = str(_mv)
+            if _cost_val and _cost_val not in ("None", "null", ""):
                 run_cost_chip = (
                     f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
                     f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
@@ -2048,15 +2059,46 @@ TIME_SAVED_KEYWORDS = [
 
 
 def _extract_cost_from_metrics(metrics: dict) -> float | None:
-    """Find a cost/spend metric in an agent's parsed metrics dict. Returns float or None."""
+    """
+    Find the total cost from an agent's parsed metrics dict.
+    Looks for a Claude-computed 'Total Cost' entry first (which sums all cost
+    components), then falls back to any individual cost/spend metric.
+    Prefers 'total' (YTD cumulative) over 'value' (current period only).
+    Returns float or None.
+    """
     import re as _re
     cost_keywords = ["api cost", "run cost", "monthly cost", "cost", "spend", "api spend"]
+
+    def _parse_num(s: str) -> float | None:
+        m = _re.search(r'[\d.]+', str(s).replace(",", "").replace("$", ""))
+        return float(m.group()) if m else None
+
+    def _best_value(entry) -> float | None:
+        if isinstance(entry, dict):
+            for field in ("total", "value"):
+                v = entry.get(field)
+                if v and str(v).lower() not in ("null", "none", ""):
+                    n = _parse_num(str(v))
+                    if n is not None:
+                        return n
+        else:
+            return _parse_num(str(entry))
+        return None
+
+    # Pass 1: look for an explicit "Total Cost" entry Claude computed
+    for key, entry in metrics.items():
+        if key.lower().strip() == "total cost":
+            n = _best_value(entry)
+            if n is not None:
+                return n
+
+    # Pass 2: fall back to any cost/spend metric
     for key, entry in metrics.items():
         if any(kw in key.lower() for kw in cost_keywords):
-            val = entry.get("value", "") if isinstance(entry, dict) else str(entry)
-            m = _re.search(r'[\d.]+', str(val).replace(",", "").replace("$", ""))
-            if m:
-                return float(m.group())
+            n = _best_value(entry)
+            if n is not None:
+                return n
+
     return None
 
 
