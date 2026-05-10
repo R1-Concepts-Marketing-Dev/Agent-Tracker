@@ -213,18 +213,6 @@
                   <div class="step-role">SMS Platform</div>
                 </div>
               </div>
-              <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#64748B;--t-color:#64748B;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(1)">
-                <div class="step-num">2</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Attentive (Chrome automation, no API)</div>
-                  <div class="step-role">SMS Platform</div>
-                </div>
-              </div>
           </div>
           <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
           <div class="detail-panel" id="detailPanel">
@@ -246,7 +234,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 1</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -258,7 +246,7 @@
   <div class="card">
     <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#4B5563;display:inline-block;"></span>Attentive (Chrome automation</span><span style="color:#30363d;font-size:16px;padding:0 4px;">&#8594;</span><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#64748B;display:inline-block;"></span>no API)</span></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#FF4F00;display:inline-block;"></span>Attentive (Chrome automation</span><span style="color:#30363d;font-size:16px;padding:0 4px;">&#8594;</span><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#64748B;display:inline-block;"></span>no API)</span></div>
     </div>
   </div>
 
@@ -286,9 +274,9 @@
 
 <script>
 
-  const STEPS = 2, TRAVEL_MS = 700;
+  const STEPS = 1, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Attentive (Chrome automation, no API)", "role": "SMS Platform", "color": "#64748B", "text": "Opens Attentive in Chrome, locates the most recent MHM SMS campaign, and clones it to create a new campaign draft.", "impact": "Eliminates manual campaign duplication in Attentive, saving setup time and reducing configuration errors week over week.", "dataLabel": "Data collected", "chips": ["Previous Campaign", "Campaign Template", "Clone Action", "SMS Content", "Prior Send Time"]}, {"name": "Attentive (Chrome automation, no API)", "role": "SMS Platform", "color": "#64748B", "text": "Updates the cloned campaign with the current week's vehicle name and adjusted send time, then saves the campaign draft.", "impact": "Produces a ready-to-send weekly SMS campaign without any manual Attentive UI work, maintaining consistent weekly cadence.", "dataLabel": "Records updated", "chips": ["Vehicle Name", "Updated Send Time", "Campaign Draft", "Week Label", "SMS Preview"]}];
+  const stepData = [{"name": "Attentive (Chrome automation, no API)", "role": "SMS Platform", "color": "#64748B", "text": "Uses Chrome browser automation to log into Attentive, clone the previous week's MHM SMS campaign, and update the vehicle name, message copy, and scheduled send time.", "impact": "Completes the weekly SMS campaign setup in minutes without any API access, eliminating 20-30 minutes of repetitive manual campaign duplication each week.", "dataLabel": "Records updated", "chips": ["Campaign Cloned", "Vehicle Name Updated", "Send Time Set", "Message Copy Updated", "Campaign Scheduled", "Audience Confirmed"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
