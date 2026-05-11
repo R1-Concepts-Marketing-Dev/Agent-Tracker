@@ -177,7 +177,7 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 5 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 18.0hh saved/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 18.0hh saved/mo est.</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $360 value/mo</span>
       
     </div>
@@ -205,32 +205,20 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#FF0000;--glow-color:rgba(255,0,0,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#E1306C;--glow-color:rgba(225,48,108,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">YouTube API</div>
-                  <div class="step-role">Content Platform</div>
+                  <div class="step-platform">YouTube API + Instagram + DuckDuckGo</div>
+                  <div class="step-role">Discovery Layer</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#FF0000;--t-color:#FF0000;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#E1306C;--t-color:#E1306C;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#E1306C;--glow-color:rgba(225,48,108,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Instagram Looter API</div>
-                  <div class="step-role">Social Platform</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#E1306C;--t-color:#E1306C;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Gemini AI</div>
@@ -258,7 +246,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -298,9 +286,9 @@
 
 <script>
 
-  const STEPS = 3, TRAVEL_MS = 700;
+  const STEPS = 2, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "YouTube API", "role": "Content Platform", "color": "#FF0000", "text": "Searches YouTube for content creators matching specified keywords, pulling channel metadata and performance stats.", "impact": "Rapidly surfaces relevant creator candidates at scale, replacing hours of manual channel research.", "dataLabel": "Data collected", "chips": ["Channel Name", "Subscriber Count", "View Count", "Content Niche", "Upload Frequency"]}, {"name": "Instagram Looter API", "role": "Social Platform", "color": "#E1306C", "text": "Pulls Instagram profile data for discovered creators including follower counts, engagement, and content type.", "impact": "Enriches creator profiles with cross-platform presence data for more complete audience evaluation.", "dataLabel": "Profiles collected", "chips": ["Instagram Handle", "Follower Count", "Avg Engagement", "Post Frequency", "Content Style"]}, {"name": "Gemini AI", "role": "AI Model", "color": "#4B5563", "text": "Analyzes aggregated creator data from all sources and scores each creator for relevance and brand fit.", "impact": "Delivers a ranked shortlist of high-fit creators, dramatically reducing time spent vetting influencer candidates.", "dataLabel": "Analysis produced", "chips": ["Relevance Score", "Audience Match", "Platform Reach", "Brand Fit Rating", "Discovery Source"]}];
+  const stepData = [{"name": "YouTube API + Instagram + DuckDuckGo", "role": "Discovery Layer", "color": "#E1306C", "text": "Searches YouTube, Instagram, and the web using input keywords to surface content creators relevant to the target niche.", "impact": "Replaces hours of manual creator browsing with an automated sweep across multiple platforms, returning a broad pool of relevant candidates instantly.", "dataLabel": "Creators discovered", "chips": ["Creator Handle", "Platform", "Channel URL", "Follower Count", "Content Niche", "Recent Posts"]}, {"name": "Gemini AI", "role": "AI Model", "color": "#4B5563", "text": "Analyzes each discovered creator's profile, content themes, and audience signals to assess relevance and fit for the target keyword or brand.", "impact": "Filters a large raw list down to genuinely relevant creators, saving the team from manually reviewing hundreds of profiles.", "dataLabel": "Creator profiles analyzed", "chips": ["Relevance Score", "Content Summary", "Audience Fit", "Platform Presence", "Engagement Signals"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
