@@ -71,7 +71,7 @@
   </td></tr>
   <script>
   (function() {
-    var RAW   = JSON.parse("[{&quot;period&quot;: &quot;Jan&quot;, &quot;hours&quot;: 0}, {&quot;period&quot;: &quot;Feb&quot;, &quot;hours&quot;: 0}, {&quot;period&quot;: &quot;Mar&quot;, &quot;hours&quot;: 5}, {&quot;period&quot;: &quot;Apr&quot;, &quot;hours&quot;: 367.0, &quot;finalized&quot;: true}, {&quot;period&quot;: &quot;May&quot;, &quot;hours&quot;: 402.0, &quot;cost&quot;: 4.1786}]".replace(/&quot;/g,'"').replace(/&amp;/g,'&'));
+    var RAW   = JSON.parse("[{&quot;period&quot;: &quot;Jan&quot;, &quot;hours&quot;: 0}, {&quot;period&quot;: &quot;Feb&quot;, &quot;hours&quot;: 0}, {&quot;period&quot;: &quot;Mar&quot;, &quot;hours&quot;: 5}, {&quot;period&quot;: &quot;Apr&quot;, &quot;hours&quot;: 367.0, &quot;finalized&quot;: true}, {&quot;period&quot;: &quot;May&quot;, &quot;hours&quot;: 397.0, &quot;cost&quot;: 4.53}]".replace(/&quot;/g,'"').replace(/&amp;/g,'&'));
     var RATE  = 20.0;
     var today = new Date();
     var curMon = today.toLocaleString("en-US", {month:"short"});
@@ -86,7 +86,7 @@
     });
 
     var total     = data.reduce(function(s,h){return s+h.hours;}, 0);
-    var totalCost = 9.67522;
+    var totalCost = 7.28261;
     document.getElementById("ts-hours").textContent = Math.round(total) + "h";
     document.getElementById("ts-value").textContent = "$" + Math.round(total * RATE).toLocaleString();
     var costEl = document.getElementById("ts-cost");
@@ -147,7 +147,7 @@
               text-transform:uppercase;color:#a371f7;margin-bottom:8px;">
               &#128203; Weekly Summary
             </div>
-            <div style="font-size:13px;line-height:1.75;color:#c9d1d9;">Our AI automation pipeline continues to grow strong, with 53 total agents across the board — 24 completed, 9 in progress, and 20 planned. No new agents were added to the pipeline this week, and no agents changed stages. While things were steady on the tracking side, the team continues to push forward on the 9 agents currently in active development. Great work maintaining momentum — we'll keep building toward that planned backlog and share updates as soon as agents start moving through the pipeline!</div>
+            <div style="font-size:13px;line-height:1.75;color:#c9d1d9;">Our AI automation pipeline continues to grow strong, with 53 total agents across the board — 24 completed, 9 in progress, and 20 planned. There were no new agents added to the pipeline this week, and no agents changed stages. While things were quiet on the update front, our completed agents continue running and delivering value daily across email marketing, paid media, creator outreach, HubSpot workflows, and more. We'll keep pushing forward on the 9 in-progress builds and look forward to sharing new milestones in the weeks ahead!</div>
           </td>
         </tr>
       </table>
@@ -227,7 +227,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates a compelling, on-brand marketing email using scraped product data and promotional context.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates a compelling, on-brand daily marketing email using scraped product data and promotional context.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -244,7 +244,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot Marketing</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Receives the AI-generated email content via API and sends it to the configured R1 Concepts contact list.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Receives the AI-generated email via API and sends it to the targeted R1 Concepts contact lists.</div>
               </div>
             </div>
 
@@ -304,7 +304,7 @@
                     background:#2563EB;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">DFC Website</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scrapes Dynamic Friction Company product pages, friction material details, and current offers as email source content.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scrapes Dynamic Friction Company product pages, part numbers, and active promotions for email content sourcing.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -321,7 +321,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Writes a daily marketing email tailored to DFC's brand voice using the scraped product and promotional data.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates a daily DFC-branded marketing email using scraped product and promotional content.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -338,7 +338,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot Marketing</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the AI-generated DFC email to the configured contact list via the HubSpot Marketing Email API.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the AI-generated email to DFC contact lists via the HubSpot Marketing Email API.</div>
               </div>
             </div>
 
@@ -400,7 +400,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot CRM</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls newly created or open support tickets from HubSpot, including customer message, contact history, and ticket metadata.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls open support tickets from HubSpot including customer messages, order details, and ticket metadata.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -417,7 +417,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Classifies the ticket by issue type and drafts a contextually accurate, brand-appropriate reply for the support team to review.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Classifies each ticket by issue type and drafts a contextually appropriate reply for the support team to review.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -434,7 +434,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot CRM</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Updates the ticket record with the AI classification and posts the drafted reply for the support agent to review and send.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Updates each ticket with the AI-generated classification and draft reply for agent review and sending.</div>
               </div>
             </div>
 
@@ -494,7 +494,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot CRM</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls all form submissions from the Amazon in-box flyer return and issue form, extracting structured customer issue data.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls in-box flyer return and issue form submissions from HubSpot, capturing customer-reported problems.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -511,7 +511,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Sheets</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Syncs the extracted HubSpot form data into a structured Google Sheet for team review and trend analysis.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Syncs the pulled HubSpot form submissions into a structured Google Sheet for team analysis and tracking.</div>
               </div>
             </div>
 
@@ -573,7 +573,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot CRM</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Monitors HubSpot contact and activity records to detect when DFC customers visit or engage with the R1 Concepts website.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Monitors HubSpot contact activity logs to detect when DFC customers visit or engage on the R1 Concepts website.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -590,7 +590,7 @@
                     background:#6264A7;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Microsoft Teams</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends a real-time alert via Power Automate to the DFC sales team in Teams and email with customer activity details.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends an instant alert via Teams and email to the DFC sales team with contact details and activity summary.</div>
               </div>
             </div>
 
@@ -650,7 +650,7 @@
                     background:#FF0000;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">YouTube API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Searches YouTube for content creators matching the provided keywords, retrieving channel metadata, subscriber counts, and recent content.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Searches YouTube for content creators matching specified keywords, pulling channel metadata and performance stats.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -667,7 +667,7 @@
                     background:#E1306C;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Instagram Looter API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls matching Instagram creator profiles and engagement data based on the same keyword criteria.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls Instagram profile data for discovered creators including follower counts, engagement, and content type.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -684,7 +684,7 @@
                     background:#4B5563;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gemini AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Analyzes and filters all collected creator profiles across platforms to identify the most relevant and brand-aligned candidates.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Analyzes aggregated creator data from all sources and scores each creator for relevance and brand fit.</div>
               </div>
             </div>
 
@@ -746,7 +746,7 @@
                     background:#4B5563;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gemini AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scores each discovered creator against customizable weighting criteria such as engagement rate, audience size, niche relevance, and content quality.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scores each discovered creator against customizable weighting criteria such as engagement rate, niche relevance, and audience demographics.</div>
               </div>
             </div>
 
@@ -806,7 +806,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Drive API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves stored creator profiles, outreach sequences, and prompt templates from Drive to inform personalized messaging.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves qualified creator profiles, outreach sequences, and prompt templates stored in Drive to inform the AI.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -823,7 +823,7 @@
                     background:#64748B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gemini API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates personalized outreach emails for each qualified creator by applying learned sequences and prompt structures to their profile data.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates personalized outreach messages for each qualified creator by applying learned sequences and brand prompts to their profile data.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -840,7 +840,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the AI-generated outreach emails directly to qualified creators and logs delivery status.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the AI-generated personalized outreach emails directly to each qualified creator's inbox.</div>
               </div>
             </div>
 
@@ -902,7 +902,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Drive API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Loads historical influencer email threads, past negotiation outcomes, and conversation pattern data to train response context.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves historical influencer email conversations, negotiation outcomes, and rate benchmarks to train the AI's response logic.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -919,7 +919,7 @@
                     background:#64748B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gemini API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reads incoming creator replies and generates contextually appropriate negotiation or follow-up responses based on learned conversation history.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reads incoming creator replies and generates contextually appropriate negotiation or follow-up responses based on learned conversation patterns.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -936,7 +936,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends AI-crafted negotiation responses back to creators and captures incoming replies for continuous learning.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Monitors the inbox for creator replies and sends the AI-drafted negotiation responses back to the creator.</div>
               </div>
             </div>
 
@@ -996,7 +996,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Sheets</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reads the MHM vehicle data and New Availability Guide, matches part numbers across both sheets to identify eligible Must Have Monday products.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls MHM vehicle data and the New Availability Guide, then matches part numbers to identify in-stock Must Have Monday products.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1013,7 +1013,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates and populates a HubSpot email draft containing the formatted sales sheet and load sheet for the weekly Must Have Monday send.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates and populates a HubSpot email draft attaching the generated sales sheet and load sheet for the Must Have Monday campaign.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1030,7 +1030,7 @@
                     background:#6264A7;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Microsoft Teams</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Posts a completion notification to the relevant Teams channel confirming the load sheet and email draft are ready for review.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Posts a notification to the relevant Teams channel confirming the load sheet and HubSpot email have been generated and are ready for review.</div>
               </div>
             </div>
 
@@ -1092,7 +1092,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Anthropic API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates compelling First to Market email copy for new product launches including subject lines, body content, and monthly recap narrative using product data as input.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates compelling email copy for new DFC product launch announcements and monthly recap emails based on product data inputs.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1109,7 +1109,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates email drafts in HubSpot with AI-generated content, attaches relevant sales sheets, and stages them for review and send.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates the email draft in HubSpot with the AI-generated copy and attaches the relevant sales sheet for the new product launch.</div>
               </div>
             </div>
 
@@ -1169,7 +1169,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls lifecycle stage metrics, contact growth data, and email performance stats for the reporting period.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls lifecycle stage metrics, contact growth data, and email performance statistics for the reporting period.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1183,10 +1183,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive</span>
+                    background:#E37400;flex-shrink:0;"></div>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">GA4</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Extracts SMS campaign metrics including send volume, click rates, revenue, and subscriber growth for the month.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Fetches web traffic, conversion, and channel performance data for the monthly reporting window.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1200,10 +1200,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">GA4</span>
+                    background:#FF6243;flex-shrink:0;"></div>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Fetches web traffic, conversion, and session data from Google Analytics 4 for the reporting period.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves SMS campaign performance data including send volume, click-through rates, and revenue generated for the period.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1220,7 +1220,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Slides API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Populates slides 48-55 of the Marketing Highlights deck with all collected metrics, charts, and formatted data from HubSpot, Attentive, GA4, and Search Console.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Populates slides 48–55 of the Marketing Highlights deck with all retrieved metrics, charts, and formatted data from each platform.</div>
               </div>
             </div>
 
@@ -1282,7 +1282,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Search Console</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Identifies keyword gaps where R1 Concepts is underperforming relative to competitors based on impressions, ranking position, and click-through data.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Identifies keyword gaps where R1 Concepts underperforms versus competitors by analyzing impression and ranking data.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1299,7 +1299,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Anthropic API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Writes full SEO-optimized blog posts targeting identified keyword gaps, structured with proper headings, meta descriptions, and Yoast-ready formatting.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Writes full SEO-optimized blog articles targeting the identified keyword gaps, structured to meet Yoast SEO requirements.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1313,10 +1313,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#21759B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">WordPress</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Publishes the AI-generated blog post to the R1 Concepts WordPress site with Yoast SEO fields pre-populated including focus keyword, meta title, and description.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Publishes the AI-written blog post to the R1 Concepts WordPress site with Yoast SEO fields populated and formatting applied.</div>
               </div>
             </div>
 
@@ -1373,10 +1373,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#6A4C93;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Dream ERP</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Exports open purchase order data including vendor names, PO numbers, due dates, and outstanding quantities requiring follow-up.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Exports open vendor purchase order data including overdue items, vendor details, and expected delivery dates.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1393,7 +1393,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Transforms and uploads the processed PO data into HubSpot, creating or updating vendor contact records and enrolling them in follow-up email sequences.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Transforms the ERP export data and uploads it to HubSpot, creating or updating vendor contact records and triggering chase email workflows.</div>
               </div>
             </div>
 
@@ -1447,15 +1447,32 @@
                   background:#1c2128;border:1px solid #30363d;
                   display:flex;align-items:center;justify-content:center;
                   font-size:9px;font-weight:700;color:#6e7681;">1</div>
+                <div style="margin-left:11px;width:1px;height:20px;background:#21262d;"></div>
+              </div>
+              <div style="padding-top:3px;padding-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                  <div style="width:7px;height:7px;border-radius:50%;
+                    background:#E44D26;flex-shrink:0;"></div>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Local browser tool (standalone HTML)</span>
+                </div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Accepts MHM vehicle part number inputs and availability guide data directly in the browser, then matches and validates part numbers client-side.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                <div style="width:22px;height:22px;border-radius:50%;
+                  background:#1c2128;border:1px solid #30363d;
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:9px;font-weight:700;color:#6e7681;">2</div>
                 
               </div>
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#E44D26;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Local browser tool (standalone HTML)</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Accepts uploaded MHM vehicle part number data and New Availability Guide files, matches them in-browser, and generates a formatted DFC load sheet Excel file for download.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Exports the matched and formatted results as a DFC-standard load sheet Excel file directly from the browser.</div>
               </div>
             </div>
 
@@ -1515,7 +1532,7 @@
                     background:#4B5563;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Support Inbox</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Captures incoming customer support requests and queues them for AI classification and response.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Ingests incoming customer support tickets and extracts key issue details such as order info, complaint type, and urgency.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1524,32 +1541,15 @@
                   background:#1c2128;border:1px solid #30363d;
                   display:flex;align-items:center;justify-content:center;
                   font-size:9px;font-weight:700;color:#6e7681;">2</div>
-                <div style="margin-left:11px;width:1px;height:20px;background:#21262d;"></div>
-              </div>
-              <div style="padding-top:3px;padding-bottom:16px;">
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-                  <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">AI Model</span>
-                </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Classifies the ticket by issue category, determines urgency, and drafts or routes an appropriate response.</div>
-              </div>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start;">
-              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-                <div style="width:22px;height:22px;border-radius:50%;
-                  background:#1c2128;border:1px solid #30363d;
-                  display:flex;align-items:center;justify-content:center;
-                  font-size:9px;font-weight:700;color:#6e7681;">3</div>
                 
               </div>
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
                     background:#4B5563;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Ticketing System</span>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">AI Model</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Updates the ticket record with the AI classification, posts the drafted response or routes to a human agent based on escalation logic.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Classifies the ticket, drafts an appropriate response or resolution path, and routes it to the correct team or auto-resolves common issues.</div>
               </div>
             </div>
 
@@ -1609,9 +1609,9 @@
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
                     background:#4285F4;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta + TikTok + Google Ads</span>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta / TikTok / Google Ads</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls current week performance data across all three paid channels and packages it alongside the prior month's daily averages for comparison.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls current week performance data across all three paid channels and compares it against the prior month's average baseline.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1628,7 +1628,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Analyzes the performance delta between the current week and the prior month average, flagging notable shifts and summarizing key takeaways per channel.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Analyzes performance deltas, identifies notable trends or anomalies, and generates a plain-English weekly checkup summary.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1645,7 +1645,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Delivers the formatted weekly performance checkup report to the relevant team members every week automatically.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Delivers the formatted weekly performance checkup report to the relevant stakeholders automatically.</div>
               </div>
             </div>
 
@@ -1703,9 +1703,9 @@
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
                     background:#4285F4;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta + TikTok + Google Ads</span>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta / TikTok / Google Ads</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Aggregates full-month performance data across all paid channels, pulling spend, returns, and engagement metrics for the reporting period.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Aggregates full month performance data across all paid channels into a single structured dataset.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1722,7 +1722,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Formats the aggregated data into slide-ready narratives, month-over-month comparisons, and executive-level commentary structured for end-of-month presentations.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Formats and narrates the monthly data into slide-ready sections with performance commentary and key takeaways.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1739,7 +1739,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the completed monthly report to stakeholders, ready to be dropped into end-of-month slides.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the completed monthly report to stakeholders formatted and ready for end-of-month slide decks.</div>
               </div>
             </div>
 
@@ -1801,7 +1801,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot CRM</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects when a contact has completed the Amazon flyer warranty registration and flags them as a qualified customer for audience export.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects when a contact completes the Amazon flyer warranty registration and flags them as a qualified customer record.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1818,7 +1818,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Validates and formats the customer contact data to ensure it meets Meta's custom audience matching requirements before upload.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Validates and normalizes customer data to ensure it meets Meta's custom audience formatting and matching requirements.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1833,9 +1833,9 @@
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
                     background:#1877F2;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta</span>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta Ads</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Receives the formatted customer list and adds them to the designated custom audience for retargeting or lookalike campaign use.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Automatically adds validated customer records into the designated Meta custom audience for retargeting campaigns.</div>
               </div>
             </div>
 
@@ -1893,9 +1893,9 @@
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
                     background:#1877F2;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta + TikTok</span>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta / TikTok Ads</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls active ad copy and performance metrics across Meta and TikTok to identify ads that are underperforming against account benchmarks.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls active ad creative and copy data alongside performance metrics to identify underperforming ads across both platforms.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1912,7 +1912,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reviews the underperforming ad copy, diagnoses likely reasons for poor performance, and generates specific rewrite recommendations for each flagged ad.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reviews underperforming ad copy against performance benchmarks and generates specific, actionable improvement recommendations.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -1929,7 +1929,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends a structured audit report with flagged ads and Claude's copy recommendations to the paid social team for review and implementation.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the copy audit report with flagged ads and recommendations to the media and creative teams.</div>
               </div>
             </div>
 
@@ -1991,7 +1991,7 @@
                     background:#6264A7;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Microsoft Teams</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Captures the transcript or notes from the weekly media meeting where tasks and action items are discussed.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Captures the transcript or notes from the weekly media meeting as the source of record for discussed tasks.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2005,10 +2005,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#7C3AED;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
+                    background:#EA4335;flex-shrink:0;"></div>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Parses the meeting content to extract discrete tasks, assign owners, set due dates, and structure them into Asana-ready task format.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Receives or forwards meeting notes to serve as a trigger and structured input for the AI processing step.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2017,6 +2017,23 @@
                   background:#1c2128;border:1px solid #30363d;
                   display:flex;align-items:center;justify-content:center;
                   font-size:9px;font-weight:700;color:#6e7681;">3</div>
+                <div style="margin-left:11px;width:1px;height:20px;background:#21262d;"></div>
+              </div>
+              <div style="padding-top:3px;padding-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                  <div style="width:7px;height:7px;border-radius:50%;
+                    background:#7C3AED;flex-shrink:0;"></div>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
+                </div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Parses the meeting notes, extracts discrete tasks, identifies assignees and deadlines, and formats them for Asana entry.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                <div style="width:22px;height:22px;border-radius:50%;
+                  background:#1c2128;border:1px solid #30363d;
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:9px;font-weight:700;color:#6e7681;">4</div>
                 
               </div>
               <div style="padding-top:3px;">
@@ -2025,7 +2042,7 @@
                     background:#F06A6A;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Asana</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates the extracted tasks in the correct Asana project with assignees, due dates, and descriptions populated automatically.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates new tasks in the appropriate Asana project with assignees, due dates, and context pulled from the meeting.</div>
               </div>
             </div>
 
@@ -2085,7 +2102,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Sheets</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reads the Agent Tracker sheet to collect the latest status, progress, and metadata for all active agents being built or maintained.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reads the Agent Tracker sheet to extract the latest status, progress, and metadata for all active agents.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2102,7 +2119,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Formats the raw tracker data into a clean, scannable weekly summary organized by status, highlighting progress made and any agents that need attention.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Formats the raw tracker data into a clean, readable weekly update summary organized by status and priority.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2119,7 +2136,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the formatted Agent Tracker weekly update to stakeholders automatically each week.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Delivers the formatted Agent Tracker weekly update to the relevant team or stakeholders automatically.</div>
               </div>
             </div>
 
@@ -2181,7 +2198,7 @@
                     background:#1877F2;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Meta Ads</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls all active Meta and TikTok ad creatives and copy fields across campaigns, ad sets, and individual ads for phrase scanning.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls all active Meta and TikTok ad creatives and copy fields, including headlines, body text, and descriptions, across every running campaign.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2198,7 +2215,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scans every ad copy field for specified phrases or patterns and compiles a flagged list noting the exact ad, field, and matched copy for each hit.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scans all collected ad copy for specific target phrases, identifying exact matches and logging the ad ID, platform, field name, and verbatim copy where each match appears.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2215,7 +2232,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Emails the complete flagged results list with each match's ad name, field type, and exact copy excerpt so the team can act immediately.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Emails a formatted flagged list to the relevant stakeholder showing every match found, with the exact ad, field, and copy snippet for each flagged phrase.</div>
               </div>
             </div>
 
@@ -2331,7 +2348,7 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#999999;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">TBD</span>
                 </div>
                 <div style="font-size:10px;color:#6e7681;line-height:1.5;">Customer-facing AI agent for R1 Concepts is currently in development with connections to be determined.</div>
@@ -2394,7 +2411,7 @@
                     background:#64748B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Web Scraping</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scrapes local business directories, listings, and web sources to identify businesses in the Cerritos area that may need warehouse or office space.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scrapes local business directories and listings to identify businesses in the Cerritos area that may need warehouse or office space.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2408,10 +2425,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#34A853;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Email Discovery</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Finds verified contact email addresses for the identified businesses using email discovery tools.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Finds and validates email addresses for decision-makers at each identified target business.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2428,7 +2445,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot CRM</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Enrolls discovered leads into HubSpot and sends a personalized warm intro email pitching the 13140 Midway Place Cerritos sublet.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Logs enriched leads into HubSpot and sends a personalized warm intro email about the 13140 Midway Place sublet opportunity.</div>
               </div>
             </div>
 
@@ -2490,7 +2507,7 @@
                     background:#FF9900;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Amazon Ads API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls campaign performance data across R1 and DFC Amazon ad accounts including spend, impressions, clicks, and ACOS metrics.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls current campaign performance data across R1 and DFC Amazon ad accounts including spend, clicks, and ACOS metrics.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2507,7 +2524,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Analyzes campaign performance data to surface optimization recommendations including bid adjustments, budget reallocation, and keyword opportunities.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Analyzes campaign performance data and generates optimization recommendations for bids, budgets, and targeting.</div>
               </div>
             </div>
 
@@ -2617,7 +2634,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Search Console</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Tracks which DFC prospect pages are being visited and feeds that behavioral signal into the workflow trigger logic.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Identifies which DFC prospect pages are being visited and passes behavioral signals into HubSpot.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2634,7 +2651,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Fires one of 6 Phase 1 workflow triggers based on the page visited and enrolls the prospect into the matching automated email sequence.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Triggers one of 6 Phase 1 automated email sequences based on which specific DFC prospect page was visited.</div>
               </div>
             </div>
 
@@ -2694,7 +2711,7 @@
                     background:#FF0000;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">YouTube</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects the latest Friction Friday video published on DFC's YouTube channel and extracts metadata and transcript.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects a newly published DFC YouTube video and extracts the video URL, title, description, and thumbnail for downstream content creation.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2708,10 +2725,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#21759B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">WordPress</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Publishes a blog post based on the video transcript and metadata, embedding the YouTube video and SEO-optimized copy.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates and publishes a blog post embedding the YouTube video along with SEO-optimized written content derived from the video topic.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2728,7 +2745,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates and sends a video email campaign to the DFC contact list featuring the Friction Friday video and blog link.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Builds and sends a Friction Friday branded video email to the DFC contact list featuring the new video and blog link.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2742,10 +2759,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#FF6243;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive SMS</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends an SMS blast to DFC's subscriber list with a short message and link to the Friction Friday video or blog post.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends an SMS message to DFC's subscriber list with a short teaser and link to the Friction Friday video or blog post.</div>
               </div>
             </div>
 
@@ -2807,7 +2824,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Ads</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls active search ad copy alongside performance metrics to identify ads falling below account performance benchmarks.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Exports active search ad copy along with key performance metrics to identify headlines and descriptions that are underperforming.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2824,7 +2841,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Analyzes underperforming search ad copy against best practices and performance data, then generates specific headline and description rewrites.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Evaluates underperforming search ad copy against performance benchmarks and best practices, then generates specific rewrite recommendations.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2841,7 +2858,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the Google Ads copy audit report with flagged ads and recommended rewrites to the search team for review.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the Google Ads copy audit report with flagged ads and improvement recommendations to the media team.</div>
               </div>
             </div>
 
@@ -2901,7 +2918,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot Form</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Mark submits a vehicle specification form with fields like make, model, year, and trim to trigger the catalog workflow.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Mark submits a vehicle specification form with details like make, model, year, and any other relevant fitment criteria.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2918,7 +2935,7 @@
                     background:#4B5563;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Dream</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Queries the DFC inventory database using the submitted vehicle spec to retrieve stocked parts and identify gaps in coverage.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Queries DFC's internal inventory database using the submitted vehicle spec to retrieve matching stocked parts and identify gaps where no parts exist.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2935,7 +2952,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Formats the raw inventory results into a clean, structured catalog layout and adds descriptive labels, categories, and gap callouts.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Formats the raw inventory query results into a clean, structured Excel-ready layout, organizing stocked items and flagging gaps in a readable catalog format.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -2952,7 +2969,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends Mark the completed Excel catalog as an email attachment, formatted and ready to share with the special markets customer.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Automatically sends Mark the completed Excel catalog file as an email attachment with a summary of what was found and what is missing.</div>
               </div>
             </div>
 
@@ -3212,6 +3229,23 @@
                   background:#1c2128;border:1px solid #30363d;
                   display:flex;align-items:center;justify-content:center;
                   font-size:9px;font-weight:700;color:#6e7681;">1</div>
+                <div style="margin-left:11px;width:1px;height:20px;background:#21262d;"></div>
+              </div>
+              <div style="padding-top:3px;padding-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                  <div style="width:7px;height:7px;border-radius:50%;
+                    background:#64748B;flex-shrink:0;"></div>
+                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive (Chrome automation, no API)</span>
+                </div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Logs into Attentive via Chrome browser automation and locates the most recent MHM SMS campaign to use as a clone source.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                <div style="width:22px;height:22px;border-radius:50%;
+                  background:#1c2128;border:1px solid #30363d;
+                  display:flex;align-items:center;justify-content:center;
+                  font-size:9px;font-weight:700;color:#6e7681;">2</div>
                 
               </div>
               <div style="padding-top:3px;">
@@ -3220,7 +3254,7 @@
                     background:#64748B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive (Chrome automation, no API)</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Uses Chrome browser automation to log into Attentive, clone the previous week's MHM SMS campaign, and update the vehicle name, message copy, and scheduled send time.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Clones the previous MHM campaign, updates the vehicle name and scheduled send time, and saves the new campaign in Attentive.</div>
               </div>
             </div>
 
@@ -3279,10 +3313,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#6A4C93;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Dream ERP</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Exports DFC sales transaction data including order history, customer purchase frequency, product categories, and revenue by account.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Exports DFC sales transaction data including order history, customer segments, product lines, and purchase recency.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3299,7 +3333,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Segments customers into cohorts — active, at-risk, lapsed — and enrolls each segment into targeted reorder reminder, cross-sell, or win-back email sequences.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Uploads segmented customer data to HubSpot and triggers targeted workflows including reorder reminders, cross-sell campaigns, and win-back sequences.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3313,10 +3347,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#FF6243;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive SMS</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Triggers targeted SMS messages to high-priority customer segments identified from the Dream sales analysis, including win-back offers and reorder nudges.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Receives segmented customer lists from the analysis and sends targeted SMS campaigns for reorder and win-back audiences.</div>
               </div>
             </div>
 
@@ -3393,7 +3427,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot File Manager</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Uploads the new Excel file to HubSpot File Manager and generates a fresh public download URL.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Uploads the new Excel file to HubSpot File Manager and generates a public download URL to replace the previous week's link.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3410,7 +3444,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Clones the previous Super Session Saturday email, swaps in the new download link, and schedules the send for Saturday at 8AM.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Clones the previous week's Super Session Saturday email, swaps in the new download link, and schedules the email to send at 8AM on Saturday.</div>
               </div>
             </div>
 
@@ -3472,7 +3506,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Anthropic API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates SEO-optimized B2B blog content targeting DFC's core audiences: shops, distributors, and fleets.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates B2B SEO-optimized blog content targeting DFC's core audiences — shops, distributors, and fleets — based on keyword and topic inputs.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3486,10 +3520,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#21759B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">WordPress</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Receives the AI-generated blog post and publishes or stages it with SEO metadata applied.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Receives the AI-generated blog post and publishes or stages it with proper formatting, categories, and SEO metadata applied.</div>
               </div>
             </div>
 
@@ -3549,7 +3583,7 @@
                     background:#FF0000;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">YouTube</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects the latest Friction Friday video published on DFC's YouTube channel and extracts metadata and transcript.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects a newly published DFC YouTube video and extracts the video URL, title, description, and thumbnail for downstream content creation.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3563,10 +3597,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#21759B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">WordPress</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Publishes a blog post based on the video transcript and metadata, embedding the YouTube video and SEO-optimized copy.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates and publishes a blog post embedding the YouTube video along with SEO-optimized written content derived from the video topic.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3583,7 +3617,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Creates and sends a video email campaign to the DFC contact list featuring the Friction Friday video and blog link.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Builds and sends a Friction Friday branded video email to the DFC contact list featuring the new video and blog link.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3597,10 +3631,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#FF6243;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive SMS</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends an SMS blast to DFC's subscriber list with a short message and link to the Friction Friday video or blog post.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends an SMS message to DFC's subscriber list with a short teaser and link to the Friction Friday video or blog post.</div>
               </div>
             </div>
 
@@ -3662,7 +3696,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls all existing R1 Concepts HubSpot workflows and audits enrollment triggers, delays, and email steps for gaps or inefficiencies.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Audits existing R1 Concepts HubSpot workflows — including site visit triggers and welcome series — to identify gaps, redundancies, and enrollment logic errors.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3679,7 +3713,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Updates and optimizes site visit trigger logic and welcome series sequences based on audit findings.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Implements optimized workflow logic, updates trigger conditions, and rebuilds welcome series sequences based on audit findings.</div>
               </div>
             </div>
 
@@ -3736,10 +3770,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#6A4C93;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Dream ERP</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Extracts Dream CustomerIDs and associated contact data from the DFC ERP system for mapping.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Extracts Dream CustomerIDs along with associated contact details such as name, email, and account type for all DFC customer records.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3756,7 +3790,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Maps each Dream CustomerID to the corresponding HubSpot contact record by updating a custom property field.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Maps each Dream CustomerID to the corresponding HubSpot contact record, updating a custom property so sales automation workflows can reference ERP identity.</div>
               </div>
             </div>
 
@@ -3815,10 +3849,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#999999;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">TBD</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Project is currently in the planning stage with connections and workflow not yet defined.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Project is currently in planning stage with connections and workflow steps not yet defined.</div>
               </div>
             </div>
 
@@ -3878,7 +3912,7 @@
                     background:#FF0000;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">YouTube</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects the latest R1 Concepts YouTube video and extracts the title, description, transcript, and thumbnail.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Detects a newly published R1 Concepts YouTube video and extracts the video URL, title, description, and thumbnail for content repurposing.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3892,10 +3926,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#21759B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">WordPress</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Publishes an SEO blog post derived from the video content, embedding the video and structured copy for search indexing.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Publishes a new blog post embedding the R1 YouTube video with SEO-optimized supporting content and metadata.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3912,7 +3946,7 @@
                     background:#FF7A59;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">HubSpot API</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Builds and sends a weekly email to R1's contact list showcasing the new video with a CTA linking to the blog post.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates and sends a weekly branded email to the R1 contact list featuring the new video and a link to the full blog post.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -3926,10 +3960,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#FF6243;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Attentive SMS</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends a weekly SMS to R1's subscriber list with a link to the new video or blog post.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends a weekly SMS to R1's subscriber list with a short message and link driving traffic to the new video or blog post.</div>
               </div>
             </div>
 
@@ -3991,7 +4025,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Search Console</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls weekly keyword rankings, impressions, clicks, and average position for DFC blog URLs.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls weekly keyword rankings, impressions, clicks, and average position data for all DFC blog URLs.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4005,10 +4039,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#E37400;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">GA4</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves weekly blog traffic metrics including sessions, engagement rate, and goal completions attributed to blog content.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves traffic, session, engagement, and conversion data tied to blog content to measure business impact beyond rankings.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4022,10 +4056,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#21759B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">WordPress</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls post-level metadata including publish dates, word counts, and Yoast SEO scores for all active blog posts.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls publish frequency, post count, and content metadata to report on the agent's output volume and publishing efficiency.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4039,10 +4073,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#A4286A;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Yoast</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Supplies on-page SEO scores, readability grades, and focus keyword status for each blog post in the weekly report.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Extracts on-page SEO scores, readability ratings, and metadata completeness across all published DFC blog posts.</div>
               </div>
             </div>
 
@@ -4102,7 +4136,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Search Console</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls monthly keyword rankings, impressions, and click data for all R1 Concepts blog URLs.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls monthly keyword ranking movements, impressions, and click data for all R1 Concepts blog content.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4116,10 +4150,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#E37400;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">GA4</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves monthly blog traffic, session quality, and conversion data attributed to R1's blog content.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Retrieves monthly blog traffic, user behavior, and goal completion data to measure the downstream business impact of published content.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4133,10 +4167,10 @@
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#21759B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">WordPress</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Extracts post-level data including publish frequency, categories, and content volume published during the reporting month.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Reports on total posts published, publishing cadence, and content inventory growth for the monthly reporting period.</div>
               </div>
             </div>
 
@@ -4195,10 +4229,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#0078D4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Email (Outlook)</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Monitors the Outlook inbox for incoming vendor PO invoice PDF attachments and triggers the automation upon detection.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Monitors an Outlook inbox for incoming vendor PO invoices as PDF attachments and triggers the stamping workflow upon receipt.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4212,10 +4246,10 @@
               <div style="padding-top:3px;padding-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#3776AB;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Python</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Runs a Python script that applies the Harbor Tires stamp image and Richard's signature to the designated fields on each invoice PDF.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Processes each PDF using Python and PDF tools to overlay the Harbor Tires stamp and Richard's signature at the correct positions on the document.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4224,32 +4258,15 @@
                   background:#1c2128;border:1px solid #30363d;
                   display:flex;align-items:center;justify-content:center;
                   font-size:9px;font-weight:700;color:#6e7681;">3</div>
-                <div style="margin-left:11px;width:1px;height:20px;background:#21262d;"></div>
-              </div>
-              <div style="padding-top:3px;padding-bottom:16px;">
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
-                  <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
-                  <span style="font-size:11px;font-weight:600;color:#c9d1d9;">PDF Tools</span>
-                </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Renders and flattens the stamped and signed PDF to produce a finalized, tamper-evident output file.</div>
-              </div>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start;">
-              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
-                <div style="width:22px;height:22px;border-radius:50%;
-                  background:#1c2128;border:1px solid #30363d;
-                  display:flex;align-items:center;justify-content:center;
-                  font-size:9px;font-weight:700;color:#6e7681;">4</div>
                 
               </div>
               <div style="padding-top:3px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
                   <div style="width:7px;height:7px;border-radius:50%;
-                    background:#4B5563;flex-shrink:0;"></div>
+                    background:#0078D4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Email (Outlook)</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the finalized stamped-and-signed invoice PDF back to the appropriate recipient or saves it to the designated folder.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends the completed, stamped, and signed PDF back to the appropriate recipient or saves it to a designated folder for records.</div>
               </div>
             </div>
 
@@ -4309,7 +4326,7 @@
                     background:#F06A6A;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Asana</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Monitors tasks, project statuses, and due dates across Asana workspaces to identify updates, blockers, or items needing attention.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Monitors Asana for task updates, status changes, deadlines, or new assignments across relevant projects.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4326,7 +4343,7 @@
                     background:#7C3AED;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Claude AI</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Summarizes the Asana task data into a concise, prioritized update highlighting what's on track, overdue, or blocked.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Summarizes task activity, flags overdue or at-risk items, and formats findings into a clear update.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4343,7 +4360,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Delivers the summarized Asana project update to relevant team members or stakeholders on a scheduled basis.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Delivers the Asana project summary to relevant team members or managers on a scheduled basis.</div>
               </div>
             </div>
 
@@ -4405,7 +4422,7 @@
                     background:#4B5563;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Dream</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls the weekly backorder report and enriches each line item with live inventory data including on-hand quantity, on-order status, and in-transit details.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Pulls live inventory status data for every part on the weekly backorder report, including on-hand quantities, on-order status, and in-transit shipments.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4422,7 +4439,7 @@
                     background:#4B5563;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Backorder Report</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Updates the master backorder report with enriched status fields and flags any parts with no viable source as dead-end items requiring escalation.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Enriches each line of the backorder report with the live inventory data and automatically flags any parts that have no source and no resupply path.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4439,7 +4456,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates and sends draft customer communications pre-populated with each part's current status, expected resolution, and any escalation notes.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Generates and sends draft customer communications for affected backorder items, pre-written with the relevant part status and expected resolution details.</div>
               </div>
             </div>
 
@@ -4499,7 +4516,7 @@
                     background:#64748B;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Web Scraping</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract make, model, year, and part fitment data for two-piece rotors.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract make, model, year, and part fitment data for all listed two-piece rotors.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4516,7 +4533,7 @@
                     background:#4B5563;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Catalog</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Cross-references the scraped fitment data against DFC's existing parts inventory to identify overlaps, gaps, and new opportunity SKUs.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Cross-references the scraped fitment data against DFC's existing parts catalog to identify overlaps where DFC already has coverage and gaps where it does not.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4533,7 +4550,7 @@
                     background:#EA4335;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Gmail</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends automated outreach emails to existing customers asking about demand for specific two-piece rotor fitments identified as gaps or opportunities.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Sends automated outreach emails to targeted customers to gather demand data on two-piece rotor fitments, particularly for vehicles where DFC has identified gaps.</div>
               </div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -4550,7 +4567,7 @@
                     background:#4285F4;flex-shrink:0;"></div>
                   <span style="font-size:11px;font-weight:600;color:#c9d1d9;">Google Sheets</span>
                 </div>
-                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Compiles all scraped catalog data, DFC cross-reference results, and customer demand responses into one formatted output sheet for Dino.</div>
+                <div style="font-size:10px;color:#6e7681;line-height:1.5;">Compiles all scraped catalog data, cross-reference results, and customer demand responses into a single formatted reference sheet delivered to Dino.</div>
               </div>
             </div>
 
