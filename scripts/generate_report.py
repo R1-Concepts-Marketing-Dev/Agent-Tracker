@@ -32,37 +32,6 @@ SHEET_GIDS         = os.environ.get("SHEET_GIDS", "0")
 # How many days back counts as "this week"
 LOOKBACK_DAYS = 7
 
-# ── Claude cost tracking ───────────────────────────────────────────────────────
-# Pricing for claude-sonnet-4-6 (USD per million tokens).
-# UPDATE THESE to match the exact rates shown in your Anthropic console.
-CLAUDE_INPUT_COST_PER_MTOK          =  3.00   # standard input tokens
-CLAUDE_OUTPUT_COST_PER_MTOK         = 15.00   # output tokens
-CLAUDE_CACHE_WRITE_COST_PER_MTOK    =  3.75   # cache creation (1.25× input rate)
-CLAUDE_CACHE_READ_COST_PER_MTOK     =  0.30   # cache read (0.1× input rate)
-
-# Accumulates across the full run; passed to _write_self_metrics at the end
-_run_cost_usd: float = 0.0
-
-def _call_cost(msg) -> float:
-    """Return the USD cost of a Claude API response."""
-    usage = getattr(msg, "usage", None)
-    if not usage:
-        return 0.0
-    return (
-        getattr(usage, "input_tokens",               0) * CLAUDE_INPUT_COST_PER_MTOK       / 1_000_000
-      + getattr(usage, "output_tokens",              0) * CLAUDE_OUTPUT_COST_PER_MTOK      / 1_000_000
-      + getattr(usage, "cache_creation_input_tokens",0) * CLAUDE_CACHE_WRITE_COST_PER_MTOK / 1_000_000
-      + getattr(usage, "cache_read_input_tokens",    0) * CLAUDE_CACHE_READ_COST_PER_MTOK  / 1_000_000
-    )
-
-
-def _add_cost(msg) -> float:
-    """Add the USD cost of a Claude API response to the run total. Returns cost added."""
-    global _run_cost_usd
-    cost = _call_cost(msg)
-    _run_cost_usd += cost
-    return cost
-
 # ── Google Sheets ───────────────────────────────────────────────────────────────
 def _normalize_stage(raw: str) -> str:
     s = raw.strip().lower()
@@ -140,30 +109,30 @@ def _sheet_url_to_csv(sheet_url: str) -> str | None:
     )
 
 
-def _fetch_and_parse_metrics(sheet_url: str, client) -> tuple:
+def _fetch_and_parse_metrics(sheet_url: str, client) -> dict:
     """
     Fetch a metrics Google Sheet and use Claude to parse it into a normalized dict.
     Works with any sheet layout — two-column, time-series, or anything else.
 
-    Returns (metrics_dict, cost_usd). Both values always present.
+    Returns metrics_dict.
     """
     if not sheet_url:
-        return {}, 0.0
+        return {}
 
     csv_url = _sheet_url_to_csv(sheet_url)
     if not csv_url:
         print(f"   ⚠️  Could not parse sheet ID from: {sheet_url}")
-        return {}, 0.0
+        return {}
 
     try:
         with urllib.request.urlopen(csv_url) as resp:
             csv_text = resp.read().decode("utf-8")
     except Exception as e:
         print(f"   ⚠️  Could not fetch metrics sheet ({e})")
-        return {}, 0.0
+        return {}
 
     if not csv_text.strip():
-        return {}, 0.0
+        return {}
 
     prompt = f"""You are parsing a metrics spreadsheet for an AI automation agent.
 The sheet may use any layout — two-column list, time-series by month, or anything else.
@@ -194,16 +163,6 @@ Rules:
   - Only include history if 2 or more data points exist; otherwise set null
   - For non-time-series sheets set history to null
 
-COST HANDLING — this is critical:
-- Look at every column and row. Identify anything that represents money spent, a fee, a cost, or expenditure — regardless of what it is named. This includes but is not limited to: ad spend, platform fees, tool subscriptions, API costs, labour costs, production costs, media spend, monthly fees, etc.
-- Sum ALL of those cost values together to produce a single total
-- Always include a top-level "_cost_total" key in your JSON at the same level as other metrics:
-  "_cost_total": {{"value": "142.50", "total": "142.50"}}
-  Use a plain number string with no currency symbol so it can be parsed directly
-- If there are multiple cost components, still return them individually as separate metrics so they are visible on the page, AND include "_cost_total" as their sum
-- If there is only one cost metric, "_cost_total" should equal that value
-- If there are NO cost metrics in the sheet, set "_cost_total" to null
-
 CSV data:
 {csv_text}"""
 
@@ -213,16 +172,15 @@ CSV data:
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
-        cost = _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
         if raw.endswith("```"):
             raw = "\n".join(raw.split("\n")[:-1])
-        return json.loads(raw.strip()), cost
+        return json.loads(raw.strip())
     except Exception as e:
         print(f"   ⚠️  Claude could not parse metrics ({e})")
-        return {}, 0.0
+        return {}
 
 
 def fetch_sheet_data() -> list[dict]:
@@ -318,13 +276,12 @@ No bullet points. Plain paragraph prose only."""
         max_tokens=400,
         messages=[{"role": "user", "content": prompt}],
     )
-    _add_cost(msg)
     return msg.content[0].text.strip()
 
 
 # ── Claude Workflow Steps ──────────────────────────────────────────────────────
 def _workflow_batch(batch: list[dict], client) -> dict:
-    """Ask Claude to generate rich workflow steps for a batch of agents."""
+    """Ask Claude to generate rich workflow steps for a batch of agents. Returns a dict."""
     agent_blocks = "\n\n".join(
         f'Agent: {a["name"]}\n'
         f'Description: {a["description"] or "No description provided"}\n'
@@ -370,26 +327,24 @@ Agents:
         max_tokens=8000,
         messages=[{"role": "user", "content": prompt}],
     )
-    cost = _add_cost(msg)
     raw = msg.content[0].text.strip()
     if raw.startswith("```"):
         raw = "\n".join(raw.split("\n")[1:])
     if raw.endswith("```"):
         raw = "\n".join(raw.split("\n")[:-1])
     try:
-        return json.loads(raw.strip()), cost
+        return json.loads(raw.strip())
     except json.JSONDecodeError:
         print(f"⚠️  Could not parse workflow JSON for batch, skipping {len(batch)} agent(s)")
-        return {}, cost
+        return {}
 
 
-def generate_workflow_steps(agents: list[dict], cost_per_agent: dict) -> dict[str, list[dict]]:
+def generate_workflow_steps(agents: list[dict]) -> dict[str, list[dict]]:
     """
     Ask Claude to generate step-by-step workflow descriptions for each agent.
     Returns a dict: { agent_name: [ {platform, role, action, impact, dataLabel, chips}, ... ] }
     Agents with no connections get an empty list.
     Processes in batches of 10 to stay within token limits.
-    Updates cost_per_agent in place with each agent's share of batch cost.
     """
     agents_with_connections = [a for a in agents if a["connections"].strip()]
     if not agents_with_connections:
@@ -406,11 +361,8 @@ def generate_workflow_steps(agents: list[dict], cost_per_agent: dict) -> dict[st
     print(f"   Processing {len(agents_with_connections)} agent(s) in {len(batches)} batch(es)...")
     for idx, batch in enumerate(batches):
         print(f"   Batch {idx + 1}/{len(batches)}: {[a['name'] for a in batch]}")
-        batch_result, batch_cost = _workflow_batch(batch, client)
+        batch_result = _workflow_batch(batch, client)
         results.update(batch_result)
-        per_agent = batch_cost / len(batch) if batch else 0
-        for a in batch:
-            cost_per_agent[a["name"]] = round(cost_per_agent.get(a["name"], 0) + per_agent, 6)
 
     return results
 
@@ -590,7 +542,6 @@ Platforms:
             max_tokens=1000,
             messages=[{"role": "user", "content": prompt}],
         )
-        _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
@@ -1141,22 +1092,12 @@ def build_full_report_html(
     week_str: str,
     workflow_map: dict = None,
     time_saved_history: list = None,
-    total_cost_usd: float = 0.0,
 ) -> str:
     """Full card-based report for GitHub Pages."""
     if workflow_map is None:
         workflow_map = {}
 
-    # Sum cost from all agents' metrics — same source as the per-agent badge
-    metrics_total_cost = 0.0
-    for a in agents:
-        c = _extract_cost_from_metrics(a.get("metrics", {}))
-        if c is not None:
-            metrics_total_cost += c
-    # Use metrics-derived total if available, otherwise fall back to tracked API spend
-    display_cost = metrics_total_cost if metrics_total_cost > 0 else total_cost_usd
-
-    time_saved_section = _build_time_saved_section(time_saved_history or [], display_cost)
+    time_saved_section = _build_time_saved_section(time_saved_history or [])
     completed   = [a for a in agents if a["stage"] == "Completed"]
     in_progress = [a for a in agents if a["stage"] == "In Progress"]
     planned     = [a for a in agents if a["stage"] == "Planned"]
@@ -1387,18 +1328,6 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
             f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
             f'background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">'
             f'&#128142; {v_str} value/mo</span>'
-        )
-
-    # ── Run cost badge — only from agent's own metrics sheet ─────────────────
-    run_cost_chip = ""
-    _agent_metrics = agent.get("metrics", {})
-    _cost_num = _extract_cost_from_metrics(_agent_metrics)
-    if _cost_num is not None:
-        _cost_display = f"${_cost_num:,.2f}" if _cost_num >= 1 else f"${_cost_num:.4f}"
-        run_cost_chip = (
-            f'<span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;'
-            f'background:#1a0a0a;border:1px solid #6e1a1a;color:#f78166;">'
-            f'&#128184; {_cost_display}/mo</span>'
         )
 
     # ── Trigger badge (frequency) ──────────────────────────────────────────────
@@ -1898,7 +1827,6 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
       </span>
       {time_saved_chip}
       {value_saved_chip}
-      {run_cost_chip}
     </div>
   </div>
 </div>
@@ -1987,8 +1915,6 @@ def save_workflow_cache(
     time_saved_history: list = None,
     time_saved_per_agent: dict = None,
     summary: str = "",
-    cost_per_agent: dict = None,
-    total_cost_usd: float = 0.0,
 ) -> None:
     os.makedirs("docs", exist_ok=True)
     cache = {
@@ -1997,8 +1923,6 @@ def save_workflow_cache(
         "time_saved_history":   time_saved_history or [],
         "time_saved_per_agent": time_saved_per_agent or {},
         "summary":              summary or "",
-        "cost_per_agent":       cost_per_agent or {},
-        "total_cost_usd":       total_cost_usd or 0.0,
     }
     with open(WORKFLOW_CACHE_PATH, "w", encoding="utf-8") as f:
         json.dump(cache, f, indent=2)
@@ -2007,7 +1931,7 @@ def save_workflow_cache(
           f"{len(time_saved_history or [])} time-saved months)")
 
 
-def load_workflow_cache() -> tuple[dict, dict, list, dict, str, dict, float]:
+def load_workflow_cache() -> tuple[dict, dict, list, dict, str]:
     if os.path.exists(WORKFLOW_CACHE_PATH):
         with open(WORKFLOW_CACHE_PATH, encoding="utf-8") as f:
             data = json.load(f)
@@ -2018,22 +1942,18 @@ def load_workflow_cache() -> tuple[dict, dict, list, dict, str, dict, float]:
             time_saved_history   = data.get("time_saved_history", list(SEED_TIME_HISTORY))
             time_saved_per_agent = data.get("time_saved_per_agent", {})
             summary              = data.get("summary", "")
-            cost_per_agent       = data.get("cost_per_agent", {})
-            total_cost_usd       = float(data.get("total_cost_usd", 0.0))
         else:
             workflows            = data
             metrics              = {}
             time_saved_history   = list(SEED_TIME_HISTORY)
             time_saved_per_agent = {}
             summary              = ""
-            cost_per_agent       = {}
-            total_cost_usd       = 0.0
         print(f"   📂 Loaded cache ({len(workflows)} workflows, "
               f"{len(metrics)} metrics, "
               f"{len(time_saved_history)} time-saved months)")
-        return workflows, metrics, time_saved_history, time_saved_per_agent, summary, cost_per_agent, total_cost_usd
+        return workflows, metrics, time_saved_history, time_saved_per_agent, summary
     print("   ⚠️  No cache found — pages will show placeholder workflow")
-    return {}, {}, list(SEED_TIME_HISTORY), {}, "", {}, 0.0
+    return {}, {}, list(SEED_TIME_HISTORY), {}, ""
 
 
 # ── Time Saved ────────────────────────────────────────────────────────────────
@@ -2052,55 +1972,6 @@ TIME_SAVED_KEYWORDS = [
     "est. hours", "estimated hours", "time efficiency",
     "saved", "reclaimed", "freed",   # broader fallbacks
 ]
-
-
-def _extract_cost_from_metrics(metrics: dict) -> float | None:
-    """
-    Extract the total cost from an agent's parsed metrics dict.
-
-    Claude always computes a '_cost_total' key when parsing a metrics sheet.
-    That's the primary source — it represents the sum of ALL cost components
-    Claude identified in the sheet regardless of how they were labelled.
-
-    Falls back to any metric whose name contains common cost/spend keywords
-    if '_cost_total' is absent (e.g. older cache entries).
-
-    Prefers 'total' (YTD) over 'value' (current period).
-    """
-    import re as _re
-
-    def _parse_num(s) -> float | None:
-        if s is None or str(s).lower() in ("null", "none", ""):
-            return None
-        m = _re.search(r'[\d.]+', str(s).replace(",", "").replace("$", ""))
-        return float(m.group()) if m else None
-
-    def _best_val(entry) -> float | None:
-        if isinstance(entry, dict):
-            for field in ("total", "value"):
-                n = _parse_num(entry.get(field))
-                if n is not None:
-                    return n
-        else:
-            return _parse_num(entry)
-        return None
-
-    # Primary: Claude-computed total across all cost components
-    if "_cost_total" in metrics:
-        n = _best_val(metrics["_cost_total"])
-        if n is not None:
-            return n
-
-    # Fallback: keyword scan for older cache entries
-    cost_keywords = ["total cost", "api cost", "run cost", "monthly cost",
-                     "ad spend", "platform fee", "tool cost", "spend", "cost"]
-    for key, entry in metrics.items():
-        if any(kw in key.lower() for kw in cost_keywords):
-            n = _best_val(entry)
-            if n is not None:
-                return n
-
-    return None
 
 
 def _extract_time_saved(metrics: dict) -> float | None:
@@ -2180,19 +2051,18 @@ Agents to estimate:
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
-        cost = _add_cost(msg)
         raw = msg.content[0].text.strip()
         if raw.startswith("```"):
             raw = "\n".join(raw.split("\n")[1:])
         if raw.endswith("```"):
             raw = "\n".join(raw.split("\n")[:-1])
-        return json.loads(raw.strip()), cost
+        return json.loads(raw.strip())
     except Exception as e:
         print(f"   ⚠️  Time saved batch estimate failed ({e})")
-        return {}, 0.0
+        return {}
 
 
-def _build_time_saved_section(history: list[dict], total_cost_usd: float = 0.0) -> str:
+def _build_time_saved_section(history: list[dict]) -> str:
     """
     Build the time saved stat squares + chart HTML for the main GitHub Pages report.
     Proration of the current month happens in JavaScript at view time, so the numbers
@@ -2208,7 +2078,7 @@ def _build_time_saved_section(history: list[dict], total_cost_usd: float = 0.0) 
   <tr><td style="padding-bottom:20px;">
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
       <tr>
-        <td width="34%" style="padding-right:6px;">
+        <td width="50%" style="padding-right:6px;">
           <div style="background:#0a1e12;border:1px solid #196130;border-radius:10px;
             padding:16px 20px;text-align:center;">
             <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
@@ -2217,22 +2087,13 @@ def _build_time_saved_section(history: list[dict], total_cost_usd: float = 0.0) 
             <div style="font-size:10px;color:#238636;margin-top:4px;">Total hours saved YTD</div>
           </div>
         </td>
-        <td width="34%" style="padding:0 3px;">
+        <td width="50%" style="padding-left:6px;">
           <div style="background:#130d2a;border:1px solid #3b2d6e;border-radius:10px;
             padding:16px 20px;text-align:center;">
             <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
               text-transform:uppercase;color:#a371f7;margin-bottom:6px;">&#128142; Value Generated</div>
             <div id="ts-value" style="font-size:32px;font-weight:800;color:#a371f7;line-height:1;">—</div>
             <div style="font-size:10px;color:#6e3eb5;margin-top:4px;">@ $20/hr equivalent</div>
-          </div>
-        </td>
-        <td width="32%" style="padding-left:6px;">
-          <div style="background:#1a0a0a;border:1px solid #6e1a1a;border-radius:10px;
-            padding:16px 20px;text-align:center;">
-            <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;
-              text-transform:uppercase;color:#f78166;margin-bottom:6px;">&#128184; Run Cost</div>
-            <div id="ts-cost" style="font-size:32px;font-weight:800;color:#f78166;line-height:1;">—</div>
-            <div style="font-size:10px;color:#7a2a1a;margin-top:4px;">Total API spend YTD</div>
           </div>
         </td>
       </tr>
@@ -2259,17 +2120,9 @@ def _build_time_saved_section(history: list[dict], total_cost_usd: float = 0.0) 
       return {{period: h.period, hours: hrs}};
     }});
 
-    var total     = data.reduce(function(s,h){{return s+h.hours;}}, 0);
-    var totalCost = {total_cost_usd};
+    var total = data.reduce(function(s,h){{return s+h.hours;}}, 0);
     document.getElementById("ts-hours").textContent = Math.round(total) + "h";
     document.getElementById("ts-value").textContent = "$" + Math.round(total * RATE).toLocaleString();
-    var costEl = document.getElementById("ts-cost");
-    if (totalCost > 0) {{
-      costEl.textContent = "$" + totalCost.toFixed(2);
-    }} else {{
-      costEl.textContent = "—";
-      costEl.style.opacity = "0.3";
-    }}
 
     var W=500, H=100, LP=36, RP=8, TP=8, BP=18, cW=W-LP-RP, cH=H-TP-BP;
     var vals   = data.map(function(h){{return h.hours;}});
@@ -2315,7 +2168,7 @@ def _build_time_saved_section(history: list[dict], total_cost_usd: float = 0.0) 
 # ── Self-metrics writer ────────────────────────────────────────────────────────
 SELF_METRICS_SHEET_URL = "https://docs.google.com/spreadsheets/d/1j5xWfZOo8wgC1E-yoiQlTikz2ateGQ1SYjgtKGLfRPA/edit?gid=0#gid=0"
 
-def _write_self_metrics(agents: list[dict], increment_reports: bool = True, run_cost_usd: float = 0.0) -> None:
+def _write_self_metrics(agents: list[dict], increment_reports: bool = True) -> None:
     """
     Write Agent Tracker self-metrics to the tracking sheet, one column per month.
 
@@ -2362,9 +2215,9 @@ def _write_self_metrics(agents: list[dict], increment_reports: bool = True, run_
 
         # ── Ensure row labels in column A (only on first run) ─────────────────
         col_a = ws.col_values(1)
-        if not any(v.strip() for v in col_a[1:7]):      # rows 2-7 empty
-            row_labels = ["Total Agents", "Completed", "In Progress", "Planned", "Reports Created", "API Cost ($)"]
-            ws.update("A2:A7", [[l] for l in row_labels])
+        if not any(v.strip() for v in col_a[1:6]):      # rows 2-6 empty
+            row_labels = ["Total Agents", "Completed", "In Progress", "Planned", "Reports Created"]
+            ws.update("A2:A6", [[l] for l in row_labels])
             if not col_a or not col_a[0].strip():
                 ws.update_cell(1, 1, "Metric")
 
@@ -2398,21 +2251,10 @@ def _write_self_metrics(agents: list[dict], increment_reports: bool = True, run_
                 reports = 1
             updates.append({"range": f"{c}6", "values": [[reports]]})
 
-        if run_cost_usd > 0:
-            # Accumulate cost within the month (add to whatever's already there)
-            existing_cost = ws.cell(7, col).value or "0"
-            try:
-                existing_cost = float(str(existing_cost).replace("$", "").replace(",", "").strip())
-            except ValueError:
-                existing_cost = 0.0
-            new_cost = round(existing_cost + run_cost_usd, 4)
-            updates.append({"range": f"{c}7", "values": [[new_cost]]})
-
         ws.batch_update(updates)
 
-        cost_str = f", ${run_cost_usd:.4f} this run" if run_cost_usd > 0 else ""
         reports_str = f", {reports} reports" if increment_reports else ""
-        print(f"   ✅ Self-metrics written to col {c} ({month_header}) — {total} agents{reports_str}{cost_str}")
+        print(f"   ✅ Self-metrics written to col {c} ({month_header}) — {total} agents{reports_str}")
 
     except Exception as e:
         print(f"   ⚠️  Could not write self-metrics ({e})")
@@ -2440,7 +2282,7 @@ def main() -> None:
         print(f"📅 Monthly snapshot mode — recording {prev_month_str} final total...")
 
         # Load existing cache for metrics + history
-        _, metrics_map, time_saved_history, _, cached_summary, cached_cost_per_agent, cached_total_cost = load_workflow_cache()
+        _, metrics_map, time_saved_history, _, cached_summary = load_workflow_cache()
         for agent in agents:
             if agent["name"] in metrics_map:
                 agent["metrics"] = metrics_map[agent["name"]]
@@ -2456,7 +2298,7 @@ def main() -> None:
 
         if needs_estimate:
             snap_client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-            estimates   = _estimate_time_saved_batch(needs_estimate, snap_client)
+            estimates = _estimate_time_saved_batch(needs_estimate, snap_client)
             for agent in needs_estimate:
                 est = estimates.get(agent["name"])
                 try:
@@ -2481,8 +2323,8 @@ def main() -> None:
             time_saved_history.append({"period": prev_month_str, "hours": total, "cost": 0, "finalized": True})
 
         # Reload full cache to preserve workflows + metrics, just update history
-        wf_map, m_map, _, old_ts_per_agent, _, _, old_total_cost = load_workflow_cache()
-        save_workflow_cache(wf_map, m_map, time_saved_history, old_ts_per_agent, cached_summary, {}, old_total_cost)
+        wf_map, m_map, _, old_ts_per_agent, _ = load_workflow_cache()
+        save_workflow_cache(wf_map, m_map, time_saved_history, old_ts_per_agent, cached_summary)
         print(f"   ✅ {prev_month_str} locked in at {total}h")
         print("✅ Done!")
         return
@@ -2499,7 +2341,7 @@ def main() -> None:
         print("🔄 Refresh-only mode — skipping Claude calls and email")
 
         print("📂 Loading cached workflow steps and metrics...")
-        workflow_map, metrics_map, time_saved_history, time_saved_per_agent, cached_summary, cached_cost_per_agent, cached_total_cost = load_workflow_cache()
+        workflow_map, metrics_map, time_saved_history, time_saved_per_agent, cached_summary = load_workflow_cache()
 
         # Apply cached data to agents
         for agent in agents:
@@ -2507,12 +2349,11 @@ def main() -> None:
                 agent["metrics"] = metrics_map[agent["name"]]
             if agent["name"] in time_saved_per_agent:
                 agent["time_saved"] = time_saved_per_agent[agent["name"]]
-            # run_cost badge comes from agent's own metrics sheet, not tracker attribution
 
         print("🏗️  Building full report (GitHub Pages)...")
         new_rows, stage_changes = detect_changes(agents)
         full_html = build_full_report_html(
-            agents, new_rows, stage_changes, cached_summary, week_str, workflow_map, time_saved_history, cached_total_cost
+            agents, new_rows, stage_changes, cached_summary, week_str, workflow_map, time_saved_history
         )
 
         print("💾 Saving full report to docs/index.html...")
@@ -2548,10 +2389,8 @@ def main() -> None:
         print("🤖 Generating Claude summary...")
         summary = generate_summary(agents, new_rows, stage_changes)
 
-        cost_per_agent: dict = {}
-
         print("🤖 Generating workflow steps for full report...")
-        workflow_map = generate_workflow_steps(agents, cost_per_agent)
+        workflow_map = generate_workflow_steps(agents)
         print(f"   Generated workflows for {len(workflow_map)} agent(s)")
 
         print("📊 Fetching and parsing agent metrics with Claude...")
@@ -2560,11 +2399,10 @@ def main() -> None:
         for agent in agents:
             link = agent.get("metric_link", "")
             if link:
-                parsed, m_cost = _fetch_and_parse_metrics(link, metrics_client)
+                parsed = _fetch_and_parse_metrics(link, metrics_client)
                 if parsed:
                     agent["metrics"] = parsed
                     metrics_map[agent["name"]] = parsed
-                    cost_per_agent[agent["name"]] = round(cost_per_agent.get(agent["name"], 0) + m_cost, 6)
                     print(f"   {agent['name']}: {len(parsed)} metric(s)")
         print(f"   ✅ Metrics parsed for {len(metrics_map)} agent(s)")
 
@@ -2582,10 +2420,7 @@ def main() -> None:
 
         if agents_needing_estimate:
             print(f"   Estimating time saved for {len(agents_needing_estimate)} completed agent(s)...")
-            estimates, est_cost = _estimate_time_saved_batch(agents_needing_estimate, metrics_client)
-            est_per_agent = est_cost / len(agents_needing_estimate) if agents_needing_estimate else 0
-            for agent in agents_needing_estimate:
-                cost_per_agent[agent["name"]] = round(cost_per_agent.get(agent["name"], 0) + est_per_agent, 6)
+            estimates = _estimate_time_saved_batch(agents_needing_estimate, metrics_client)
             for agent in agents_needing_estimate:
                 est = estimates.get(agent["name"])
                 if est is not None:
@@ -2605,32 +2440,27 @@ def main() -> None:
         print(f"   Total this month: {total_this_month}h across {len(time_saved_per_agent)} agent(s)")
 
         # Load existing history from cache (or seed if first run), update current month
-        _, _, time_saved_history, _, _, _, _prev_total_cost = load_workflow_cache()
+        _, _, time_saved_history, _, _ = load_workflow_cache()
         month_periods = [h["period"] for h in time_saved_history]
         if current_month in month_periods:
             for h in time_saved_history:
                 if h["period"] == current_month:
                     h["hours"] = total_this_month
-                    h["cost"]  = round(h.get("cost", 0) + _run_cost_usd, 4)
         else:
             time_saved_history.append({
                 "period": current_month,
                 "hours":  total_this_month,
-                "cost":   round(_run_cost_usd, 4),
             })
 
-        # new_total_cost = prev total (loaded when we fetched history) + this run
-        new_total_cost = round(_prev_total_cost + _run_cost_usd, 4)
-
         print("💾 Saving cache (workflows + metrics + time saved + summary)...")
-        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary, cost_per_agent, new_total_cost)
+        save_workflow_cache(workflow_map, metrics_map, time_saved_history, time_saved_per_agent, summary)
 
         print("🏗️  Building email (simplified)...")
         email_html = build_email_html(agents, new_rows, stage_changes, summary, week_str)
 
         print("🏗️  Building full report (GitHub Pages)...")
         full_html = build_full_report_html(
-            agents, new_rows, stage_changes, summary, week_str, workflow_map, time_saved_history, new_total_cost
+            agents, new_rows, stage_changes, summary, week_str, workflow_map, time_saved_history
         )
 
         print("💾 Saving full report to docs/index.html...")
@@ -2649,8 +2479,8 @@ def main() -> None:
                 f.write(page_html)
         print(f"   ✅ Generated {len(agents)} agent page(s) in docs/agents/")
 
-        print(f"📊 Writing self-metrics to Agent Tracker sheet (run cost: ${_run_cost_usd:.4f})...")
-        _write_self_metrics(agents, increment_reports=True, run_cost_usd=_run_cost_usd)
+        print("📊 Writing self-metrics to Agent Tracker sheet...")
+        _write_self_metrics(agents, increment_reports=True)
 
         print("📧 Sending email...")
         send_email(email_html, week_str)
