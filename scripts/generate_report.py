@@ -109,67 +109,112 @@ def _sheet_url_to_csv(sheet_url: str) -> str | None:
     )
 
 
+def _fetch_all_tabs(sheet_url: str) -> str:
+    """
+    Fetch all tabs from a Google Sheet and return them combined as labelled CSV blocks.
+    Uses gspread + service account if available (reads every tab).
+    Falls back to single-tab CSV export if no service account is configured.
+    """
+    import re as _re
+    match = _re.search(r'/spreadsheets/d/([a-zA-Z0-9_-]+)', sheet_url)
+    if not match:
+        return ""
+    sheet_id = match.group(1)
+
+    sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+    if sa_json:
+        try:
+            import gspread
+            from google.oauth2.service_account import Credentials
+            creds = Credentials.from_service_account_info(
+                json.loads(sa_json),
+                scopes=["https://www.googleapis.com/auth/spreadsheets"],
+            )
+            gc = gspread.authorize(creds)
+            sh = gc.open_by_key(sheet_id)
+            parts = []
+            for ws in sh.worksheets():
+                rows = ws.get_all_values()
+                if not rows or all(all(c == "" for c in r) for r in rows):
+                    continue
+                buf = io.StringIO()
+                csv.writer(buf).writerows(rows)
+                parts.append(f"=== Tab: {ws.title} ===\n{buf.getvalue()}")
+            return "\n\n".join(parts)
+        except Exception as e:
+            print(f"   ⚠️  gspread all-tabs failed ({e}), falling back to single tab")
+
+    # Fallback: single tab via public CSV export
+    csv_url = _sheet_url_to_csv(sheet_url)
+    if not csv_url:
+        return ""
+    try:
+        with urllib.request.urlopen(csv_url) as resp:
+            return resp.read().decode("utf-8")
+    except Exception as e:
+        print(f"   ⚠️  Could not fetch metrics sheet ({e})")
+        return ""
+
+
 def _fetch_and_parse_metrics(sheet_url: str, client) -> dict:
     """
-    Fetch a metrics Google Sheet and use Claude to parse it into a normalized dict.
-    Works with any sheet layout — two-column, time-series, or anything else.
-
-    Returns metrics_dict.
+    Fetch ALL tabs from a metrics Google Sheet and use Claude to parse them
+    into a normalized metrics dict. Works with any layout across any number of tabs.
     """
     if not sheet_url:
         return {}
 
-    csv_url = _sheet_url_to_csv(sheet_url)
-    if not csv_url:
-        print(f"   ⚠️  Could not parse sheet ID from: {sheet_url}")
-        return {}
-
-    try:
-        with urllib.request.urlopen(csv_url) as resp:
-            csv_text = resp.read().decode("utf-8")
-    except Exception as e:
-        print(f"   ⚠️  Could not fetch metrics sheet ({e})")
-        return {}
-
+    csv_text = _fetch_all_tabs(sheet_url)
     if not csv_text.strip():
         return {}
 
     prompt = f"""You are parsing a metrics spreadsheet for an AI automation agent.
-The sheet may use any layout — two-column list, time-series by month, or anything else.
-Extract all meaningful metrics and return ONLY valid JSON — no explanation, no markdown.
+The data may come from multiple tabs — each tab is labelled "=== Tab: Name ===" above its CSV data.
+Extract all meaningful metrics across ALL tabs and return ONLY valid JSON — no explanation, no markdown.
 
-Return this exact structure:
+DETECT TWO FORMATS and handle both:
+
+FORMAT A — Summary/metrics tab (one row per metric, or months as rows with metric columns):
+Return as normal named metrics:
 {{
   "Metric Name": {{
-    "value": "most recent or current value as a clean human-readable string",
-    "total": "YTD or cumulative total if present or calculable, else null",
-    "delta": "MoM or period-over-period change if available (e.g. '+12%' or '-3%'), else null",
+    "value": "most recent or current value",
+    "total": "YTD or cumulative total if calculable, else null",
+    "delta": "MoM change if available, else null",
     "history": [{{"period": "Apr", "value": 24310}}, ...] or null
   }}
 }}
 
-Rules:
-- Time-series sheets: use the most recent non-empty data row for "value"
-- If a Total or YTD row exists, use it for "total"; if data can be summed, sum it
-- Pair MoM %/change columns with their parent metric as "delta" — not as standalone metrics
-- Skip YoY, QoQ, and other secondary derived columns entirely
-- Skip columns that are fully empty
-- Format numbers cleanly: "24,310" not "24310.0", "7.6%" not "0.076"
-- Keep metric names concise and human-readable (strip redundant words like "Est.")
-- For rate/average metrics (CTR, Avg Position, etc.) "total" should be the period average, not a sum
-- For "history": include all available non-empty data points as raw numbers (no commas/units)
-  - "period" should be a short label e.g. "Apr", "Q1", "Week 3"
-  - "value" must be a plain number for charting (e.g. 24310 not "24,310")
-  - Only include history if 2 or more data points exist; otherwise set null
-  - For non-time-series sheets set history to null
+FORMAT B — Activity log/change log tab (multiple rows per time period, entity columns like Ad Name, Platform, Item, Change, etc.):
+Return as a special "_table" key alongside any summary metrics:
+{{
+  "_table": {{
+    "title": "descriptive title for the table e.g. Ad Performance Log",
+    "headers": ["Month", "Platform", "Ad Name", "CTR", ...],
+    "rows": [["May 2026", "TikTok", "Voiceover RTG", "1.12%", ...], ...]
+  }}
+}}
+Also extract aggregated summary metrics from the log data (totals, averages) as normal metric entries.
 
-CSV data:
+Rules for ALL tabs:
+- Read ALL tabs — do not skip any tab with real data
+- Merge intelligently if the same metric appears in multiple tabs
+- Time-series: use the most recent non-empty row for "value"
+- If a Total or YTD row exists, use it for "total"; sum if calculable
+- Pair MoM %/change columns with their parent metric as "delta"
+- Skip YoY, QoQ columns; skip fully empty columns
+- Format numbers cleanly: "24,310" not "24310.0", "7.6%" not "0.076"
+- Keep metric names concise (strip "Est.", "Total" prefixes where redundant)
+- For rates/averages (CTR, CPC, Avg Position): "total" = period average not sum
+- For "history": raw numbers only, 2+ points required, null for non-time-series
+
+Sheet data (all tabs):
 {csv_text}"""
 
     try:
         msg = client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=1000,
+            max_tokens=4000,
             messages=[{"role": "user", "content": prompt}],
         )
         raw = msg.content[0].text.strip()
@@ -1196,6 +1241,75 @@ def build_full_report_html(
 </html>"""
 
 
+# ── Activity log table renderer ───────────────────────────────────────────────
+def _build_activity_table_html(table: dict) -> str:
+    """Render a _table dict as a dark-themed scrollable HTML table card."""
+    if not table or not isinstance(table, dict):
+        return ""
+    title   = table.get("title", "Activity Log")
+    headers = table.get("headers", [])
+    rows    = table.get("rows", [])
+    if not headers or not rows:
+        return ""
+
+    # Platform badge colours
+    PLATFORM_COLORS = {
+        "tiktok":    ("rgba(201,209,217,0.08)", "#30363d", "#c9d1d9"),
+        "meta":      ("rgba(24,119,242,0.12)",  "#1877F2", "#58a6ff"),
+        "facebook":  ("rgba(24,119,242,0.12)",  "#1877F2", "#58a6ff"),
+        "google":    ("rgba(66,133,244,0.12)",  "#4285F4", "#79c0ff"),
+        "instagram": ("rgba(225,48,108,0.12)",  "#E1306C", "#f78166"),
+    }
+
+    def _platform_badge(val: str) -> str:
+        key = val.lower().strip()
+        for name, (bg, border, color) in PLATFORM_COLORS.items():
+            if name in key:
+                return (f'<span style="display:inline-block;padding:2px 8px;border-radius:20px;'
+                        f'font-size:10px;font-weight:700;background:{bg};border:1px solid {border};'
+                        f'color:{color};">{val}</span>')
+        return val
+
+    is_platform_col = [any(kw in h.lower() for kw in ["platform", "channel", "network"])
+                       for h in headers]
+
+    header_html = "".join(
+        f'<th style="padding:9px 14px;text-align:left;font-size:9px;font-weight:700;'
+        f'letter-spacing:1.2px;text-transform:uppercase;color:#4d5561;'
+        f'border-bottom:1px solid #21262d;white-space:nowrap;">{h}</th>'
+        for h in headers
+    )
+
+    rows_html = ""
+    for row in rows:
+        cells = ""
+        for i, cell in enumerate(row):
+            val = str(cell)
+            display = _platform_badge(val) if (i < len(is_platform_col) and is_platform_col[i]) else val
+            style = "padding:11px 14px;border-bottom:1px solid #161b22;white-space:nowrap;"
+            if i == 0:
+                style += "color:#6e7681;font-size:11px;"
+            cells += f'<td style="{style}">{display}</td>'
+        rows_html += f'<tr style="transition:background 0.1s;" onmouseover="this.style.background=\'#1c2128\'" onmouseout="this.style.background=\'\'">{cells}</tr>'
+
+    count_label = f"{len(rows)} entr{'y' if len(rows)==1 else 'ies'}"
+
+    return f"""
+  <!-- Activity Log -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-label">&#128203; &nbsp;{title}</div>
+      <span style="font-size:10px;color:#4d5561;">{count_label}</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr>{header_html}</tr></thead>
+        <tbody>{rows_html}</tbody>
+      </table>
+    </div>
+  </div>"""
+
+
 # ── Individual Agent Page Builder ─────────────────────────────────────────────
 def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
     """Build a standalone HTML page for a single agent with v4 animated workflow."""
@@ -1340,9 +1454,12 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
 
     # ── Metrics section ────────────────────────────────────────────────────────
     metrics = agent.get("metrics", {})
+    activity_table_html = _build_activity_table_html(metrics.get("_table"))
     if metrics:
         metric_tiles = ""
         for idx, (label, entry) in enumerate(metrics.items()):
+            if label.startswith("_"):   # skip internal keys like _table
+                continue
             # Support both old {name: str} and new {name: {value, total, delta}} formats
             if isinstance(entry, dict):
                 value = entry.get("value", "")
@@ -1854,6 +1971,8 @@ def build_agent_page_html(agent: dict, steps: list[dict], week_str: str) -> str:
   </div>
 
   {metrics_section}
+
+  {activity_table_html}
 
   <!-- Connections -->
   <div class="card">
