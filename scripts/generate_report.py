@@ -2109,7 +2109,9 @@ def _extract_time_saved(metrics: dict) -> float | None:
         if isinstance(entry, dict):
             history = entry.get("history")
             if isinstance(history, list) and history:
-                last = history[-1].get("value", 0)
+                last_entry = history[-1]
+                # History items can be {"period": ..., "value": ...} or plain numbers
+                last = last_entry.get("value", 0) if isinstance(last_entry, dict) else last_entry
                 try:
                     return float(last)
                 except (TypeError, ValueError):
