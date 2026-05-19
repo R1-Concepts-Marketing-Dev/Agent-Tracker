@@ -172,10 +172,23 @@ def _fetch_and_parse_metrics(sheet_url: str, client) -> dict:
 The data may come from multiple tabs — each tab is labelled "=== Tab: Name ===" above its CSV data.
 Extract all meaningful metrics across ALL tabs and return ONLY valid JSON — no explanation, no markdown.
 
-DETECT TWO FORMATS and handle both:
+CRITICAL — DETECT THE FORMAT BEFORE EXTRACTING ANYTHING:
 
-FORMAT A — Summary/metrics tab (one row per metric, or months as rows with metric columns):
-Return as normal named metrics:
+A tab is a LOG/ACTIVITY TABLE if ANY of these are true:
+- It has a column named Platform, Channel, Network, Ad Name, Campaign, Item, Product, or similar entity identifier
+- The same metric appears multiple times (once per platform/entity) in separate rows
+- There are 3+ rows of data where each row represents a different entity rather than a different time period
+
+A tab is a SUMMARY/METRICS sheet if:
+- Each row is a single named metric with its value (two-column list)
+- OR months/periods are rows and metrics are columns (time-series)
+
+FOR LOG TABS — do this:
+1. Put ALL rows into "_table" — do NOT create individual metric tiles for each row
+2. Extract only high-level aggregated stats as regular metrics (e.g. "Total Spend" summing all platforms, "Avg CTR" averaging all rows) — maximum 4-5 aggregated metrics from a log tab
+3. Never create tiles like "Meta Spend", "TikTok Spend", "Google Impressions" — those belong in the table, not as tiles
+
+FOR SUMMARY TABS — return as normal named metrics:
 {{
   "Metric Name": {{
     "value": "most recent or current value",
@@ -185,16 +198,16 @@ Return as normal named metrics:
   }}
 }}
 
-FORMAT B — Activity log/change log tab (multiple rows per time period, entity columns like Ad Name, Platform, Item, Change, etc.):
-Return as a special "_table" key alongside any summary metrics:
+FOR LOG TABS — return "_table" plus up to 5 aggregated summary metrics:
 {{
   "_table": {{
-    "title": "descriptive title for the table e.g. Ad Performance Log",
+    "title": "descriptive title e.g. Ad Performance Log",
     "headers": ["Month", "Platform", "Ad Name", "CTR", ...],
     "rows": [["May 2026", "TikTok", "Voiceover RTG", "1.12%", ...], ...]
-  }}
+  }},
+  "Total Spend": {{"value": "8,940", "total": "8,940", "delta": null, "history": null}},
+  "Avg CTR": {{"value": "2.1%", "total": null, "delta": null, "history": null}}
 }}
-Also extract aggregated summary metrics from the log data (totals, averages) as normal metric entries.
 
 Rules for ALL tabs:
 - Read ALL tabs — do not skip any tab with real data
