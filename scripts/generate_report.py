@@ -172,42 +172,25 @@ def _fetch_and_parse_metrics(sheet_url: str, client) -> dict:
 The data may come from multiple tabs — each tab is labelled "=== Tab: Name ===" above its CSV data.
 Extract all meaningful metrics across ALL tabs and return ONLY valid JSON — no explanation, no markdown.
 
-CRITICAL — DETECT THE FORMAT BEFORE EXTRACTING ANYTHING:
+USE THE TAB NAME to decide how to handle each tab — this is the primary rule:
 
-A tab is a LOG/ACTIVITY TABLE if ANY of these are true:
-- It has a column named Platform, Channel, Network, Ad Name, Campaign, Item, Product, or similar entity identifier
-- The same metric appears multiple times (once per platform/entity) in separate rows
-- There are 3+ rows of data where each row represents a different entity rather than a different time period
+TAB IS A LOG/TABLE if its name contains any of these words (case-insensitive):
+log, activity, audit, changes, history, entries, tracker, runs, events, report, feed
 
-A tab is a SUMMARY/METRICS sheet if:
-- Each row is a single named metric with its value (two-column list)
-- OR months/periods are rows and metrics are columns (time-series)
+TAB IS A METRICS tab if its name contains any of these words, OR if it is the first/only tab:
+metrics, summary, overview, stats, kpi, data, performance, results
 
-FOR LOG TABS — do this:
-1. Put ALL rows into "_table" — do NOT create individual metric tiles for each row
-2. Extract only high-level aggregated stats as regular metrics (e.g. "Total Spend" summing all platforms, "Avg CTR" averaging all rows) — maximum 4-5 aggregated metrics from a log tab
-3. Never create tiles like "Meta Spend", "TikTok Spend", "Google Impressions" — those belong in the table, not as tiles
+WHEN A TAB IS A LOG:
+- Put ALL its rows into the "_table" key — do NOT create metric tiles from log rows
+- Do not create per-entity tiles like "Meta Spend" or "TikTok CTR"
+- "_table" structure:
+  {{"title": "use the tab name as title", "headers": [...], "rows": [[...], ...]}}
 
-FOR SUMMARY TABS — return as normal named metrics:
-{{
-  "Metric Name": {{
-    "value": "most recent or current value",
-    "total": "YTD or cumulative total if calculable, else null",
-    "delta": "MoM change if available, else null",
-    "history": [{{"period": "Apr", "value": 24310}}, ...] or null
-  }}
-}}
+WHEN A TAB IS A METRICS tab:
+- Extract each metric normally as a named entry
+- Return as: {{"Metric Name": {{"value": "...", "total": "...", "delta": "...", "history": [...]}}}}
 
-FOR LOG TABS — return "_table" plus up to 5 aggregated summary metrics:
-{{
-  "_table": {{
-    "title": "descriptive title e.g. Ad Performance Log",
-    "headers": ["Month", "Platform", "Ad Name", "CTR", ...],
-    "rows": [["May 2026", "TikTok", "Voiceover RTG", "1.12%", ...], ...]
-  }},
-  "Total Spend": {{"value": "8,940", "total": "8,940", "delta": null, "history": null}},
-  "Avg CTR": {{"value": "2.1%", "total": null, "delta": null, "history": null}}
-}}
+If a tab name is ambiguous, default to treating it as a METRICS tab.
 
 Rules for ALL tabs:
 - Read ALL tabs — do not skip any tab with real data
