@@ -209,23 +209,23 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Web Scraper</div>
-                  <div class="step-role">Data Collection</div>
+                  <div class="step-role">Scraper</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
                 <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#34A853;--glow-color:rgba(52,168,83,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Google Sheets</div>
+                  <div class="step-platform">Catalog + Sheets</div>
                   <div class="step-role">Spreadsheet</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#4285F4;--t-color:#4285F4;"></div>
+                <div class="travel-dot" id="dot-1" style="background:#34A853;--t-color:#34A853;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-2" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(2)">
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Web Scraper", "role": "Data Collection", "color": "#4B5563", "text": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract all available make, model, and year fitment data for two-piece rotors.", "impact": "Builds a comprehensive competitive fitment reference in a fraction of the time it would take to manually browse and document three separate catalog websites.", "dataLabel": "Data collected", "chips": ["Make/Model/Year", "Brand Source", "Part Numbers", "Fitment Data", "Rotor Specs", "Catalog URLs"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Cross-references the scraped fitment data against DFC's existing parts catalog and populates a structured sheet showing matches, gaps, and opportunity vehicles — formatted for Dino.", "impact": "Gives Dino a clean, ready-to-use reference sheet that immediately identifies where DFC has coverage and where product development or sourcing opportunities exist.", "dataLabel": "Records updated", "chips": ["DFC Match", "Coverage Gaps", "Opportunity Vehicles", "Brand Comparison", "Formatted Output", "Fitment Matrix"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to targeted customers to gather demand data on specific two-piece rotor fitments identified as gaps in DFC's catalog.", "impact": "Generates real demand signals from existing customers without requiring manual outreach, helping prioritize which gaps are worth filling first.", "dataLabel": "Email contains", "chips": ["Fitment Inquiry", "Vehicle Spec", "Demand Survey", "Customer Segment", "Gap Reference", "Response Request"]}];
+  const stepData = [{"name": "Web Scraper", "role": "Scraper", "color": "#4B5563", "text": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract all available two-piece rotor fitments, capturing make, model, year, and part details for each listing.", "impact": "Compiles a comprehensive multi-brand fitment reference that would take days to build manually, giving DFC a complete view of the two-piece rotor market in one pass.", "dataLabel": "Data collected", "chips": ["Brand Name", "Vehicle Make", "Vehicle Model", "Vehicle Year", "Part Number", "Rotor Specs"]}, {"name": "Catalog + Sheets", "role": "Spreadsheet", "color": "#34A853", "text": "Cross-references the scraped competitor fitments against DFC's existing parts catalog and writes a structured output sheet showing coverage matches and gaps for Dino's review.", "impact": "Instantly reveals where DFC has competitive coverage and where product gaps exist, giving the team a data-driven foundation for sourcing and inventory decisions.", "dataLabel": "Records updated", "chips": ["Fitment Match", "DFC Part Number", "Coverage Gap", "Brand Comparison", "Catalog Reference", "Sheet Output"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to target customers to gather demand data on two-piece rotor fitments, asking which vehicles they need covered.", "impact": "Collects real customer demand signals at scale without manual outreach effort, ensuring the final catalog is shaped by actual market need.", "dataLabel": "Email contains", "chips": ["Outreach Message", "Fitment Survey", "Customer Segment", "Vehicle Query", "Response Request"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
