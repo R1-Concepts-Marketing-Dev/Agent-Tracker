@@ -177,8 +177,8 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 1 platform connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 12.0hh saved/mo</span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $240 value/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 15.0hh saved/mo est.</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $300 value/mo</span>
     </div>
   </div>
 </div>
@@ -209,7 +209,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Support Inbox</div>
-                  <div class="step-role">Ticket Source</div>
+                  <div class="step-role">Ticketing</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -232,8 +232,8 @@
                 <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Ticketing Platform</div>
-                  <div class="step-role">Help Desk</div>
+                  <div class="step-platform">Support Platform</div>
+                  <div class="step-role">Ticketing</div>
                 </div>
               </div>
           </div>
@@ -271,7 +271,7 @@
   <div class="card">
     <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#4B5563;display:inline-block;"></span>TBD</span></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#888888;display:inline-block;"></span>TBD</span></div>
     </div>
   </div>
 
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Support Inbox", "role": "Ticket Source", "color": "#4B5563", "text": "Receives incoming customer support requests and captures the raw ticket content including issue description, order details, and customer identity.", "impact": "Centralizes all inbound support volume into a single intake point, ensuring no ticket is missed and all requests are queued for automated processing.", "dataLabel": "Data collected", "chips": ["Customer Name", "Issue Description", "Order Number", "Submission Timestamp", "Contact Info"]}, {"name": "AI Model", "role": "AI Model", "color": "#4B5563", "text": "Classifies the ticket by issue type, determines urgency, and generates a recommended resolution or draft response based on historical support patterns.", "impact": "Reduces average ticket handle time significantly by auto-routing and pre-drafting responses, allowing support agents to resolve more tickets per hour.", "dataLabel": "Analysis produced", "chips": ["Issue Category", "Urgency Score", "Draft Response", "Recommended Action", "Confidence Score", "Escalation Flag"]}, {"name": "Ticketing Platform", "role": "Help Desk", "color": "#4B5563", "text": "Creates or updates the ticket record with the AI classification, draft response, and routing assignment for agent review or auto-send.", "impact": "Keeps the support queue organized with pre-triaged tickets, cutting manual sorting time and ensuring high-priority issues surface immediately.", "dataLabel": "Records updated", "chips": ["Ticket Status", "Assigned Agent", "Response Draft", "Priority Level", "Resolution Path"]}];
+  const stepData = [{"name": "Support Inbox", "role": "Ticketing", "color": "#4B5563", "text": "Receives incoming customer support tickets and queues them for AI classification and response.", "impact": "Captures all inbound support requests in a centralized queue, ensuring no ticket is missed and reducing manual triage time.", "dataLabel": "Data collected", "chips": ["Customer name", "Issue description", "Product referenced", "Ticket priority", "Submission timestamp"]}, {"name": "AI Model", "role": "AI Model", "color": "#4B5563", "text": "Classifies the ticket by issue type, determines urgency, and drafts an appropriate response or resolution path.", "impact": "Reduces average ticket handle time and ensures consistent, accurate responses across all support volume.", "dataLabel": "Analysis produced", "chips": ["Issue category", "Urgency score", "Suggested response", "Escalation flag", "Resolution type"]}, {"name": "Support Platform", "role": "Ticketing", "color": "#4B5563", "text": "Posts the AI-drafted response to the customer or routes the ticket to the appropriate human agent if escalation is flagged.", "impact": "Speeds up resolution for routine tickets while ensuring complex issues reach the right team member immediately.", "dataLabel": "Ticket resolved or routed", "chips": ["Response sent", "Agent assigned", "Ticket status updated", "Escalation triggered", "Resolution logged"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
