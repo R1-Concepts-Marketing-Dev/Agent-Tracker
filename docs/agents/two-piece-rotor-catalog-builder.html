@@ -209,7 +209,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Web Scraper</div>
-                  <div class="step-role">Scraper</div>
+                  <div class="step-role">Data Scraper</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -220,8 +220,8 @@
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">DFC Catalog</div>
-                  <div class="step-role">Catalog</div>
+                  <div class="step-platform">DFC Parts Catalog</div>
+                  <div class="step-role">Internal Catalog</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -313,7 +313,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Web Scraper", "role": "Scraper", "color": "#4B5563", "text": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract all listed two-piece rotor fitments by make, model, and year.", "impact": "Builds a comprehensive competitor fitment reference in a fraction of the time it would take to manually browse and transcribe three separate catalogs.", "dataLabel": "Data collected", "chips": ["Make", "Model", "Year", "Part Number", "Supplier", "Fitment Details"]}, {"name": "DFC Catalog", "role": "Catalog", "color": "#2563EB", "text": "Cross-references the scraped fitment data against DFC's existing parts catalog to identify which two-piece rotor applications DFC already covers and which are gaps.", "impact": "Instantly maps the competitive landscape against DFC's own inventory, giving Dino a clear picture of where DFC is competitive and where there is opportunity to expand.", "dataLabel": "Records matched", "chips": ["DFC Part Match", "Coverage Gaps", "Overlapping SKUs", "Missing Applications", "Category Tags", "Cross-Reference IDs"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to relevant customers asking about their demand for specific two-piece rotor applications identified as gaps in DFC's catalog.", "impact": "Gathers real demand signal from the market automatically, replacing manual outreach and giving the product team data to prioritize which gaps to fill first.", "dataLabel": "Email contains", "chips": ["Customer Name", "Vehicle Application", "Demand Survey", "Gap Reference", "Response Link", "Product Interest"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles all scraped fitments, cross-reference results, and customer demand responses into a single formatted reference sheet delivered to Dino.", "impact": "Gives Dino one consolidated, decision-ready document instead of raw data across multiple sources, directly supporting catalog expansion prioritization.", "dataLabel": "Output compiled", "chips": ["Full Fitment List", "DFC Coverage Status", "Gap Summary", "Demand Responses", "Supplier Source", "Priority Score"]}];
+  const stepData = [{"name": "Web Scraper", "role": "Data Scraper", "color": "#4B5563", "text": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract make, model, year, and part fitment data for all available two-piece rotor products.", "impact": "Builds a comprehensive competitive fitment reference in minutes rather than the days it would take to manually compile data from three separate manufacturer catalogs.", "dataLabel": "Data collected", "chips": ["Vehicle Year/Make/Model", "Part Numbers", "Manufacturer", "Fitment Data", "Product Specs", "Catalog Source"]}, {"name": "DFC Parts Catalog", "role": "Internal Catalog", "color": "#2563EB", "text": "Cross-references the scraped fitment data against DFC's existing parts catalog to identify which two-piece rotor applications DFC currently covers and which represent gaps or new product opportunities.", "impact": "Instantly reveals where DFC has competitive coverage and where there are market gaps, giving the product team a data-driven basis for sourcing and catalog expansion decisions.", "dataLabel": "Gap analysis produced", "chips": ["DFC Coverage Match", "Gap Identified", "Covered Part Numbers", "Missing Applications", "Opportunity Flags"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to targeted customers asking about their demand for specific two-piece rotor applications where gaps were identified, collecting real-world demand signals.", "impact": "Gathers demand data directly from customers at scale without requiring sales reps to make individual calls, prioritizing which catalog gaps are worth filling based on actual market interest.", "dataLabel": "Outreach sent", "chips": ["Customer Segment", "Targeted Application", "Demand Survey", "Vehicle Reference", "Response Tracking"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles all scraped catalog data, DFC cross-reference results, gap flags, and customer demand responses into a single formatted output sheet delivered to Dino.", "impact": "Gives Dino one clean, consolidated reference to make informed catalog and sourcing decisions, eliminating the need to manually reconcile data from multiple sources.", "dataLabel": "Output sheet produced", "chips": ["Full Fitment Reference", "DFC Coverage Status", "Gap List", "Demand Signals", "Manufacturer Comparison", "Formatted for Review"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
