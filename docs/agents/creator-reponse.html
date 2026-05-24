@@ -177,8 +177,8 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 3 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 22.0hh saved/mo</span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $440 value/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 20.0hh saved/mo est.</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $400 value/mo</span>
     </div>
   </div>
 </div>
@@ -216,24 +216,24 @@
                 <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Gemini API</div>
-                  <div class="step-role">AI Model</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#64748B;--t-color:#64748B;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Gmail API</div>
                   <div class="step-role">Email</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#EA4335;--t-color:#EA4335;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Gemini API</div>
+                  <div class="step-role">AI Model</div>
                 </div>
               </div>
           </div>
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Google Drive API", "role": "Storage", "color": "#4285F4", "text": "Loads historical influencer email conversations and negotiation outcomes to train response context.", "impact": "Grounds AI responses in real negotiation history, producing replies that reflect proven deal-making patterns.", "dataLabel": "Data collected", "chips": ["Past Conversations", "Negotiation Outcomes", "Rate Benchmarks", "Creator Profiles", "Deal Terms"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Analyzes incoming creator reply and generates a contextually appropriate negotiation or follow-up response.", "impact": "Handles creator negotiation conversations at scale without manual back-and-forth, accelerating deal closure timelines.", "dataLabel": "Analysis produced", "chips": ["Reply Draft", "Sentiment Analysis", "Negotiation Stage", "Suggested Rate", "Tone Match"]}, {"name": "Gmail API", "role": "Email", "color": "#EA4335", "text": "Sends the AI-generated negotiation response back to the creator's email thread.", "impact": "Maintains responsive communication with creators around the clock, reducing deal drop-off from delayed replies.", "dataLabel": "Email contains", "chips": ["Negotiation Reply", "Counter Offer", "Deliverable Terms", "Next Steps", "Thread Context"]}];
+  const stepData = [{"name": "Google Drive API", "role": "Storage", "color": "#4285F4", "text": "Retrieves historical influencer email conversations and negotiation playbooks to ground the AI in past deal patterns.", "impact": "Gives the agent institutional knowledge from prior negotiations, enabling smarter, context-aware responses that reflect what has worked before.", "dataLabel": "Data collected", "chips": ["Past Conversations", "Negotiation Playbooks", "Deal Terms", "Creator History", "Response Patterns"]}, {"name": "Gmail API", "role": "Email", "color": "#EA4335", "text": "Reads incoming creator reply emails and surfaces the conversation thread for AI processing.", "impact": "Eliminates manual inbox monitoring so no creator response goes unread or unanswered, keeping deal momentum alive.", "dataLabel": "Data collected", "chips": ["Creator Reply", "Thread History", "Sender Info", "Reply Timestamp", "Negotiation Stage"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Analyzes the creator's reply and generates a contextually appropriate negotiation or conversation response based on learned email history.", "impact": "Accelerates deal progression by producing thoughtful, negotiation-aware replies instantly, reducing back-and-forth cycle time from days to minutes.", "dataLabel": "Analysis produced", "chips": ["Draft Response", "Negotiation Tone", "Counter Offer", "Next Step CTA", "Sentiment Score"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
