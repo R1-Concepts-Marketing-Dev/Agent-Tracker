@@ -177,7 +177,7 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 3 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 30.0hh saved/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 30.0hh saved/mo est.</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $600 value/mo</span>
     </div>
   </div>
@@ -208,32 +208,32 @@
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">HubSpot API</div>
-                  <div class="step-role">CRM</div>
+                  <div class="step-platform">HubSpot</div>
+                  <div class="step-role">CRM / Ticketing</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
                 <div class="travel-dot" id="dot-0" style="background:#FF7A59;--t-color:#FF7A59;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#2563EB;--glow-color:rgba(37,99,235,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Anthropic API</div>
-                  <div class="step-role">AI Model</div>
+                  <div class="step-platform">DFC Website</div>
+                  <div class="step-role">Knowledge Source</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#7C3AED;--t-color:#7C3AED;"></div>
+                <div class="travel-dot" id="dot-1" style="background:#2563EB;--t-color:#2563EB;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(2)">
+              <div class="step-box" id="step-2" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(2)">
                 <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">HubSpot API</div>
-                  <div class="step-role">CRM</div>
+                  <div class="step-platform">Claude AI</div>
+                  <div class="step-role">AI Model</div>
                 </div>
               </div>
           </div>
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Pulls newly created or open support tickets from HubSpot, including customer messages, ticket metadata, and associated contact history.", "impact": "Centralizes all incoming support requests for AI processing, ensuring no ticket is missed and response times are dramatically reduced.", "dataLabel": "Tickets retrieved", "chips": ["Ticket ID", "Customer Message", "Issue Category", "Contact History", "Ticket Status"]}, {"name": "Anthropic API", "role": "AI Model", "color": "#7C3AED", "text": "Classifies each ticket by issue type and drafts a accurate, brand-appropriate reply using context from the ticket and DFC/R1 product knowledge.", "impact": "Cuts ticket response drafting time from minutes to seconds per ticket, allowing the support team to review and send rather than write from scratch.", "dataLabel": "Analysis produced", "chips": ["Issue Classification", "Draft Reply", "Suggested Resolution", "Priority Level", "Product Reference"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Writes the AI-generated classification and draft reply back to the HubSpot ticket so the support team can review, edit, and send directly from their inbox.", "impact": "Keeps the support team working entirely within HubSpot while accelerating resolution times and improving reply consistency.", "dataLabel": "Records updated", "chips": ["Ticket Classification", "Draft Reply Text", "Updated Ticket Status", "Internal Note", "Agent Assignment"]}];
+  const stepData = [{"name": "HubSpot", "role": "CRM / Ticketing", "color": "#FF7A59", "text": "Pulls newly created or updated support tickets from HubSpot, extracting customer issue details, ticket category, and contact history.", "impact": "Centralizes all incoming support requests for automated processing, eliminating the need for agents to manually triage inboxes.", "dataLabel": "Ticket data retrieved", "chips": ["Ticket ID", "Customer Name", "Issue Description", "Ticket Status", "Contact History", "Product Referenced"]}, {"name": "DFC Website", "role": "Knowledge Source", "color": "#2563EB", "text": "Retrieves relevant product information, fitment guides, and technical specs from the DFC website to inform support replies.", "impact": "Grounds AI responses in accurate product data, reducing incorrect answers and improving first-contact resolution rates.", "dataLabel": "Reference content retrieved", "chips": ["Product Specs", "Fitment Data", "Installation Guides", "Part Numbers", "FAQ Content"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Classifies the support ticket by issue type and drafts a personalized, accurate reply for the R1 Concepts support team to review and send.", "impact": "Cuts ticket response drafting time dramatically, allowing support agents to handle higher volumes while maintaining response quality.", "dataLabel": "Draft reply generated", "chips": ["Issue Classification", "Drafted Response", "Suggested Resolution", "Tone & Tone Check", "Product References", "Escalation Flag"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
