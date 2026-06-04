@@ -208,7 +208,7 @@
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Dream</div>
+                  <div class="step-platform">Dream (ERP/Inventory)</div>
                   <div class="step-role">Inventory System</div>
                 </div>
               </div>
@@ -221,7 +221,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Backorder Report</div>
-                  <div class="step-role">Spreadsheet</div>
+                  <div class="step-role">Data Layer</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream", "role": "Inventory System", "color": "#4B5563", "text": "Pulls live inventory status for every part on the weekly backorder report, returning on-hand quantities, on-order quantities, and in-transit shipment data.", "impact": "Replaces a dozen people doing independent lookups by centralizing all live inventory status into one automated pull, saving hours of duplicated effort each week.", "dataLabel": "Inventory data retrieved", "chips": ["On-Hand Qty", "On-Order Qty", "In-Transit Status", "Part Numbers", "Expected Arrival", "Dead-End Flag"]}, {"name": "Backorder Report", "role": "Spreadsheet", "color": "#4B5563", "text": "Enriches each backorder line with the live Dream inventory data, appending current status columns and flagging parts with no sourcing path as dead-ends.", "impact": "Transforms a static backorder list into a dynamic, decision-ready report that clearly shows which parts have a resolution path and which are true dead-ends requiring escalation.", "dataLabel": "Records updated", "chips": ["Enriched Backorder Lines", "Status Appended", "Dead-End Flags", "Source Available Y/N", "Updated Quantities"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications for backordered parts, pre-populated with part status, expected resolution, and escalation notes for dead-end items.", "impact": "Eliminates the manual drafting burden across multiple team members, ensuring customers receive timely, consistent updates with accurate status information.", "dataLabel": "Email contains", "chips": ["Customer Name", "Part Status Update", "Expected Ship Date", "Dead-End Escalation", "Draft Communication", "Backorder Reference"]}];
+  const stepData = [{"name": "Dream (ERP/Inventory)", "role": "Inventory System", "color": "#4B5563", "text": "Pulls live inventory status for every part on the weekly backorder report, including on-hand quantity, on-order quantity, and in-transit shipment data.", "impact": "Replaces a dozen people doing independent lookups with one automated pull, giving every stakeholder the same accurate real-time picture simultaneously.", "dataLabel": "Inventory data retrieved", "chips": ["On-hand qty", "On-order qty", "In-transit qty", "Part number", "Expected arrival", "Source availability"]}, {"name": "Backorder Report", "role": "Data Layer", "color": "#4B5563", "text": "Enriches the existing backorder report rows with the live Dream inventory data and flags any parts that have no current source — no stock, no order, no transit.", "impact": "Transforms a static backorder list into an actionable triage document, making dead-end parts immediately visible so the team can escalate or find alternatives.", "dataLabel": "Report enriched", "chips": ["Enriched part rows", "Dead-end flags", "Status per line", "Source gap alerts", "Updated report"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications for affected backorder lines, pre-filled with accurate status details pulled directly from the enriched report.", "impact": "Saves hours of manual email drafting per week and ensures customers receive consistent, accurate status updates without waiting for a rep to find the time.", "dataLabel": "Email contains", "chips": ["Draft customer email", "Part status detail", "ETA if available", "Dead-end notice", "Order reference"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
