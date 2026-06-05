@@ -177,8 +177,8 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 3 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 30.0hh saved/mo</span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $600 value/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 25.0hh saved/mo est.</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $500 value/mo</span>
     </div>
   </div>
 </div>
@@ -208,7 +208,7 @@
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">HubSpot</div>
+                  <div class="step-platform">HubSpot API</div>
                   <div class="step-role">CRM / Ticketing</div>
                 </div>
               </div>
@@ -220,7 +220,7 @@
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Claude AI</div>
+                  <div class="step-platform">Anthropic API</div>
                   <div class="step-role">AI Model</div>
                 </div>
               </div>
@@ -232,7 +232,7 @@
                 <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">HubSpot</div>
+                  <div class="step-platform">HubSpot API</div>
                   <div class="step-role">CRM / Ticketing</div>
                 </div>
               </div>
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "HubSpot", "role": "CRM / Ticketing", "color": "#FF7A59", "text": "Pulls newly created or updated support tickets from HubSpot, including customer messages, order details, and ticket metadata.", "impact": "Centralizes all incoming support requests for automated processing, ensuring no ticket is missed or delayed.", "dataLabel": "Ticket data retrieved", "chips": ["Ticket ID", "Customer Message", "Order Number", "Issue Category", "Ticket Status"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Classifies each support ticket by issue type and drafts a contextually appropriate reply for the R1 support team to review.", "impact": "Cuts ticket triage and response drafting time dramatically, allowing support agents to handle higher volume with faster resolution.", "dataLabel": "Classification and draft produced", "chips": ["Issue Type Label", "Priority Level", "Draft Reply", "Suggested Resolution", "Confidence Score"]}, {"name": "HubSpot", "role": "CRM / Ticketing", "color": "#FF7A59", "text": "Writes the AI-generated classification and draft reply back to the HubSpot ticket for agent review and sending.", "impact": "Keeps all support activity inside the existing CRM workflow, giving agents a ready-to-send response with zero context switching.", "dataLabel": "Ticket updated", "chips": ["Draft Reply Text", "Ticket Category", "Updated Ticket Status", "Agent Notes Field", "Timestamp"]}];
+  const stepData = [{"name": "HubSpot API", "role": "CRM / Ticketing", "color": "#FF7A59", "text": "Pulls newly created or updated support tickets from HubSpot, including customer message, ticket category, and associated contact details.", "impact": "Centralizes all incoming support requests for automated processing, ensuring no ticket goes unreviewed and reducing queue backlog.", "dataLabel": "Ticket data retrieved", "chips": ["Ticket ID", "Customer Message", "Contact Info", "Ticket Status", "Submission Timestamp"]}, {"name": "Anthropic API", "role": "AI Model", "color": "#7C3AED", "text": "Classifies the support ticket by issue type and drafts a contextually accurate reply for the R1 Concepts support team to review and send.", "impact": "Cuts average ticket response drafting time dramatically, allowing support agents to handle higher volumes while maintaining reply quality.", "dataLabel": "Classification and draft produced", "chips": ["Issue Category", "Draft Reply", "Suggested Resolution", "Priority Flag", "Tone Guidance"]}, {"name": "HubSpot API", "role": "CRM / Ticketing", "color": "#FF7A59", "text": "Writes the AI-generated classification and draft reply back to the HubSpot ticket for the support team to review, edit, and send.", "impact": "Keeps all drafted responses inside the existing support workflow, enabling agents to act quickly without switching tools or copying content.", "dataLabel": "Ticket updated", "chips": ["Draft Response", "Issue Label", "Ticket Owner", "Status Update", "Internal Note"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
