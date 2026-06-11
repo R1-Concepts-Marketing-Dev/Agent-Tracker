@@ -177,7 +177,7 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 5 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 18.0hh saved/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 18.0hh saved/mo est.</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $360 value/mo</span>
     </div>
   </div>
@@ -204,20 +204,32 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#E1306C;--glow-color:rgba(225,48,108,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#FF0000;--glow-color:rgba(255,0,0,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">YouTube API / Instagram Looter API / DuckDuckGo API</div>
-                  <div class="step-role">Discovery Platforms</div>
+                  <div class="step-platform">YouTube API</div>
+                  <div class="step-role">Content Platform</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#E1306C;--t-color:#E1306C;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#FF0000;--t-color:#FF0000;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#E1306C;--glow-color:rgba(225,48,108,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Instagram Looter API</div>
+                  <div class="step-role">Social Platform</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#E1306C;--t-color:#E1306C;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Gemini API</div>
@@ -245,7 +257,7 @@
           </div>
           <div class="wf-controls">
             <button class="nav-btn" id="prevBtn" onclick="prev()" disabled>&#8592;</button>
-            <div class="step-counter" id="stepCounter">Step 1 of 2</div>
+            <div class="step-counter" id="stepCounter">Step 1 of 3</div>
             <button class="nav-btn" id="nextBtn" onclick="next()">&#8594;</button>
           </div>
     </div>
@@ -287,9 +299,9 @@
 
 <script>
 
-  const STEPS = 2, TRAVEL_MS = 700;
+  const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "YouTube API / Instagram Looter API / DuckDuckGo API", "role": "Discovery Platforms", "color": "#E1306C", "text": "Searches YouTube, Instagram, and the web using provided keywords to surface content creators relevant to the target niche or campaign.", "impact": "Replaces hours of manual creator browsing with an automated multi-platform sweep, delivering a broad pool of relevant candidates instantly.", "dataLabel": "Creators discovered", "chips": ["Creator Handle", "Platform", "Niche Keywords", "Follower Count", "Content Samples"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Analyzes each discovered creator's content, audience, and profile data to assess relevance and fit for the campaign or brand.", "impact": "Filters a large raw discovery list down to genuinely aligned creators, saving the team from manual profile reviews and mismatched outreach.", "dataLabel": "Creator profiles analyzed", "chips": ["Content Relevance", "Audience Fit", "Engagement Rate", "Platform Presence", "Niche Match"]}];
+  const stepData = [{"name": "YouTube API", "role": "Content Platform", "color": "#FF0000", "text": "Searches YouTube for content creators matching the input keywords, retrieving channel data, subscriber counts, and recent video performance.", "impact": "Rapidly surfaces relevant creator candidates from YouTube's vast library, compressing days of manual creator research into seconds.", "dataLabel": "Data collected", "chips": ["Channel Name", "Subscriber Count", "View Count", "Niche Keywords", "Engagement Rate"]}, {"name": "Instagram Looter API", "role": "Social Platform", "color": "#E1306C", "text": "Retrieves Instagram profile data for matched creators including follower counts, post frequency, and engagement metrics.", "impact": "Expands creator discovery across Instagram simultaneously, giving a fuller cross-platform picture of each creator's reach and activity.", "dataLabel": "Data collected", "chips": ["Instagram Handle", "Follower Count", "Post Frequency", "Avg Likes", "Bio Keywords"]}, {"name": "Gemini API", "role": "AI Model", "color": "#64748B", "text": "Analyzes and summarizes discovered creator profiles across platforms to produce a ranked, enriched shortlist based on relevance to the input keywords.", "impact": "Eliminates manual review of hundreds of raw profiles by delivering a curated, AI-scored list ready for outreach or qualification.", "dataLabel": "Analysis produced", "chips": ["Relevance Score", "Platform Presence", "Audience Summary", "Content Themes", "Contact Info", "Creator Shortlist"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
