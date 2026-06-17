@@ -204,16 +204,16 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#2563EB;--glow-color:rgba(37,99,235,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Dream (DFC ERP)</div>
+                  <div class="step-platform">Dream (ERP)</div>
                   <div class="step-role">Inventory System</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#2563EB;--t-color:#2563EB;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-1" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(1)">
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream (DFC ERP)", "role": "Inventory System", "color": "#2563EB", "text": "Pulls live inventory status for every part on the weekly backorder report, retrieving on-hand quantity, on-order quantity, and in-transit data for each line item.", "impact": "Replaces a dozen people doing independent manual lookups with a single automated pull, consolidating all inventory intelligence into one enriched report in minutes.", "dataLabel": "Inventory data retrieved", "chips": ["Part Number", "On-Hand Qty", "On-Order Qty", "In-Transit Qty", "Expected Date", "Source Availability"]}, {"name": "Backorder Report", "role": "Data Layer", "color": "#4B5563", "text": "Merges the live Dream inventory data into the existing backorder report, enriching each line with current status and automatically flagging any parts with no on-hand, on-order, or in-transit source as dead-end items.", "impact": "Transforms a static backorder list into an actionable enriched report with clear dead-end flags, so the team immediately knows which parts need escalation without any additional research.", "dataLabel": "Report enriched", "chips": ["Enriched Backorder List", "Dead-End Flags", "Status per Line", "Source Gaps", "Priority Items", "Updated Quantities"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications for backordered items, pre-populated with the live status data and tailored messaging based on whether inventory is incoming or has no source.", "impact": "Eliminates the manual drafting of customer status updates across multiple team members, ensuring consistent and timely outreach goes out automatically as part of the weekly cycle.", "dataLabel": "Email contains", "chips": ["Customer Name", "Part Status", "Expected Date", "Dead-End Notice", "Draft Communication", "Order Reference"]}];
+  const stepData = [{"name": "Dream (ERP)", "role": "Inventory System", "color": "#4B5563", "text": "Pulls live inventory status for every part on the weekly backorder report — including on-hand quantity, on-order quantity, and in-transit status.", "impact": "Replaces a dozen people doing independent manual lookups with a single automated pull, saving hours of duplicated effort every week.", "dataLabel": "Inventory data retrieved", "chips": ["On-Hand Qty", "On-Order Qty", "In-Transit Status", "Part Numbers", "Expected Arrival", "Dead-End Flags"]}, {"name": "Backorder Report", "role": "Data Layer", "color": "#4B5563", "text": "Merges the live Dream inventory data into the backorder report, enriching each line item and flagging parts with no viable source as dead ends.", "impact": "Transforms a static backorder list into a fully enriched, actionable status report — leadership sees the full picture instantly.", "dataLabel": "Records updated", "chips": ["Enriched Part Lines", "Dead-End Flags", "Status per Part", "Source Availability", "Updated Report"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer-facing communications for backordered items, pre-populated with the relevant part status and estimated timelines.", "impact": "Cuts the time to communicate order updates to customers from hours of manual drafting down to a single review-and-send step.", "dataLabel": "Email contains", "chips": ["Customer Name", "Part Status Update", "ETA if Available", "Dead-End Notice", "Draft Communication"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
