@@ -208,7 +208,7 @@
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Dream (ERP/Inventory System)</div>
+                  <div class="step-platform">Dream (ERP)</div>
                   <div class="step-role">Inventory System</div>
                 </div>
               </div>
@@ -221,7 +221,7 @@
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Backorder Report</div>
-                  <div class="step-role">Spreadsheet</div>
+                  <div class="step-role">Data Source</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Dream (ERP/Inventory System)", "role": "Inventory System", "color": "#4B5563", "text": "Pulls live inventory status for every part number on the weekly backorder report, including on-hand quantity, on-order quantity, and in-transit status.", "impact": "Instantly enriches the backorder report with real-time data that a dozen team members currently spend hours pulling independently, consolidating all lookups into one automated pass.", "dataLabel": "Inventory data retrieved", "chips": ["Part Number", "On Hand Qty", "On Order Qty", "In Transit Status", "Expected Date", "No-Source Flag"]}, {"name": "Backorder Report", "role": "Spreadsheet", "color": "#4B5563", "text": "Receives the enriched inventory data and updates each line of the backorder report with current status, flagging any parts that have no on-hand, on-order, or in-transit source as dead ends.", "impact": "Produces a fully enriched, decision-ready backorder report automatically, making it immediately clear which orders can be fulfilled and which require escalation.", "dataLabel": "Records updated", "chips": ["Updated Status Columns", "Dead-End Flags", "Fulfillable Lines", "Escalation Needed", "Report Timestamp"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications for flagged backorder lines, notifying customers of delays, expected arrival dates, or dead-end parts with no available source.", "impact": "Replaces the most time-consuming manual step in the process by pre-drafting every customer message, so the team only needs to review and send rather than write from scratch.", "dataLabel": "Email contains", "chips": ["Customer Name", "Part Number", "Status Update", "Expected Date", "Dead-End Notice", "Draft Flag"]}];
+  const stepData = [{"name": "Dream (ERP)", "role": "Inventory System", "color": "#4B5563", "text": "Pulls live inventory status for every part number on the backorder report, retrieving on-hand quantity, on-order status, and in-transit details.", "impact": "Enriches the backorder report with real-time data in one automated pass, replacing a process that currently requires a dozen people doing independent manual lookups.", "dataLabel": "Data collected", "chips": ["On Hand Qty", "On Order Status", "In Transit", "Part Numbers", "Expected Dates", "Dead-End Flags"]}, {"name": "Backorder Report", "role": "Data Source", "color": "#4B5563", "text": "Serves as the base document that the agent reads and writes back to — receiving enriched status fields and dead-end flags for each line item.", "impact": "Transforms the backorder report from a static list into a fully enriched, decision-ready document without anyone touching it manually.", "dataLabel": "Records updated", "chips": ["Updated Status", "Dead-End Parts", "Source Availability", "Enriched Lines", "Flag Annotations"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Generates and sends draft customer communications for affected backorder lines, pre-populated with the live status details for each part.", "impact": "Prepares customer-ready updates automatically, cutting the time between knowing a part's status and communicating it to the customer.", "dataLabel": "Email contains", "chips": ["Customer Name", "Part Status", "Expected Availability", "Dead-End Notice", "Draft Language"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
