@@ -177,7 +177,7 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 3 platforms connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 10.0hh saved/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 10.0hh saved/mo est.</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $200 value/mo</span>
     </div>
   </div>
@@ -216,24 +216,24 @@
                 <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#6264A7;--glow-color:rgba(98,100,167,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Microsoft Teams</div>
+                  <div class="step-role">Collaboration</div>
+                </div>
+              </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#6264A7;--t-color:#6264A7;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#FF7A59;--glow-color:rgba(255,122,89,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">HubSpot API</div>
                   <div class="step-role">CRM</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#FF7A59;--t-color:#FF7A59;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#6264A7;--glow-color:rgba(98,100,167,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Microsoft Teams</div>
-                  <div class="step-role">Notifications</div>
                 </div>
               </div>
           </div>
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Reads the MHM vehicle data and cross-references it against the New Availability Guide to identify matching part numbers and build the load sheet.", "impact": "Eliminates manual part number matching across two data sources, producing an accurate load sheet in seconds instead of 30–60 minutes of spreadsheet work.", "dataLabel": "Data collected", "chips": ["MHM Vehicle List", "Part Numbers", "Availability Status", "Load Sheet Rows", "Product Descriptions"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Creates and populates the weekly Must Have Monday HubSpot email draft with the generated sales sheet and load sheet as attachments or embedded content.", "impact": "Automates email assembly and scheduling so the MHM campaign goes out consistently each week without manual HubSpot setup or content entry.", "dataLabel": "Records updated", "chips": ["Email Draft Created", "Sales Sheet Attached", "Load Sheet Attached", "Send Schedule Set", "Contact List Assigned"]}, {"name": "Microsoft Teams", "role": "Notifications", "color": "#6264A7", "text": "Posts a completion notification to the relevant Teams channel confirming the email has been created and is ready for review or has been sent.", "impact": "Keeps the marketing team informed without requiring them to monitor the automation, enabling quick human review before final send if needed.", "dataLabel": "Notification sent", "chips": ["Completion Alert", "Email Preview Link", "Load Sheet Summary", "Send Time Confirmed", "Approval Prompt"]}];
+  const stepData = [{"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Matches MHM vehicle part numbers against the New Availability Guide to identify in-stock products eligible for the weekly promotion.", "impact": "Eliminates manual cross-referencing of vehicle fitment data, cutting load sheet preparation from hours to seconds with zero lookup errors.", "dataLabel": "Data matched", "chips": ["MHM Vehicle List", "Part Numbers", "Availability Status", "Load Sheet Rows", "Fitment Data"]}, {"name": "Microsoft Teams", "role": "Collaboration", "color": "#6264A7", "text": "Posts a notification to the relevant Teams channel confirming the load sheet has been generated and the email campaign is being built.", "impact": "Keeps the sales and marketing team informed of campaign readiness in real time without requiring anyone to check email or manually report status.", "dataLabel": "Status notification sent", "chips": ["Campaign Name", "Load Sheet Status", "Vehicle Count", "Send Readiness", "Timestamp"]}, {"name": "HubSpot API", "role": "CRM", "color": "#FF7A59", "text": "Creates and sends the Must Have Monday HubSpot email with the generated sales sheet and load sheet attached to the target contact list.", "impact": "Fully automates weekly campaign deployment, ensuring consistent Monday delivery and freeing marketing staff from repetitive email build tasks.", "dataLabel": "Email campaign sent", "chips": ["Email Template", "Sales Sheet Link", "Load Sheet Attachment", "Contact List", "Send Time"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
