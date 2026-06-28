@@ -204,24 +204,24 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Web Scraper</div>
-                  <div class="step-role">Scraper</div>
+                  <div class="step-platform">Web Scraping (Gyro Disc, Alcon, Brembo)</div>
+                  <div class="step-role">Web Scraper</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#64748B;--t-color:#64748B;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-1" style="--dot-color:#2563EB;--glow-color:rgba(37,99,235,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">DFC Catalog</div>
-                  <div class="step-role">Catalog</div>
+                  <div class="step-platform">Catalog (DFC Internal)</div>
+                  <div class="step-role">Data Source</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -313,7 +313,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Web Scraper", "role": "Scraper", "color": "#4B5563", "text": "Scrapes Gyro Disc, Alcon, and Brembo's online catalogs to extract make, model, and year fitment data for all available two-piece rotor products.", "impact": "Builds a comprehensive competitive fitment reference in a fraction of the time it would take to manually review three separate manufacturer catalogs.", "dataLabel": "Data collected", "chips": ["Make/model/year", "Rotor specs", "Manufacturer", "Part numbers", "Fitment data"]}, {"name": "DFC Catalog", "role": "Catalog", "color": "#2563EB", "text": "Cross-references the scraped fitment data against DFC's existing parts inventory to identify which vehicles are already covered and where gaps or opportunities exist.", "impact": "Gives Dino a clear, data-backed map of where DFC competes and where new product opportunities exist in the two-piece rotor market.", "dataLabel": "Gap analysis produced", "chips": ["DFC coverage", "Competitor coverage", "Part gaps", "Overlap flags", "Opportunity SKUs"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to target customers to gather demand data — asking which vehicles and rotor specs are most relevant to their purchasing needs.", "impact": "Collects real demand signals from the market at scale without requiring manual outreach from the sales or product team.", "dataLabel": "Email contains", "chips": ["Demand survey", "Vehicle prompts", "Customer segment", "Response request", "Product context"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles all scraped catalog data, cross-reference results, and customer demand responses into a single formatted output sheet delivered to Dino.", "impact": "Delivers a fully organized, decision-ready reference document that consolidates what would otherwise require weeks of manual research and outreach.", "dataLabel": "Catalog delivered", "chips": ["Fitment reference", "DFC gap map", "Demand data", "Competitor coverage", "Formatted output"]}];
+  const stepData = [{"name": "Web Scraping (Gyro Disc, Alcon, Brembo)", "role": "Web Scraper", "color": "#64748B", "text": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract all available two-piece rotor fitments by make, model, and year.", "impact": "Builds a comprehensive market-wide fitment reference in minutes instead of the days it would take to manually browse three separate vendor catalogs.", "dataLabel": "Data collected", "chips": ["Make/Model/Year", "Vendor SKUs", "Rotor Specs", "Fitment Coverage", "Vendor Source"]}, {"name": "Catalog (DFC Internal)", "role": "Data Source", "color": "#2563EB", "text": "Cross-references the scraped competitor fitments against DFC's existing parts catalog to identify which applications DFC already covers and which are gaps.", "impact": "Instantly reveals where DFC has competitive coverage and where market opportunities exist, giving Dino an actionable gap analysis without manual comparison.", "dataLabel": "Cross-reference produced", "chips": ["DFC Matched Parts", "Coverage Gaps", "Competitor-Only Fitments", "Part Numbers", "Gap Count"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to targeted customers asking them to confirm demand for specific two-piece rotor applications where gaps were identified.", "impact": "Gathers real demand signal from the market proactively, so product decisions are driven by customer data rather than internal assumptions.", "dataLabel": "Email contains", "chips": ["Vehicle Application", "Demand Survey", "Customer Segment", "Gap Applications", "Response Request"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles the full output — scraped fitments, DFC cross-reference results, coverage gaps, and customer demand responses — into one formatted reference sheet for Dino.", "impact": "Delivers a single, organized decision-ready document that consolidates all research and demand data, enabling Dino to prioritize catalog expansion without any manual assembly.", "dataLabel": "Records updated", "chips": ["Fitment Matrix", "Coverage Status", "Demand Responses", "Gap Prioritization", "Vendor Source Tags", "Final Formatted Output"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
