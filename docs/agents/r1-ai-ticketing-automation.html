@@ -177,7 +177,7 @@
         background:#1c2128;border:1px solid #30363d;color:#8b949e;">
         &#128279; 1 platform connected
       </span>
-      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 15.0hh saved/mo</span>
+      <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#0a1e12;border:1px solid #196130;color:#3fb950;">&#9203; 15.0hh saved/mo est.</span>
       <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#130d2a;border:1px solid #3b2d6e;color:#a371f7;">&#128142; $300 value/mo</span>
     </div>
   </div>
@@ -208,8 +208,8 @@
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Support Inbox (TBD)</div>
-                  <div class="step-role">Ticket Source</div>
+                  <div class="step-platform">Support Inbox</div>
+                  <div class="step-role">Ticket Intake</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
@@ -220,8 +220,8 @@
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">AI Model (TBD)</div>
-                  <div class="step-role">AI Model</div>
+                  <div class="step-platform">AI Model</div>
+                  <div class="step-role">AI Classification</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -232,8 +232,8 @@
                 <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Ticketing Platform (TBD)</div>
-                  <div class="step-role">Helpdesk</div>
+                  <div class="step-platform">Ticketing Platform</div>
+                  <div class="step-role">Resolution & Logging</div>
                 </div>
               </div>
           </div>
@@ -271,7 +271,7 @@
   <div class="card">
     <div class="card-header"><div class="card-label">&#128279; &nbsp;Connections</div></div>
     <div class="card-body">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#4B5563;display:inline-block;"></span>TBD</span></div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;gap:6px;background:#1c2128;border:1px solid #30363d;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:#c9d1d9;"><span style="width:8px;height:8px;border-radius:50%;background:#AAAAAA;display:inline-block;"></span>TBD</span></div>
     </div>
   </div>
 
@@ -301,7 +301,7 @@
 
   const STEPS = 3, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Support Inbox (TBD)", "role": "Ticket Source", "color": "#4B5563", "text": "Receives incoming customer support requests and queues them for AI classification.", "impact": "Centralizes all inbound support volume so no ticket is missed and every request enters a consistent triage pipeline.", "dataLabel": "Data collected", "chips": ["Customer message", "Contact info", "Submission timestamp", "Channel source", "Raw ticket text"]}, {"name": "AI Model (TBD)", "role": "AI Model", "color": "#4B5563", "text": "Reads each ticket, classifies the issue type, determines urgency, and drafts a resolution or response.", "impact": "Reduces average handle time by automating first-response drafts and routing, freeing agents to focus on complex cases.", "dataLabel": "Analysis produced", "chips": ["Issue category", "Urgency score", "Suggested response", "Escalation flag", "Confidence score"]}, {"name": "Ticketing Platform (TBD)", "role": "Helpdesk", "color": "#4B5563", "text": "Logs the AI classification, assigns the ticket to the correct queue or agent, and sends the drafted response to the customer.", "impact": "Ensures every ticket is routed accurately and responded to faster, improving customer satisfaction scores.", "dataLabel": "Records updated", "chips": ["Ticket status", "Assigned agent", "Response sent", "Resolution category", "SLA timestamp"]}];
+  const stepData = [{"name": "Support Inbox", "role": "Ticket Intake", "color": "#4B5563", "text": "Receives incoming customer support requests and queues them for AI classification and routing.", "impact": "Centralizes all inbound support volume into a single intake pipeline, eliminating manual triage time and ensuring no ticket is missed.", "dataLabel": "Data collected", "chips": ["Customer name", "Issue description", "Order reference", "Submission timestamp", "Contact channel"]}, {"name": "AI Model", "role": "AI Classification", "color": "#4B5563", "text": "Reads each ticket, classifies the issue type, assesses urgency, and drafts or routes an appropriate response.", "impact": "Reduces average ticket handle time and ensures consistent, accurate responses across high support volumes for R1 Concepts customers.", "dataLabel": "Analysis produced", "chips": ["Issue category", "Urgency score", "Suggested response", "Routing decision", "Confidence level", "Resolution type"]}, {"name": "Ticketing Platform", "role": "Resolution & Logging", "color": "#4B5563", "text": "Posts the AI-generated response or routes the ticket to the correct agent with full context attached.", "impact": "Speeds up resolution time and improves customer satisfaction by delivering accurate answers faster with full ticket context preserved.", "dataLabel": "Records updated", "chips": ["Response sent", "Agent assigned", "Ticket status", "Resolution notes", "Escalation flag"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
