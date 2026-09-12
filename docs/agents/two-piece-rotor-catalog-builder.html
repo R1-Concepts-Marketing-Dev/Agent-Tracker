@@ -204,24 +204,24 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#4B5563;--glow-color:rgba(75,85,99,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#64748B;--glow-color:rgba(100,116,139,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Web Scraper (Gyro Disc, Alcon, Brembo)</div>
+                  <div class="step-platform">Web Scraping (Gyro Disc, Alcon, Brembo)</div>
                   <div class="step-role">Web Scraper</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#4B5563;--t-color:#4B5563;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#64748B;--t-color:#64748B;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-1" style="--dot-color:#2563EB;--glow-color:rgba(37,99,235,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Internal Catalog (DFC)</div>
-                  <div class="step-role">Inventory System</div>
+                  <div class="step-platform">DFC Catalog</div>
+                  <div class="step-role">Inventory Cross-Reference</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
@@ -313,7 +313,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Web Scraper (Gyro Disc, Alcon, Brembo)", "role": "Web Scraper", "color": "#4B5563", "text": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract all available two-piece rotor fitments by make, model, and year.", "impact": "Compiles a comprehensive market reference in minutes that would take days of manual browsing and data entry across three separate vendor catalogs.", "dataLabel": "Data collected", "chips": ["Vehicle make", "Vehicle model", "Year range", "Rotor specs", "Vendor source", "Part numbers"]}, {"name": "Internal Catalog (DFC)", "role": "Inventory System", "color": "#2563EB", "text": "Cross-references the scraped fitment data against DFC's existing parts inventory to identify which vehicles are covered and which represent unmet demand opportunities.", "impact": "Instantly reveals where DFC has competitive coverage and where product gaps exist, turning raw market data into a strategic inventory decision tool.", "dataLabel": "Cross-reference produced", "chips": ["Matched parts", "Coverage gaps", "DFC part numbers", "Unmet fitments", "Competitor-only listings"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to existing customers asking about demand for specific two-piece rotor fitments where DFC currently has no inventory.", "impact": "Gathers real demand signal from the market passively, allowing DFC to make data-backed inventory decisions rather than guessing at which gaps to fill first.", "dataLabel": "Email contains", "chips": ["Vehicle fitment ask", "Customer name", "Demand survey", "Specific rotor specs", "Response request"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles the full cross-referenced catalog, demand responses, and coverage analysis into a single formatted sheet delivered to Dino.", "impact": "Gives Dino one clean, actionable output containing competitive landscape, DFC coverage, and customer demand data — eliminating the need to reconcile information from multiple sources manually.", "dataLabel": "Output delivered", "chips": ["Full fitment list", "Coverage status", "Demand responses", "Gap priority", "Vendor breakdown", "Formatted for review"]}];
+  const stepData = [{"name": "Web Scraping (Gyro Disc, Alcon, Brembo)", "role": "Web Scraper", "color": "#64748B", "text": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to extract all available two-piece rotor fitments by make, model, and year.", "impact": "Compiles a comprehensive market fitment reference in minutes that would take days to build manually from three separate vendor sites.", "dataLabel": "Data collected", "chips": ["Make", "Model", "Year", "Rotor specs", "Vendor source", "Part number"]}, {"name": "DFC Catalog", "role": "Inventory Cross-Reference", "color": "#2563EB", "text": "Cross-references the scraped fitment data against DFC's existing parts catalog to identify which two-piece rotor applications DFC already covers and which represent gaps.", "impact": "Gives Dino a clear picture of where DFC competes and where there are untapped opportunities, without any manual line-by-line comparison.", "dataLabel": "Coverage mapped", "chips": ["DFC matches", "Coverage gaps", "Overlap count", "Missing fitments", "Competitive SKUs"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated outreach emails to targeted customers to gather demand data on specific two-piece rotor fitments where DFC has gaps.", "impact": "Generates real demand signal from the market automatically, helping prioritize which gaps are worth filling based on actual customer interest rather than guesswork.", "dataLabel": "Outreach sent", "chips": ["Customer segment", "Fitment asked about", "Response tracking", "Demand survey", "Personalized vehicle reference"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Compiles all scraped fitments, DFC cross-reference results, and customer demand responses into one formatted, filterable reference sheet delivered to Dino.", "impact": "Produces a single source of truth for two-piece rotor strategy that Dino can filter, sort, and act on — replacing scattered notes and spreadsheets with one living document.", "dataLabel": "Output compiled", "chips": ["Full fitment list", "DFC coverage status", "Demand responses", "Gap priority", "Vendor source", "Formatted output"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
