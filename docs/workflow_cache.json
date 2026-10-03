@@ -5,43 +5,43 @@
         "platform": "R1 Concepts Website",
         "role": "Content Source",
         "action": "Scrapes current product listings, promotions, and brake part details to use as source material for email content.",
-        "impact": "Ensures every email reflects live inventory and current offers, keeping messaging accurate and relevant without manual content gathering.",
+        "impact": "Ensures every email reflects live inventory and accurate product info, eliminating manual content gathering.",
         "dataLabel": "Data collected",
         "chips": [
           "Product Names",
           "Part Numbers",
-          "Active Promotions",
-          "Product Descriptions",
+          "Promotions",
+          "Pricing",
+          "Product URLs",
           "Category Pages"
         ]
       },
       {
-        "platform": "Anthropic API",
+        "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Generates a complete daily marketing email \u2014 subject line, body copy, and CTAs \u2014 based on R1 product data and brand voice.",
-        "impact": "Delivers professionally written, on-brand email content every day without requiring a copywriter, scaling content output dramatically.",
+        "action": "Generates a complete daily marketing email \u2014 subject line, body copy, and CTAs \u2014 based on scraped R1 product data.",
+        "impact": "Produces professional, on-brand email content daily with zero copywriting effort from the team.",
         "dataLabel": "Email content generated",
         "chips": [
           "Subject Line",
           "Email Body",
           "Call-to-Action",
           "Product Highlights",
-          "Promotional Angle",
-          "Brand Tone"
+          "Promotional Angle"
         ]
       },
       {
-        "platform": "HubSpot API",
+        "platform": "HubSpot Marketing",
         "role": "Email Platform",
-        "action": "Publishes and sends the AI-generated email to targeted R1 contact lists via the HubSpot Marketing Email API.",
-        "impact": "Automates daily email deployment to the full customer base, maintaining consistent outreach cadence and driving repeat purchase traffic.",
-        "dataLabel": "Email delivered",
+        "action": "Receives the AI-generated email via API and sends it to the configured R1 Concepts contact lists.",
+        "impact": "Automates daily email deployment to the full contact base, maintaining consistent outreach without manual scheduling.",
+        "dataLabel": "Email deployed",
         "chips": [
           "Contact List",
-          "Send Timestamp",
-          "Email HTML",
-          "Campaign Tag",
-          "Recipient Count"
+          "Send Time",
+          "Email Template",
+          "Campaign Tracking",
+          "Delivery Status"
         ]
       }
     ],
@@ -49,154 +49,151 @@
       {
         "platform": "Dynamic Friction Company Website",
         "role": "Content Source",
-        "action": "Scrapes DFC product pages, brand messaging, and current promotions to inform daily email content generation.",
-        "impact": "Grounds AI-generated content in real DFC product data, ensuring accuracy and reducing the risk of off-brand or outdated messaging.",
+        "action": "Scrapes current DFC product lines, featured parts, and brand messaging to inform daily email content.",
+        "impact": "Keeps email content aligned with live DFC catalog and brand positioning without manual research.",
         "dataLabel": "Data collected",
         "chips": [
-          "DFC Product Lines",
-          "Friction Material Details",
-          "Active Offers",
+          "Product Lines",
+          "Part Numbers",
           "Brand Messaging",
+          "Featured SKUs",
           "Category Info"
         ]
       },
       {
-        "platform": "Anthropic API",
+        "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Writes a full daily marketing email tailored to DFC's audience, including subject line, body, and product-specific content.",
-        "impact": "Produces high-quality email copy at scale for a separate brand without additional headcount, enabling parallel marketing operations.",
+        "action": "Generates a daily DFC-branded marketing email including subject line, body, and product-focused CTAs.",
+        "impact": "Delivers consistent daily marketing output for DFC with no copywriting overhead.",
         "dataLabel": "Email content generated",
         "chips": [
           "Subject Line",
-          "Body Copy",
+          "Email Body",
           "Product Focus",
-          "CTA Text",
-          "DFC Brand Voice",
-          "Promotional Hook"
+          "Call-to-Action",
+          "Brand Tone"
         ]
       },
       {
-        "platform": "HubSpot API",
+        "platform": "HubSpot Marketing",
         "role": "Email Platform",
-        "action": "Sends the finalized DFC marketing email to the appropriate HubSpot contact lists on a daily schedule.",
-        "impact": "Keeps DFC customers consistently engaged with fresh content every day, supporting retention and sales pipeline without manual sending.",
-        "dataLabel": "Email delivered",
+        "action": "Sends the AI-generated DFC email to the appropriate HubSpot contact lists via the Marketing Email API.",
+        "impact": "Ensures DFC contacts receive daily touchpoints, supporting pipeline nurture and brand visibility at scale.",
+        "dataLabel": "Email deployed",
         "chips": [
           "DFC Contact List",
-          "Send Time",
-          "Campaign Label",
-          "Email HTML",
-          "Deployment Status"
+          "Send Status",
+          "Campaign ID",
+          "Open Tracking",
+          "Click Tracking"
         ]
       }
     ],
     "R1 Support Agent": [
       {
-        "platform": "HubSpot API",
-        "role": "CRM / Ticketing",
-        "action": "Pulls incoming support tickets from HubSpot, including customer messages, order details, and ticket metadata.",
-        "impact": "Centralizes ticket intake automatically, giving the AI full context on each issue without agents needing to manually queue or sort requests.",
-        "dataLabel": "Ticket data retrieved",
+        "platform": "HubSpot CRM",
+        "role": "CRM",
+        "action": "Pulls newly created or updated support tickets from HubSpot to be processed by the AI agent.",
+        "impact": "Centralizes ticket intake so no support request goes unprocessed or delayed in the queue.",
+        "dataLabel": "Tickets retrieved",
         "chips": [
           "Ticket ID",
-          "Customer Message",
-          "Order Number",
+          "Customer Name",
+          "Issue Description",
           "Ticket Status",
-          "Contact Info",
-          "Submission Time"
+          "Submission Date"
         ]
       },
       {
-        "platform": "Anthropic API",
+        "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Classifies each ticket by issue type and drafts a contextually appropriate reply for the R1 support team to review and send.",
-        "impact": "Cuts response drafting time significantly, allowing support agents to handle higher ticket volumes with consistent, accurate replies.",
-        "dataLabel": "AI output produced",
+        "action": "Classifies each ticket by issue type and drafts a context-aware reply for the R1 support team to review and send.",
+        "impact": "Cuts ticket response drafting time significantly, letting the support team focus on review and resolution rather than composition.",
+        "dataLabel": "AI classification and draft produced",
         "chips": [
           "Issue Category",
           "Priority Level",
           "Draft Reply",
           "Suggested Resolution",
-          "Confidence Score",
-          "Escalation Flag"
+          "Confidence Score"
         ]
       },
       {
-        "platform": "HubSpot API",
-        "role": "CRM / Ticketing",
-        "action": "Writes the ticket classification and draft reply back into the HubSpot ticket record for agent review and action.",
-        "impact": "Keeps all support context in one place, enabling agents to approve and send replies in seconds rather than writing from scratch.",
-        "dataLabel": "Records updated",
+        "platform": "HubSpot CRM",
+        "role": "CRM",
+        "action": "Writes the AI-generated classification and draft reply back to the corresponding HubSpot ticket for team review.",
+        "impact": "Keeps all support context inside HubSpot so agents have AI-assisted replies ready without switching tools.",
+        "dataLabel": "Ticket updated",
         "chips": [
-          "Ticket Classification",
-          "Draft Reply Text",
-          "Updated Ticket Status",
-          "Agent Notes Field",
-          "Timestamp"
+          "Ticket Category Tag",
+          "Draft Response",
+          "Agent Assignment",
+          "Updated Status",
+          "Internal Note"
         ]
       }
     ],
     "Customer Issues Analyzer": [
       {
-        "platform": "HubSpot API",
-        "role": "CRM / Forms",
-        "action": "Pulls all in-box flyer return and issue form submissions from HubSpot, capturing structured customer complaint and return data.",
-        "impact": "Consolidates all customer issue submissions automatically, eliminating manual exports and ensuring no submissions are missed.",
+        "platform": "HubSpot CRM",
+        "role": "CRM",
+        "action": "Pulls all in-box flyer form submissions from HubSpot, capturing return requests and customer-reported issues.",
+        "impact": "Consolidates scattered form submissions into a structured pull, making issue volume and patterns visible for the first time.",
         "dataLabel": "Form submissions retrieved",
         "chips": [
           "Submission Date",
+          "Customer Name",
           "Issue Type",
           "Order Number",
-          "Customer Name",
-          "Return Reason",
-          "Product SKU"
+          "Product SKU",
+          "Return Reason"
         ]
       },
       {
-        "platform": "Google Sheets API",
+        "platform": "Google Sheets",
         "role": "Spreadsheet",
-        "action": "Syncs the retrieved form submissions into a structured Google Sheet for team review, filtering, and trend analysis.",
-        "impact": "Gives the operations and product teams a clean, always-current dataset to identify recurring issues, reduce returns, and improve product quality.",
-        "dataLabel": "Records updated",
+        "action": "Syncs the retrieved HubSpot submissions into a structured Google Sheet for team review and trend analysis.",
+        "impact": "Gives the team a live, sortable dataset of customer issues that enables faster root-cause identification and product feedback loops.",
+        "dataLabel": "Records synced",
         "chips": [
-          "Issue Log Row",
-          "Return Category",
+          "Issue Log",
+          "Return Count",
           "SKU Frequency",
-          "Submission Timestamp",
-          "Status Column",
-          "Volume Trends"
+          "Date Range",
+          "Status Tracking",
+          "Team Notes"
         ]
       }
     ],
     "DFC Sales Active Customer Alerts": [
       {
-        "platform": "HubSpot API",
+        "platform": "HubSpot CRM",
         "role": "CRM",
-        "action": "Monitors HubSpot contact activity to detect when known DFC customers visit or engage with the R1 Concepts website.",
-        "impact": "Surfaces warm, high-intent customer signals in real time, allowing the sales team to reach out while interest is active rather than days later.",
-        "dataLabel": "Activity signal detected",
+        "action": "Monitors HubSpot contact activity to detect when DFC customers visit or engage with the R1 Concepts website.",
+        "impact": "Surfaces warm, in-market buying signals in real time so sales reps can act while customer intent is highest.",
+        "dataLabel": "Activity detected",
         "chips": [
           "Contact Name",
           "Company",
           "Page Visited",
           "Visit Timestamp",
-          "Engagement Score",
-          "Account Tier"
+          "Activity Score",
+          "Deal Stage"
         ]
       },
       {
-        "platform": "Microsoft Teams (Power Automate)",
-        "role": "Alerts / Automation",
-        "action": "Sends an instant alert to the DFC sales team via Microsoft Teams message and email with the customer activity details.",
-        "impact": "Enables same-minute follow-up on active buyers, increasing the likelihood of converting cross-brand interest into a DFC sales conversation.",
+        "platform": "Microsoft Teams",
+        "role": "Collaboration",
+        "action": "Sends an automated real-time alert to the DFC sales team via Teams and email with customer activity details.",
+        "impact": "Eliminates manual CRM monitoring and ensures reps are notified instantly, increasing the likelihood of timely follow-up.",
         "dataLabel": "Alert delivered",
         "chips": [
           "Customer Name",
           "Activity Summary",
+          "R1 Page Viewed",
           "Alert Timestamp",
-          "Sales Rep Tagged",
-          "Email Notification",
-          "CRM Link"
+          "Rep Assigned",
+          "Follow-Up Link"
         ]
       }
     ],
@@ -204,8 +201,8 @@
       {
         "platform": "TBD",
         "role": "In Development",
-        "action": "This agent is currently in development; final platform connections and workflow steps have not yet been defined.",
-        "impact": "Once live, will provide automated customer-facing support for R1 Concepts, improving response time and reducing support team load.",
+        "action": "This agent is currently in development and connections have not yet been finalized.",
+        "impact": "Will provide automated customer-facing support for R1 Concepts once deployed.",
         "dataLabel": "TBD",
         "chips": [
           "In Development",
@@ -217,47 +214,46 @@
     ],
     "Cerritos Building Sublet Agent": [
       {
-        "platform": "Web Scraping / Email Discovery",
-        "role": "Lead Research",
-        "action": "Scrapes local business directories and web sources to identify businesses in the Cerritos area that may need warehouse or office space, then discovers contact emails.",
-        "impact": "Generates a fresh list of qualified local leads every day without manual prospecting, dramatically expanding outreach volume.",
+        "platform": "Web Scraping",
+        "role": "Lead Discovery",
+        "action": "Scrapes local business directories and listings daily to identify businesses in the Cerritos area that may need warehouse or office space.",
+        "impact": "Generates a fresh pipeline of relevant leads each day without any manual prospecting effort from the team.",
         "dataLabel": "Leads discovered",
         "chips": [
           "Business Name",
-          "Contact Email",
-          "Business Type",
+          "Industry",
           "Location",
-          "Employee Size",
-          "Source URL"
+          "Company Size",
+          "Contact Info",
+          "Space Need Signal"
         ]
       },
       {
-        "platform": "HubSpot API",
-        "role": "CRM",
-        "action": "Creates or updates contact records in HubSpot for each discovered lead, tagging them to the Cerritos sublet campaign.",
-        "impact": "Keeps all sublet prospects organized in CRM for tracking, follow-up sequencing, and pipeline visibility across the team.",
-        "dataLabel": "Records created",
+        "platform": "Email Discovery",
+        "role": "Contact Enrichment",
+        "action": "Finds and validates contact email addresses for the identified local businesses to enable outreach.",
+        "impact": "Ensures outreach lands in real inboxes, maximizing deliverability and response potential for each lead.",
+        "dataLabel": "Contacts enriched",
         "chips": [
-          "Contact Record",
-          "Company Name",
-          "Campaign Tag",
-          "Lead Source",
           "Email Address",
-          "Enrollment Date"
+          "Contact Name",
+          "Title",
+          "Verified Status",
+          "Domain Match"
         ]
       },
       {
-        "platform": "HubSpot API",
-        "role": "Email Platform",
-        "action": "Sends a personalized warm introduction email to each new lead highlighting the 13140 Midway Place Cerritos sublet opportunity.",
-        "impact": "Delivers targeted outreach at scale daily, turning cold local businesses into warm inbound conversations about the space with no manual effort.",
-        "dataLabel": "Email delivered",
+        "platform": "HubSpot CRM",
+        "role": "CRM",
+        "action": "Logs enriched leads into HubSpot and sends a personalized warm intro email pitching the 13140 Midway Place Cerritos sublet.",
+        "impact": "Automates daily warm outreach at scale, keeping the sublet opportunity in front of new prospects every day with zero manual effort.",
+        "dataLabel": "Outreach sent",
         "chips": [
-          "Intro Email",
+          "Lead Record",
+          "Email Sent",
           "Property Details",
-          "Square Footage",
-          "Location Pitch",
-          "CTA Link",
+          "Sublet Pitch",
+          "Follow-Up Sequence",
           "Send Timestamp"
         ]
       }
@@ -266,80 +262,93 @@
       {
         "platform": "Amazon Ads API",
         "role": "Ad Platform",
-        "action": "Pulls current campaign performance data across R1 and DFC Amazon ad accounts, including spend, impressions, clicks, and ACOS metrics.",
-        "impact": "Centralizes cross-brand ad data automatically, eliminating manual report downloads and giving the AI a complete performance picture to work from.",
+        "action": "Pulls live campaign performance data across R1 and DFC Amazon ad accounts for AI analysis.",
+        "impact": "Centralizes cross-brand ad data in real time, enabling unified performance visibility without manual reporting.",
         "dataLabel": "Ad data collected",
         "chips": [
           "Campaign Name",
-          "Spend",
-          "ACOS",
           "Impressions",
           "Clicks",
+          "ACOS",
+          "Spend",
           "Conversion Rate"
         ]
       },
       {
-        "platform": "Anthropic API",
+        "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Analyzes campaign performance data and generates optimization recommendations including bid adjustments, budget shifts, and keyword actions.",
-        "impact": "Accelerates ad optimization cycles from weekly manual reviews to daily AI-driven insights, improving ROAS and reducing wasted ad spend.",
-        "dataLabel": "Analysis produced",
+        "action": "Analyzes campaign performance metrics and generates optimization recommendations for bids, budgets, and targeting.",
+        "impact": "Accelerates ad optimization cycles and surfaces actionable insights that would take a human analyst hours to produce.",
+        "dataLabel": "Optimization analysis produced",
         "chips": [
           "Bid Recommendations",
-          "Budget Reallocation",
-          "Keyword Flags",
-          "Underperforming Campaigns",
-          "Optimization Summary",
+          "Budget Shifts",
+          "Keyword Gaps",
+          "Underperforming ASINs",
+          "ACOS Targets",
           "Priority Actions"
         ]
       }
     ],
     "Creator Discovery Tool": [
       {
-        "platform": "YouTube API / Instagram Looter API / DuckDuckGo API",
-        "role": "Discovery APIs",
-        "action": "Searches YouTube, Instagram, and the web using provided keywords to surface relevant content creators and their public profile data.",
-        "impact": "Replaces hours of manual creator research with an automated multi-platform sweep, returning a broad candidate pool in minutes.",
+        "platform": "YouTube API / Instagram API",
+        "role": "Social Platforms",
+        "action": "Searches YouTube and Instagram using target keywords to surface relevant content creators and their public profile data.",
+        "impact": "Discovers a broad pool of relevant creators in minutes, replacing hours of manual platform browsing.",
         "dataLabel": "Creators discovered",
         "chips": [
           "Creator Handle",
           "Platform",
           "Subscriber Count",
-          "Content Niche",
+          "Niche Keywords",
           "Profile URL",
-          "Follower Count"
+          "Engagement Rate"
         ]
       },
       {
-        "platform": "Gemini API",
-        "role": "AI Model",
-        "action": "Analyzes discovered creator profiles against campaign criteria and organizes them into a structured list with relevance context.",
-        "impact": "Filters raw discovery results into a curated, campaign-relevant creator list, saving the marketing team significant manual vetting time.",
-        "dataLabel": "Analysis produced",
+        "platform": "DuckDuckGo API",
+        "role": "Web Search",
+        "action": "Supplements social discovery with web search results to find creators active outside major platforms or with cross-platform presence.",
+        "impact": "Widens the discovery net beyond algorithm-limited platform searches, ensuring no relevant creator is missed.",
+        "dataLabel": "Additional profiles found",
         "chips": [
-          "Relevance Summary",
-          "Content Themes",
+          "Creator Name",
+          "Website",
+          "Cross-Platform Links",
+          "Content Topics",
+          "Search Rank"
+        ]
+      },
+      {
+        "platform": "Gemini AI",
+        "role": "AI Model",
+        "action": "Analyzes discovered creator profiles and summarizes relevance, content fit, and audience alignment based on search context.",
+        "impact": "Delivers pre-filtered, context-aware creator shortlists so teams spend time on evaluation, not raw discovery.",
+        "dataLabel": "Creator profiles analyzed",
+        "chips": [
+          "Relevance Score",
+          "Content Summary",
           "Audience Fit",
-          "Engagement Estimate",
-          "Platform Breakdown",
-          "Creator List"
+          "Platform Presence",
+          "Brand Safety Signal"
         ]
       }
     ],
     "Creator Qualifier": [
       {
-        "platform": "Gemini API",
+        "platform": "Gemini AI",
         "role": "AI Model",
-        "action": "Scores each discovered creator using customizable weighting criteria such as engagement rate, niche fit, audience size, and content quality.",
-        "impact": "Produces a ranked, scored creator shortlist that lets marketing teams prioritize outreach instantly rather than manually comparing dozens of profiles.",
-        "dataLabel": "Scores produced",
+        "action": "Scores each discovered creator against customizable weighting criteria such as engagement rate, audience size, niche fit, and brand alignment.",
+        "impact": "Produces a ranked, objective creator shortlist instantly, eliminating subjective manual scoring and accelerating partnership decisions.",
+        "dataLabel": "Creator scores produced",
         "chips": [
           "Engagement Score",
           "Niche Fit Score",
           "Audience Size Weight",
-          "Content Quality Rating",
-          "Composite Score",
-          "Rank Order"
+          "Brand Alignment",
+          "Overall Rank",
+          "Qualifier Criteria"
         ]
       }
     ],
@@ -347,42 +356,42 @@
       {
         "platform": "Google Drive API",
         "role": "Storage",
-        "action": "Retrieves qualified creator profiles, outreach sequences, and prompt templates stored in Drive to prepare for personalized outreach.",
-        "impact": "Centralizes creator data and messaging frameworks so the agent always works from the latest approved sequences without manual file hunting.",
+        "action": "Retrieves the qualified creator list and previously learned outreach sequences and prompt templates stored in Drive.",
+        "impact": "Ensures outreach is personalized and consistent by grounding the AI in pre-approved messaging frameworks and vetted creator data.",
         "dataLabel": "Data collected",
         "chips": [
           "Creator Profiles",
-          "Outreach Sequences",
-          "Prompt Templates",
+          "Outreach Templates",
+          "Sequence Logic",
           "Qualification Criteria"
         ]
       },
       {
         "platform": "Gemini API",
         "role": "AI Model",
-        "action": "Generates personalized outreach emails for each qualified creator by applying learned sequences and brand-specific prompts to their profile data.",
-        "impact": "Produces tailored, on-brand outreach at scale in seconds, replacing hours of manual copywriting per creator batch.",
-        "dataLabel": "Email content generated",
+        "action": "Generates personalized outreach email copy for each creator by applying learned sequence logic and prompt templates to their profile data.",
+        "impact": "Scales creator outreach without manual copywriting, producing tailored messages that reflect each creator's niche and audience fit.",
+        "dataLabel": "Content generated",
         "chips": [
-          "Personalized Subject Line",
+          "Personalized Email Body",
+          "Subject Line",
           "Creator Name",
-          "Niche Relevance",
-          "Call to Action",
-          "Brand Voice"
+          "Campaign Fit Notes",
+          "CTA"
         ]
       },
       {
         "platform": "Gmail API",
         "role": "Email",
-        "action": "Sends the AI-generated outreach emails directly to each qualified creator from the brand inbox.",
-        "impact": "Executes outreach to entire creator lists automatically, compressing days of sending work into minutes and ensuring no creator is missed.",
-        "dataLabel": "Emails sent",
+        "action": "Sends the AI-generated outreach emails to each qualified creator from the configured sender account.",
+        "impact": "Automates high-volume creator prospecting, eliminating manual sending and ensuring timely, consistent first contact at scale.",
+        "dataLabel": "Email contains",
         "chips": [
-          "Recipient Email",
-          "Send Timestamp",
-          "Outreach Stage",
-          "Creator Handle",
-          "Campaign Tag"
+          "Personalized Greeting",
+          "Brand Pitch",
+          "Collaboration Ask",
+          "Reply Tracking",
+          "Send Timestamp"
         ]
       }
     ],
@@ -390,43 +399,43 @@
       {
         "platform": "Google Drive API",
         "role": "Storage",
-        "action": "Loads historical influencer email conversations, past negotiation outcomes, and rate benchmarks to ground the AI in real precedent.",
-        "impact": "Ensures negotiation responses reflect actual past deals, preventing the agent from making offers outside established norms.",
-        "dataLabel": "Historical data loaded",
+        "action": "Retrieves historical influencer email conversations and negotiation outcomes to inform the AI's response strategy.",
+        "impact": "Grounds the AI in real negotiation patterns that have worked, improving response quality and deal success rates over time.",
+        "dataLabel": "Data collected",
         "chips": [
           "Past Email Threads",
           "Negotiation Outcomes",
           "Rate Benchmarks",
-          "Creator Tier Data",
-          "Deal Terms"
-        ]
-      },
-      {
-        "platform": "Gemini API",
-        "role": "AI Model",
-        "action": "Reads incoming creator replies and generates contextually appropriate negotiation or follow-up responses based on learned conversation patterns.",
-        "impact": "Handles creator reply volume instantly and consistently, keeping conversations moving without requiring a human to draft each response.",
-        "dataLabel": "Response generated",
-        "chips": [
-          "Reply Context",
-          "Counter Offer Logic",
-          "Tone Match",
-          "Deal Stage",
-          "Next Step Action"
+          "Creator Personas",
+          "Accepted Terms"
         ]
       },
       {
         "platform": "Gmail API",
         "role": "Email",
-        "action": "Sends the AI-drafted negotiation responses back to creators and monitors threads for new incoming replies.",
-        "impact": "Maintains real-time conversation momentum with creators, reducing response lag from days to minutes and improving deal close rates.",
-        "dataLabel": "Emails sent & monitored",
+        "action": "Reads incoming creator replies and surfaces the full conversation thread context for the AI to analyze.",
+        "impact": "Eliminates manual inbox monitoring and ensures no creator response goes unaddressed, keeping deal pipelines moving.",
+        "dataLabel": "Email contains",
         "chips": [
-          "Thread ID",
-          "Response Sent",
-          "Creator Reply Detected",
-          "Negotiation Round",
-          "Send Timestamp"
+          "Creator Reply",
+          "Thread History",
+          "Sentiment Signal",
+          "Negotiation Stage",
+          "Timestamp"
+        ]
+      },
+      {
+        "platform": "Gemini API",
+        "role": "AI Model",
+        "action": "Analyzes the creator's reply alongside historical negotiation data and drafts a contextual response that advances the deal.",
+        "impact": "Accelerates creator deal closure by delivering informed, on-brand negotiation replies without requiring human drafting for every exchange.",
+        "dataLabel": "Content generated",
+        "chips": [
+          "Negotiation Reply",
+          "Counter Offer Logic",
+          "Tone Calibration",
+          "Next Step CTA",
+          "Deal Stage Update"
         ]
       }
     ],
@@ -434,43 +443,43 @@
       {
         "platform": "Google Sheets",
         "role": "Spreadsheet",
-        "action": "Pulls weekly MHM vehicle data and the New Availability Guide, then matches part numbers to generate the formatted load sheet.",
-        "impact": "Eliminates manual cross-referencing of two large data sources, producing an accurate load sheet in seconds instead of 30\u201360 minutes.",
-        "dataLabel": "Data matched & compiled",
+        "action": "Pulls MHM vehicle data and the New Availability Guide, then matches part numbers to generate the formatted load sheet.",
+        "impact": "Eliminates hours of manual cross-referencing each week, producing an accurate load sheet in seconds with no lookup errors.",
+        "dataLabel": "Data collected",
         "chips": [
           "MHM Vehicle List",
           "Part Numbers",
           "Availability Status",
           "Load Sheet Rows",
-          "Weekly Inventory"
+          "Match Results"
         ]
       },
       {
         "platform": "HubSpot API",
-        "role": "CRM / Email Platform",
-        "action": "Creates the Must Have Monday HubSpot email draft with the generated sales sheet and load sheet attached, then sends it to the target list.",
-        "impact": "Fully automates weekly email production and deployment, freeing the marketing team from repetitive build-and-send tasks every Monday.",
-        "dataLabel": "Email created & sent",
+        "role": "CRM / Email",
+        "action": "Creates and populates a HubSpot email draft with the generated sales sheet and load sheet attached, then sends to the target list.",
+        "impact": "Ensures Monday emails go out on time every week with accurate product data, removing the manual build-and-send process entirely.",
+        "dataLabel": "Email contains",
         "chips": [
-          "Email Template",
-          "Sales Sheet Link",
-          "Load Sheet Attachment",
-          "Send List",
-          "Campaign Name"
+          "Sales Sheet",
+          "Load Sheet",
+          "Vehicle Features",
+          "Availability Data",
+          "Send List"
         ]
       },
       {
         "platform": "Microsoft Teams",
         "role": "Notifications",
-        "action": "Posts a confirmation message to the relevant Teams channel once the email has been successfully created and sent.",
-        "impact": "Gives the team instant visibility into automation completion without needing to log into HubSpot to verify.",
-        "dataLabel": "Notification delivered",
+        "action": "Posts a confirmation message to the designated Teams channel once the HubSpot email has been successfully created and sent.",
+        "impact": "Gives the marketing team instant visibility into send status without logging into HubSpot, keeping the workflow transparent.",
+        "dataLabel": "Notification sent",
         "chips": [
           "Send Confirmation",
-          "Email Name",
+          "Email Preview Link",
+          "Load Sheet Summary",
           "Send Timestamp",
-          "Recipient Count",
-          "Status Flag"
+          "Error Alerts"
         ]
       }
     ],
@@ -478,29 +487,29 @@
       {
         "platform": "Anthropic API",
         "role": "AI Model",
-        "action": "Analyzes new product launch data and generates compelling email copy, subject lines, and sales sheet summaries tailored to DFC's First to Market positioning.",
-        "impact": "Produces launch-ready email content in minutes, enabling DFC to reach customers faster than competitors on new product drops.",
-        "dataLabel": "Email copy generated",
+        "action": "Analyzes new product launch data and generates compelling email copy including headlines, product descriptions, and sales sheet content.",
+        "impact": "Cuts email production time for new launches from hours to minutes, enabling DFC to hit market faster than competitors.",
+        "dataLabel": "Content generated",
         "chips": [
-          "Product Name",
-          "Launch Messaging",
-          "Subject Line",
-          "Sales Sheet Summary",
-          "Monthly Recap Copy"
+          "Email Headline",
+          "Product Description",
+          "Key Selling Points",
+          "Sales Sheet Copy",
+          "Monthly Recap Summary"
         ]
       },
       {
         "platform": "HubSpot API",
-        "role": "CRM / Email Platform",
-        "action": "Creates email drafts in HubSpot using the AI-generated content and attaches relevant sales sheets for review or direct sending.",
-        "impact": "Removes manual email building from the workflow, ensuring every new product gets a polished draft ready for one-click approval and deployment.",
-        "dataLabel": "Draft emails created",
+        "role": "CRM / Email",
+        "action": "Creates email drafts in HubSpot populated with AI-generated copy, attaches sales sheets, and stages them for review or scheduled send.",
+        "impact": "Delivers publish-ready First to Market emails directly into HubSpot without any manual template building or copy-paste work.",
+        "dataLabel": "Records updated",
         "chips": [
           "Email Draft",
-          "Sales Sheet Attached",
-          "Product Launch Tag",
-          "Monthly Recap Flag",
-          "HubSpot Campaign"
+          "Sales Sheet Attachment",
+          "Launch Product Name",
+          "Target Segment",
+          "Campaign Tag"
         ]
       }
     ],
@@ -508,57 +517,57 @@
       {
         "platform": "HubSpot API",
         "role": "CRM",
-        "action": "Extracts lifecycle stage metrics, contact growth, and email performance data for the reporting period.",
-        "impact": "Pulls structured CRM metrics instantly, replacing manual HubSpot report exports that typically take 20\u201330 minutes per pull.",
-        "dataLabel": "CRM metrics extracted",
+        "action": "Pulls lifecycle stage metrics including contact growth, deal pipeline, and email performance data for the reporting period.",
+        "impact": "Aggregates CRM performance data instantly, replacing manual HubSpot report exports that previously took significant time to compile.",
+        "dataLabel": "Data collected",
         "chips": [
-          "Lifecycle Stages",
+          "Lifecycle Stage Counts",
+          "Email Open Rates",
+          "Deal Volume",
           "Contact Growth",
-          "Email Open Rate",
-          "Click Rate",
-          "List Performance"
-        ]
-      },
-      {
-        "platform": "GA4",
-        "role": "Analytics",
-        "action": "Pulls website traffic, conversion, and channel performance data for the monthly reporting window.",
-        "impact": "Delivers accurate web analytics into the deck automatically, eliminating copy-paste errors from manual GA4 reporting.",
-        "dataLabel": "Web analytics data",
-        "chips": [
-          "Sessions",
-          "Conversions",
-          "Channel Breakdown",
-          "Bounce Rate",
-          "Revenue Attributed"
+          "Campaign Performance"
         ]
       },
       {
         "platform": "Attentive",
         "role": "SMS Platform",
-        "action": "Retrieves SMS campaign performance metrics including sends, clicks, revenue, and subscriber growth for the period.",
-        "impact": "Consolidates SMS reporting data without manual platform login, saving time and ensuring SMS slides are always current.",
-        "dataLabel": "SMS performance data",
+        "action": "Extracts SMS campaign performance metrics including send volume, click rates, and revenue attribution for the month.",
+        "impact": "Captures SMS channel data automatically, ensuring the deck reflects full omnichannel performance without manual platform logins.",
+        "dataLabel": "Data collected",
         "chips": [
-          "SMS Sends",
+          "SMS Send Volume",
           "Click Rate",
-          "Revenue Generated",
+          "Revenue Attributed",
           "Subscriber Growth",
-          "Campaign Count"
+          "Campaign Names"
+        ]
+      },
+      {
+        "platform": "GA4",
+        "role": "Analytics",
+        "action": "Retrieves web traffic, conversion, and engagement metrics from Google Analytics 4 for the reporting month.",
+        "impact": "Provides accurate site performance context within the deck, eliminating manual GA4 data pulls and transcription errors.",
+        "dataLabel": "Data collected",
+        "chips": [
+          "Sessions",
+          "Conversion Rate",
+          "Traffic Source",
+          "Bounce Rate",
+          "Revenue Events"
         ]
       },
       {
         "platform": "Google Slides API",
         "role": "Presentation",
-        "action": "Writes all collected metrics directly into slides 48\u201355 of the Marketing Highlights deck, populating charts, tables, and stat callouts.",
-        "impact": "Completes eight slides of the monthly deck automatically, saving hours of manual data entry and formatting work before leadership review.",
+        "action": "Populates slides 48 through 55 of the Marketing Highlights deck with all collected metrics, charts, and formatted data labels.",
+        "impact": "Delivers a fully updated deck section in minutes rather than hours, freeing the marketing team to focus on insights instead of formatting.",
         "dataLabel": "Slides updated",
         "chips": [
-          "Slide 48\u201355",
-          "Metric Values",
-          "Chart Data",
-          "Search Console Stats",
-          "Final Deck Output"
+          "Lifecycle Metrics",
+          "SMS Stats",
+          "Web Traffic Data",
+          "Search Visibility",
+          "Formatted Charts"
         ]
       }
     ],
@@ -566,44 +575,43 @@
       {
         "platform": "Google Search Console",
         "role": "SEO Data",
-        "action": "Identifies R1 Concepts' keyword ranking gaps and traffic opportunities by comparing current performance against competitor benchmarks.",
-        "impact": "Surfaces high-value keyword targets automatically, ensuring every blog produced addresses a real search gap rather than guessing at topics.",
-        "dataLabel": "Keyword gaps identified",
+        "action": "Identifies keyword gaps where R1 Concepts underperforms competitors by analyzing impression, click, and ranking data.",
+        "impact": "Focuses content production on the highest-opportunity search terms, maximizing organic traffic gains with each published post.",
+        "dataLabel": "Data collected",
         "chips": [
-          "Keyword Rankings",
-          "Competitor Gaps",
+          "Keyword Gaps",
+          "Competitor Rankings",
           "Search Volume",
-          "Click Opportunity",
-          "Query Performance"
+          "Impression Data",
+          "Click-Through Rate"
         ]
       },
       {
         "platform": "Anthropic API",
         "role": "AI Model",
-        "action": "Writes fully structured SEO blog posts targeting the identified keyword gaps, including headers, meta descriptions, and Yoast-optimized content.",
-        "impact": "Produces publication-ready, SEO-optimized blog content at scale, dramatically increasing content output without adding headcount.",
-        "dataLabel": "Blog content generated",
+        "action": "Writes SEO-optimized blog articles targeting the identified keyword gaps, structured for Yoast SEO compliance and search intent.",
+        "impact": "Produces publish-ready long-form content at scale, compressing weeks of manual content writing into an automated pipeline.",
+        "dataLabel": "Content generated",
         "chips": [
-          "Blog Title",
+          "Blog Article",
           "Target Keyword",
           "Meta Description",
-          "H2 Structure",
-          "Word Count",
-          "Internal Links"
+          "Header Structure",
+          "Internal Link Suggestions"
         ]
       },
       {
         "platform": "WordPress",
         "role": "CMS",
-        "action": "Publishes the AI-generated blog posts to the R1 Concepts WordPress site with Yoast SEO fields pre-populated and formatting applied.",
-        "impact": "Takes content from draft to live without manual CMS work, compressing the publish cycle and accelerating organic ranking gains.",
-        "dataLabel": "Blog posts published",
+        "action": "Publishes the AI-generated article to the R1 Concepts WordPress site with Yoast SEO fields populated including meta title, description, and focus keyword.",
+        "impact": "Gets SEO content live immediately after generation with zero manual publishing steps, accelerating the brand's search visibility growth.",
+        "dataLabel": "Records updated",
         "chips": [
-          "Published URL",
+          "Published Post",
           "Yoast SEO Score",
-          "Focus Keyword Set",
-          "Publish Timestamp",
-          "Category Tag"
+          "Focus Keyword",
+          "Meta Title",
+          "Publish Timestamp"
         ]
       }
     ],
@@ -611,29 +619,29 @@
       {
         "platform": "Dream ERP",
         "role": "ERP System",
-        "action": "Exports open purchase order data including vendor details, PO numbers, due dates, and outstanding quantities for processing.",
-        "impact": "Captures the full PO follow-up list directly from the source of truth, eliminating manual export and formatting steps.",
-        "dataLabel": "PO data exported",
+        "action": "Exports open vendor purchase order data including PO numbers, due dates, vendor names, and outstanding quantities.",
+        "impact": "Captures the full vendor follow-up workload automatically, removing the need for manual ERP report generation and data extraction.",
+        "dataLabel": "Data collected",
         "chips": [
-          "PO Number",
-          "Vendor Name",
-          "Due Date",
+          "PO Numbers",
+          "Vendor Names",
+          "Due Dates",
           "Outstanding Qty",
-          "Order Value"
+          "Order Status"
         ]
       },
       {
         "platform": "HubSpot API",
         "role": "CRM",
-        "action": "Transforms and uploads the processed PO data into HubSpot as vendor records or tasks, triggering automated chase email sequences.",
-        "impact": "Converts raw ERP data into actionable vendor follow-up workflows automatically, ensuring no overdue PO falls through the cracks.",
-        "dataLabel": "Records uploaded & triggered",
+        "action": "Transforms the ERP export data and uploads it to HubSpot, creating or updating vendor contact records and enrolling them in the PO chase email sequence.",
+        "impact": "Automates the entire vendor follow-up pipeline, ensuring no overdue PO is missed and saving hours of manual outreach coordination per week.",
+        "dataLabel": "Records updated",
         "chips": [
-          "Vendor Contact Record",
-          "PO Reference",
-          "Chase Email Triggered",
-          "Follow-up Date",
-          "Overdue Flag"
+          "Vendor Records",
+          "PO Details",
+          "Chase Email Enrolled",
+          "Follow-Up Date",
+          "Outstanding Balance"
         ]
       }
     ],
@@ -641,59 +649,59 @@
       {
         "platform": "Local browser tool (standalone HTML)",
         "role": "Browser Tool",
-        "action": "Accepts MHM vehicle part number inputs and matches them against the embedded New Availability Guide logic within the browser.",
-        "impact": "Gives any team member instant load sheet generation on-demand without needing external tools, logins, or technical setup.",
-        "dataLabel": "Data matched in browser",
+        "action": "Accepts MHM vehicle part number inputs, matches them against the embedded New Availability Guide logic, and validates availability status for each line.",
+        "impact": "Gives any team member the ability to generate accurate load sheets instantly without ERP access, spreadsheet skills, or IT support.",
+        "dataLabel": "Data collected",
         "chips": [
-          "Part Numbers Entered",
-          "Availability Match",
-          "Vehicle Name",
-          "Stock Status",
-          "Match Results"
+          "Part Numbers",
+          "Vehicle Names",
+          "Availability Status",
+          "Match Results",
+          "SKU Details"
         ]
       },
       {
         "platform": "Local browser tool (standalone HTML)",
         "role": "Browser Tool",
-        "action": "Exports the matched and formatted results as a structured Excel load sheet file ready for use in sales or fulfillment workflows.",
-        "impact": "Delivers a clean, properly formatted load sheet in one click, removing manual spreadsheet building and formatting time entirely.",
-        "dataLabel": "Excel file exported",
+        "action": "Formats the matched data into a DFC-standard load sheet structure and exports it as a downloadable Excel file.",
+        "impact": "Produces a submission-ready load sheet in seconds, eliminating manual formatting and reducing load sheet errors that delay order fulfillment.",
+        "dataLabel": "Export produced",
         "chips": [
           "Formatted Load Sheet",
           "Excel File",
-          "Part Number List",
-          "Availability Column",
+          "Part Number Rows",
+          "Availability Columns",
           "Export Timestamp"
         ]
       }
     ],
     "MHM Attentive SMS Automation": [
       {
-        "platform": "Attentive (Chrome automation, no API)",
+        "platform": "Attentive (Chrome automation)",
         "role": "SMS Platform",
-        "action": "Opens Attentive in Chrome, locates the previous week's MHM SMS campaign, and clones it as the starting point for the new campaign.",
-        "impact": "Eliminates repetitive campaign setup by reusing proven structure, cutting campaign creation time from 15+ minutes to under a minute.",
-        "dataLabel": "Campaign cloned",
+        "action": "Logs into Attentive via Chrome browser automation, locates the previous MHM SMS campaign, and clones it to create a new campaign shell.",
+        "impact": "Eliminates manual campaign setup in Attentive each week, saving repetitive configuration time and reducing the risk of setup errors.",
+        "dataLabel": "Data collected",
         "chips": [
           "Previous Campaign ID",
-          "Clone Action",
-          "Campaign Template",
-          "SMS Content",
-          "Attentive UI"
+          "Clone Template",
+          "Campaign Structure",
+          "Audience Segment",
+          "Prior Send Time"
         ]
       },
       {
-        "platform": "Attentive (Chrome automation, no API)",
+        "platform": "Attentive (Chrome automation)",
         "role": "SMS Platform",
-        "action": "Updates the cloned campaign with the current week's MHM vehicle name and sets the correct scheduled send time before saving.",
-        "impact": "Ensures every weekly SMS campaign is accurate and scheduled on time without any manual editing or risk of copy-paste errors.",
-        "dataLabel": "Campaign updated & scheduled",
+        "action": "Updates the cloned campaign with the current week's MHM vehicle name in the message body and sets the new scheduled send time.",
+        "impact": "Ensures every weekly MHM SMS goes out with accurate vehicle details and correct timing without any manual Attentive interaction.",
+        "dataLabel": "Records updated",
         "chips": [
-          "Vehicle Name Updated",
-          "Send Time Set",
+          "Vehicle Name",
+          "SMS Message Body",
+          "Scheduled Send Time",
           "Campaign Name",
-          "Schedule Confirmed",
-          "Weekly MHM Tag"
+          "Updated Preview"
         ]
       }
     ],
@@ -701,43 +709,43 @@
       {
         "platform": "Dream ERP",
         "role": "ERP System",
-        "action": "Exports DFC sales transaction data including customer purchase history, order frequency, product mix, and revenue figures.",
-        "impact": "Provides the complete sales dataset needed for segmentation and analysis without manual reporting pulls from the ERP.",
-        "dataLabel": "Sales data exported",
+        "action": "Exports DFC sales transaction data including order history, customer purchase frequency, product mix, and revenue by account.",
+        "impact": "Provides the complete sales data foundation needed to power segmentation and campaign targeting without manual reporting pulls.",
+        "dataLabel": "Data collected",
         "chips": [
-          "Customer Orders",
-          "Purchase History",
-          "Product SKUs",
-          "Revenue",
-          "Order Frequency"
+          "Order History",
+          "Customer Revenue",
+          "Purchase Frequency",
+          "Product Mix",
+          "Last Order Date"
         ]
       },
       {
         "platform": "HubSpot API",
-        "role": "CRM",
-        "action": "Segments customers into dashboards by behavior \u2014 active buyers, reorder candidates, cross-sell targets, and win-back prospects \u2014 and enrolls them in appropriate email sequences.",
-        "impact": "Transforms raw sales data into targeted, automated campaigns that surface revenue opportunities and re-engage lapsed customers without manual list building.",
-        "dataLabel": "Segments created & emails triggered",
+        "role": "CRM / Email",
+        "action": "Segments customers into reorder, cross-sell, and win-back audiences based on ERP data and enrolls each segment in the appropriate automated email campaign.",
+        "impact": "Activates personalized revenue recovery and growth campaigns automatically, turning raw sales data into targeted outreach without manual list building.",
+        "dataLabel": "Records updated",
         "chips": [
-          "Customer Segment",
-          "Reorder Reminder",
-          "Cross-sell Campaign",
-          "Win-back Enrolled",
-          "HubSpot Sequence"
+          "Customer Segments",
+          "Reorder Candidates",
+          "Win-Back List",
+          "Cross-Sell Targets",
+          "Enrollment Status"
         ]
       },
       {
         "platform": "Attentive SMS",
         "role": "SMS Platform",
-        "action": "Sends targeted SMS messages to high-priority segments such as win-back prospects or urgent reorder reminders based on HubSpot segmentation outputs.",
-        "impact": "Reaches customers on a high-engagement channel for time-sensitive campaigns, increasing response rates beyond email alone.",
-        "dataLabel": "SMS campaigns sent",
+        "action": "Triggers SMS campaigns to high-priority segments such as lapsed customers and reorder candidates to complement the HubSpot email sequences.",
+        "impact": "Adds an SMS touchpoint to the outreach mix, increasing customer response rates and revenue recovery through multi-channel campaign coverage.",
+        "dataLabel": "Campaign sent",
         "chips": [
-          "SMS Recipient List",
-          "Win-back Message",
-          "Reorder Prompt",
+          "SMS Message",
+          "Target Segment",
+          "Personalized Offer",
           "Send Timestamp",
-          "Campaign Type"
+          "Click Tracking"
         ]
       }
     ],
@@ -746,43 +754,43 @@
         "platform": "Microsoft Teams",
         "role": "File Monitor",
         "action": "Monitors a designated Teams channel for a new Excel file uploaded by William Nguyen each week.",
-        "impact": "Eliminates manual file-checking and ensures the automation triggers only when fresh session data is available, removing delays between file upload and email deployment.",
+        "impact": "Eliminates manual file checking and ensures the automation triggers only when fresh session data is available, removing delays in campaign prep.",
         "dataLabel": "Data collected",
         "chips": [
-          "Excel File",
+          "Excel File Upload",
           "Sender: William Nguyen",
-          "Upload Timestamp",
           "File Name",
-          "Channel Detected"
+          "Upload Timestamp",
+          "Channel Trigger"
         ]
       },
       {
         "platform": "HubSpot File Manager",
-        "role": "Asset Manager",
-        "action": "Uploads the new Excel file to HubSpot File Manager and generates a public download URL to replace the previous week's link.",
-        "impact": "Ensures subscribers always receive a live, current download link without manual asset management or broken URLs from outdated files.",
-        "dataLabel": "Asset stored",
+        "role": "Asset Management",
+        "action": "Uploads the new Excel file to HubSpot File Manager and generates a fresh public download URL to replace the previous week's link.",
+        "impact": "Ensures subscribers always receive a working, up-to-date download link without manual asset management or broken URLs.",
+        "dataLabel": "Records updated",
         "chips": [
-          "New File URL",
-          "Previous URL Replaced",
-          "File Version",
-          "Public Link Generated",
-          "Upload Confirmed"
+          "File Upload",
+          "Download URL",
+          "Asset Version",
+          "Public Link",
+          "File ID"
         ]
       },
       {
         "platform": "HubSpot API",
         "role": "Email Automation",
-        "action": "Clones the previous week's Super Session Saturday email, swaps the download link with the new file URL, and schedules send for Saturday at 8AM.",
-        "impact": "Delivers a fully updated weekly email to the DFC audience on a consistent schedule with zero manual production time, maintaining brand consistency across every send.",
+        "action": "Clones the previous week's Super Session Saturday email, swaps in the new download link, and schedules the send for Saturday at 8AM.",
+        "impact": "Delivers a consistent, on-brand weekly email to the full list every Saturday without any manual design or scheduling work, saving 1\u20132 hours of campaign setup per week.",
         "dataLabel": "Email contains",
         "chips": [
           "Cloned Template",
           "New Download Link",
-          "Scheduled 8AM Saturday",
+          "Scheduled Send 8AM",
           "Recipient List",
-          "Subject Line",
-          "Send Confirmed"
+          "Campaign Name",
+          "Send Date"
         ]
       }
     ],
@@ -790,121 +798,122 @@
       {
         "platform": "Anthropic API",
         "role": "AI Model",
-        "action": "Generates SEO-optimized B2B blog content targeting DFC's core audiences including shops, distributors, and fleets using keyword and topic inputs.",
-        "impact": "Produces publication-ready blog drafts at scale without copywriter hours, enabling DFC to compete for high-intent search traffic across multiple audience segments simultaneously.",
-        "dataLabel": "Content produced",
+        "action": "Generates SEO-optimized B2B blog content targeting DFC's core audiences \u2014 shops, distributors, and fleets \u2014 based on keyword and topic inputs.",
+        "impact": "Produces publication-ready blog drafts in minutes instead of days, scaling content output without adding headcount and building consistent organic search presence.",
+        "dataLabel": "Analysis produced",
         "chips": [
           "Target Keywords",
           "Audience Segment",
           "Blog Draft",
           "Meta Description",
           "SEO Title",
-          "Internal Links"
+          "Internal Link Suggestions"
         ]
       },
       {
         "platform": "WordPress",
         "role": "CMS",
-        "action": "Receives the generated blog content and publishes or stages it as a new post with SEO metadata applied.",
-        "impact": "Keeps DFC's blog consistently updated with search-optimized content, building domain authority and driving organic inbound leads from shops, fleets, and distributors over time.",
-        "dataLabel": "Post published",
+        "action": "Receives the AI-generated content and publishes or stages the blog post with proper formatting, categories, and SEO metadata.",
+        "impact": "Keeps the DFC blog consistently populated with indexed, search-ready content that drives inbound traffic from shops, fleets, and distributors.",
+        "dataLabel": "Records updated",
         "chips": [
           "Post Title",
-          "Slug/URL",
-          "Category Tagged",
+          "Body Content",
+          "Category Tags",
           "Publish Status",
-          "Meta Tags",
-          "Author Assigned"
+          "SEO Metadata",
+          "Featured Image Slot"
         ]
       }
     ],
     "Friction Friday Automation": [
       {
-        "platform": "YouTube + Bing Images + Wikipedia",
+        "platform": "YouTube + Bing + Wikimedia + Wikipedia",
         "role": "Web Scraper",
-        "action": "Scrapes YouTube for existing Friction Friday video formats, pulls reference images from Bing Images, and retrieves vehicle background information from Wikipedia and Wikimedia Commons.",
-        "impact": "Eliminates hours of manual research by automatically gathering all reference material needed to produce an informed, on-brand video package before any content is created.",
+        "action": "Scrapes YouTube for existing Friction Friday-style videos, pulls reference images from Bing and Wikimedia, and fetches vehicle background info from Wikipedia using Puppeteer.",
+        "impact": "Eliminates hours of manual research by automatically gathering all raw reference content, visuals, and vehicle context needed to produce a fully informed video package.",
         "dataLabel": "Data collected",
         "chips": [
           "Vehicle Year/Make/Model",
-          "Reference Images",
-          "Wikipedia Summary",
-          "Competitor Video Formats",
-          "Wikimedia Assets"
+          "Reference Video Titles",
+          "Thumbnail Images",
+          "Wiki Vehicle Info",
+          "Scraped Image URLs"
         ]
       },
       {
         "platform": "Claude API",
         "role": "AI Model",
-        "action": "Uses the scraped vehicle data and research to write a complete Friction Friday video script in the established format, including narration, segment structure, and thumbnail copy.",
-        "impact": "Produces a fully structured, on-brand script in seconds, removing the need for a copywriter and ensuring consistent episode formatting across every vehicle.",
+        "action": "Receives all scraped reference data and vehicle specs, then generates a complete Friction Friday video script with voiceover-ready narration, section breaks, and thumbnail copy.",
+        "impact": "Produces a publish-ready script in seconds that would otherwise take a content writer 2\u20134 hours, maintaining a consistent show format across every episode.",
         "dataLabel": "Script produced",
         "chips": [
-          "Video Script",
-          "Thumbnail Text",
-          "Episode Segments",
-          "Narration Copy",
-          "Vehicle Highlights"
+          "Full Video Script",
+          "Section Timestamps",
+          "Thumbnail Headline",
+          "Narration Tone",
+          "Vehicle Context Summary"
         ]
       },
       {
         "platform": "ElevenLabs",
-        "role": "Voice AI",
-        "action": "Converts the Claude-generated script into a finished voiceover audio file using a consistent AI voice persona.",
-        "impact": "Delivers a broadcast-ready voiceover in minutes without scheduling a recording session, keeping episode production on a fast, repeatable cadence.",
+        "role": "Voice Synthesis",
+        "action": "Converts the Claude-generated script into a natural-sounding voiceover audio file using a consistent show voice.",
+        "impact": "Delivers studio-quality narration without a recording session, keeping episode production time under an hour regardless of vehicle complexity.",
         "dataLabel": "Audio produced",
         "chips": [
-          "Voiceover Audio File",
-          "Voice Persona",
-          "Narration Timing",
-          "MP3 Export"
+          "MP3 Voiceover File",
+          "Voice Profile",
+          "Script Text Input",
+          "Audio Duration",
+          "Narration Segments"
         ]
       },
       {
         "platform": "Google Sheets",
-        "role": "Output Hub",
-        "action": "Logs the completed video package assets \u2014 script, voiceover file link, thumbnail, and assembled video \u2014 into a tracking sheet via Apps Script webhook for review and publishing.",
-        "impact": "Centralizes every deliverable in one place so the team can review, approve, and publish without hunting across multiple tools or folders.",
-        "dataLabel": "Package logged",
+        "role": "Output Logger",
+        "action": "Receives the completed video package \u2014 script, audio file link, thumbnail asset, and assembled video \u2014 via an Apps Script webhook and logs everything into a structured row for review and publishing.",
+        "impact": "Creates a single organized hub where the team can track every episode's assets, status, and publish-readiness without digging through folders or inboxes.",
+        "dataLabel": "Records updated",
         "chips": [
+          "Episode Title",
           "Script Link",
-          "Voiceover File URL",
+          "Voiceover URL",
           "Thumbnail Asset",
           "Video File Link",
-          "Vehicle Record",
-          "Status Flag"
+          "Publish Status"
         ]
       }
     ],
     "R1 HubSpot Workflow Optimization": [
       {
         "platform": "HubSpot API",
-        "role": "CRM Audit",
-        "action": "Pulls all existing R1 Concepts HubSpot workflows and audits enrollment triggers, delays, branch logic, and email sequences for site visit and welcome series flows.",
-        "impact": "Identifies broken logic, redundant steps, or mis-timed triggers that suppress lead conversion, enabling targeted fixes that improve welcome series completion rates and site-visit follow-up speed.",
-        "dataLabel": "Audit produced",
+        "role": "CRM",
+        "action": "Audits all active R1 Concepts HubSpot workflows \u2014 including site visit triggers and welcome series \u2014 to identify logic gaps, redundant steps, and enrollment errors.",
+        "impact": "Uncovers revenue leaks where leads fall out of nurture sequences or receive incorrect messaging, allowing targeted fixes that improve conversion rates.",
+        "dataLabel": "Analysis produced",
         "chips": [
           "Workflow List",
-          "Trigger Conditions",
-          "Enrollment Gaps",
-          "Delay Timing",
-          "Email Sequence",
-          "Branch Logic"
+          "Enrollment Triggers",
+          "Logic Conditions",
+          "Contact Segments",
+          "Error Flags",
+          "Email Steps"
         ]
       },
       {
         "platform": "HubSpot API",
-        "role": "CRM Optimization",
-        "action": "Implements optimized workflow configurations including corrected triggers, updated delays, and improved branching for welcome series and site visit automations.",
-        "impact": "Ensures every new lead and site visitor enters the correct nurture path immediately, reducing drop-off and improving the consistency of R1's automated customer experience at scale.",
+        "role": "CRM",
+        "action": "Applies optimized trigger conditions, updated enrollment criteria, and revised email sequences across site visit and welcome workflows.",
+        "impact": "Ensures every new lead and site visitor receives the right message at the right time, improving engagement rates and reducing manual workflow maintenance.",
         "dataLabel": "Records updated",
         "chips": [
           "Updated Triggers",
-          "Revised Delays",
-          "Welcome Series Fix",
-          "Site Visit Flow",
-          "Workflow Status",
-          "Contacts Affected"
+          "Revised Enrollment",
+          "New Delay Steps",
+          "Welcome Series",
+          "A/B Test Flags",
+          "Go-Live Status"
         ]
       }
     ],
@@ -912,8 +921,8 @@
       {
         "platform": "Dream ERP",
         "role": "ERP System",
-        "action": "Exports DFC customer records including Dream CustomerIDs, contact details, and account attributes for mapping to HubSpot.",
-        "impact": "Creates a clean, structured data foundation that connects ERP purchase history and account data to marketing automation, enabling sales workflows to act on real customer behavior.",
+        "action": "Extracts customer records including Dream CustomerIDs, contact details, and account metadata for all DFC accounts in the ERP.",
+        "impact": "Creates a clean, structured data export that serves as the authoritative source for matching customer identities across systems.",
         "dataLabel": "Data collected",
         "chips": [
           "Dream CustomerID",
@@ -921,22 +930,22 @@
           "Email Address",
           "Account Type",
           "Purchase History",
-          "Account Status"
+          "Company Name"
         ]
       },
       {
         "platform": "HubSpot API",
         "role": "CRM",
-        "action": "Maps each Dream CustomerID to the corresponding HubSpot contact record and updates custom properties to enable segmentation and workflow triggers.",
-        "impact": "Unlocks DFC's ability to run personalized, ERP-data-driven sales automation workflows targeting the right contacts based on actual purchasing relationships and account history.",
+        "action": "Maps each Dream CustomerID to the corresponding HubSpot contact record and writes the ID as a custom property for use in sales automation workflows.",
+        "impact": "Connects DFC's ERP purchase data to HubSpot CRM, enabling automated sales workflows to trigger based on real customer behavior and purchase history.",
         "dataLabel": "Records updated",
         "chips": [
-          "CustomerID Mapped",
-          "Custom Property Set",
-          "Contact Matched",
-          "Segment Eligible",
-          "Workflow Trigger Ready",
-          "Duplicate Check"
+          "HubSpot Contact ID",
+          "Dream CustomerID",
+          "Custom Property",
+          "Match Status",
+          "Workflow Eligibility",
+          "Sync Timestamp"
         ]
       }
     ],
@@ -944,14 +953,13 @@
       {
         "platform": "TBD",
         "role": "Planning",
-        "action": "Project is currently in the planning stage with connections and scope not yet defined.",
-        "impact": "Early-stage scoping ensures the automation is designed with clear objectives before build, reducing rework and aligning stakeholders on expected outcomes.",
-        "dataLabel": "Planning notes",
+        "action": "Project is currently in planning stage with no defined connections or workflow steps established yet.",
+        "impact": "Early scoping ensures the right tools and integrations are selected before build begins, reducing rework and accelerating future execution.",
+        "dataLabel": "Data collected",
         "chips": [
-          "Scope TBD",
-          "Connections TBD",
-          "In Planning",
-          "Not Yet Active"
+          "Project Status: Planning",
+          "Connections: TBD",
+          "Scope Undefined"
         ]
       }
     ],
@@ -959,155 +967,170 @@
       {
         "platform": "YouTube",
         "role": "Content Source",
-        "action": "Detects the latest R1 Concepts YouTube video and extracts the title, URL, transcript, and thumbnail for downstream content production.",
-        "impact": "Automatically triggers the full weekly content pipeline the moment a video is published, eliminating manual handoffs and compressing production time from hours to minutes.",
+        "action": "Detects the latest R1 Concepts YouTube upload and extracts the video URL, title, description, and transcript for downstream content creation.",
+        "impact": "Instantly captures new video content at publish time and triggers the full multi-channel distribution workflow without any manual handoff.",
         "dataLabel": "Data collected",
         "chips": [
           "Video URL",
           "Video Title",
           "Transcript",
-          "Thumbnail",
+          "Thumbnail URL",
           "Publish Date",
-          "Channel Source"
+          "Video Description"
         ]
       },
       {
         "platform": "WordPress",
         "role": "CMS",
-        "action": "Publishes an SEO-formatted blog post derived from the video transcript with embedded video, meta tags, and structured content.",
-        "impact": "Converts every video into a long-lived search asset that drives organic traffic to R1's site from audiences who discover content through Google rather than YouTube.",
-        "dataLabel": "Post published",
+        "action": "Generates and publishes an SEO blog post from the video transcript, embedding the video and structured written content.",
+        "impact": "Turns every YouTube video into a searchable long-form asset, compounding organic traffic value from content R1 is already producing.",
+        "dataLabel": "Records updated",
         "chips": [
-          "Blog Title",
-          "SEO Meta",
+          "Blog Post",
           "Embedded Video",
-          "Written Summary",
-          "Publish Status",
-          "Category Tag"
+          "SEO Metadata",
+          "Body Content",
+          "Category",
+          "Publish Status"
         ]
       },
       {
         "platform": "HubSpot API",
         "role": "Email Automation",
-        "action": "Generates and sends a weekly email to R1's HubSpot contact list featuring the new video, blog post link, and key callouts.",
-        "impact": "Maintains consistent weekly touchpoints with R1's customer and prospect base, driving return visits and reinforcing brand authority through regular value-added content.",
+        "action": "Builds and deploys a weekly branded email to R1's contact list featuring the new video and a link to the blog post.",
+        "impact": "Keeps R1's email list engaged with fresh weekly content and drives measurable traffic back to R1 owned channels with no manual email build required.",
         "dataLabel": "Email contains",
         "chips": [
-          "Video Link",
-          "Blog URL",
-          "Email Subject",
-          "Audience Segment",
-          "CTA Button",
-          "Send Timestamp"
+          "Video Thumbnail",
+          "Subject Line",
+          "Blog CTA",
+          "Contact List",
+          "Send Schedule",
+          "Campaign Tag"
         ]
       },
       {
         "platform": "Attentive SMS",
         "role": "SMS Platform",
-        "action": "Sends a weekly SMS to R1's subscriber list with a short message and direct link to the new video or blog post.",
-        "impact": "Captures mobile-first customers who may not open email, boosting total weekly content reach and driving measurable traffic spikes tied to each video release.",
-        "dataLabel": "SMS contains",
+        "action": "Sends an automated SMS to opted-in R1 subscribers linking directly to the new video or blog post.",
+        "impact": "Maximizes reach for each content drop by hitting mobile subscribers through a channel with near-instant open rates, driving additional views and site sessions.",
+        "dataLabel": "Email contains",
         "chips": [
           "SMS Copy",
-          "Video URL",
+          "Short Link",
           "Subscriber Segment",
           "Send Time",
-          "Delivery Status",
-          "Opt-in List"
+          "Opt-In List",
+          "Video Reference"
         ]
       }
     ],
     "DFC Blog Agent Reporting": [
       {
         "platform": "Google Search Console",
-        "role": "SEO Data",
-        "action": "Pulls weekly keyword ranking data, impressions, clicks, and average position for all DFC blog URLs.",
-        "impact": "Provides ground-truth SEO performance data that shows which topics are gaining search visibility and which need optimization, enabling data-driven editorial decisions.",
+        "role": "SEO Analytics",
+        "action": "Pulls weekly keyword rankings, impressions, clicks, and average position data for all DFC blog URLs.",
+        "impact": "Gives the team a clear view of which blog topics are gaining search traction and where ranking improvements are driving real traffic growth.",
         "dataLabel": "Data collected",
         "chips": [
           "Keyword Rankings",
           "Impressions",
           "Click-Through Rate",
-          "Avg Position",
-          "Blog URLs",
+          "Avg. Position",
+          "Blog URL Performance",
           "Query Data"
         ]
       },
       {
         "platform": "GA4",
-        "role": "Analytics",
-        "action": "Retrieves weekly blog traffic metrics including sessions, users, bounce rate, time on page, and goal conversions attributed to blog content.",
-        "impact": "Connects SEO visibility to actual business outcomes by showing how blog traffic translates into engaged users and downstream conversions for DFC.",
+        "role": "Web Analytics",
+        "action": "Retrieves session data, traffic sources, time on page, and conversion events tied to DFC blog content.",
+        "impact": "Connects SEO performance to actual business outcomes by showing which blog posts drive qualified sessions and downstream conversions.",
         "dataLabel": "Analysis produced",
         "chips": [
           "Sessions",
-          "Unique Users",
+          "Traffic Source",
           "Bounce Rate",
           "Time on Page",
-          "Conversions",
-          "Traffic Source"
+          "Conversion Events",
+          "New vs Returning"
         ]
       },
       {
         "platform": "WordPress",
         "role": "CMS",
-        "action": "Pulls post-level metadata including publish dates, word counts, post counts, and Yoast SEO scores across all DFC blog content.",
-        "impact": "Tracks content production efficiency and quality benchmarks, ensuring the blog agent is hitting output targets and maintaining SEO standards across every published post.",
-        "dataLabel": "Records reviewed",
+        "action": "Provides post-level metadata including publish dates, categories, word count, and update history to correlate content attributes with performance.",
+        "impact": "Identifies which content types and topics drive the best results, informing smarter future content decisions for the DFC blog.",
+        "dataLabel": "Records updated",
         "chips": [
           "Post Count",
           "Publish Dates",
           "Word Count",
-          "Yoast SEO Score",
           "Category Breakdown",
-          "Draft vs Published"
+          "Update Log",
+          "Author Data"
+        ]
+      },
+      {
+        "platform": "Yoast",
+        "role": "SEO Plugin",
+        "action": "Exports on-page SEO scores, readability grades, and focus keyword optimization status for each published DFC blog post.",
+        "impact": "Surfaces posts with low SEO scores that are underperforming, prioritizing which content needs optimization to unlock better rankings.",
+        "dataLabel": "Analysis produced",
+        "chips": [
+          "SEO Score",
+          "Readability Grade",
+          "Focus Keyword",
+          "Meta Status",
+          "Optimization Flags",
+          "Schema Status"
         ]
       }
     ],
     "R1 Blog Agent Reporting": [
       {
         "platform": "Google Search Console",
-        "role": "SEO Data",
-        "action": "Pulls monthly keyword ranking trends, impressions, clicks, and position changes for all R1 Concepts blog content.",
-        "impact": "Gives R1 a clear monthly view of SEO momentum, identifying which posts are climbing in rankings and contributing to organic growth goals.",
+        "role": "SEO Analytics",
+        "action": "Pulls monthly keyword ranking trends, impressions, and click data for all R1 Concepts blog posts.",
+        "impact": "Tracks month-over-month SEO growth and identifies which R1 content topics are gaining authority in search, guiding future content strategy.",
         "dataLabel": "Data collected",
         "chips": [
           "Keyword Rankings",
           "Monthly Impressions",
           "Clicks",
-          "Avg Position",
-          "Position Change",
+          "Avg. Position",
+          "URL Performance",
           "Top Queries"
         ]
       },
       {
         "platform": "GA4",
-        "role": "Analytics",
-        "action": "Retrieves monthly blog traffic performance including sessions, new users, engagement rate, and any conversion events tied to blog-sourced visits.",
-        "impact": "Demonstrates the business impact of R1's blog investment by connecting organic traffic volume to user engagement and measurable on-site conversion activity.",
+        "role": "Web Analytics",
+        "action": "Retrieves monthly blog traffic metrics including sessions, engagement rate, and goal completions attributed to blog content.",
+        "impact": "Demonstrates the business impact of the R1 blog program by tying content investment directly to measurable traffic and conversion outcomes.",
         "dataLabel": "Analysis produced",
         "chips": [
           "Monthly Sessions",
-          "New Users",
           "Engagement Rate",
-          "Conversions",
-          "Bounce Rate",
-          "Traffic Trend"
+          "Goal Completions",
+          "Traffic Source",
+          "Top Blog Pages",
+          "New Users"
         ]
       },
       {
         "platform": "WordPress",
         "role": "CMS",
-        "action": "Audits the R1 blog for total published posts, monthly output volume, content categories, and post-level performance metadata.",
-        "impact": "Provides a production efficiency snapshot that helps stakeholders understand content velocity and ensures the blogging cadence aligns with monthly SEO and traffic targets.",
-        "dataLabel": "Records reviewed",
+        "action": "Provides a monthly content inventory report including posts published, categories covered, and update cadence for the R1 blog.",
+        "impact": "Gives stakeholders a clear picture of content volume and consistency, making it easy to evaluate the agent's output efficiency over time.",
+        "dataLabel": "Records updated",
         "chips": [
           "Posts Published",
-          "Monthly Output",
-          "Category Mix",
+          "Categories",
+          "Publish Cadence",
           "Word Count Avg",
-          "Publish Schedule",
-          "Author Activity"
+          "Content Age",
+          "Update Frequency"
         ]
       }
     ],
@@ -1116,45 +1139,45 @@
         "platform": "Email (Outlook)",
         "role": "Email",
         "action": "Monitors the Outlook inbox for incoming vendor PO invoice emails and extracts attached PDF files for processing.",
-        "impact": "Eliminates manual inbox monitoring and PDF download steps, ensuring every incoming vendor invoice is immediately routed into the stamping and signing pipeline without human intervention.",
+        "impact": "Eliminates manual inbox monitoring and PDF downloading, ensuring every invoice is captured and processed immediately upon arrival.",
         "dataLabel": "Data collected",
         "chips": [
-          "Vendor Email",
-          "PDF Attachment",
-          "Invoice Received",
-          "Sender Name",
-          "Email Timestamp",
-          "PO Reference"
+          "Sender Email",
+          "Invoice PDF",
+          "Attachment Name",
+          "Receive Timestamp",
+          "Vendor Name",
+          "Invoice Number"
+        ]
+      },
+      {
+        "platform": "Python",
+        "role": "Automation Script",
+        "action": "Processes each extracted PDF by applying the Harbor Tires stamp image and Richard's signature to the correct position on the document.",
+        "impact": "Completes in seconds what previously required manual PDF editing or printing and scanning, handling high invoice volumes without errors or delays.",
+        "dataLabel": "Analysis produced",
+        "chips": [
+          "Stamp Placement",
+          "Signature Applied",
+          "Page Coordinates",
+          "PDF Version",
+          "Processing Status",
+          "File Output"
         ]
       },
       {
         "platform": "PDF Tools",
         "role": "Document Processing",
-        "action": "Applies the Harbor Tires stamp and Richard's signature image to the designated fields on each vendor PO invoice PDF.",
-        "impact": "Processes invoices in seconds with consistent stamp and signature placement, eliminating the manual print-sign-scan cycle and reducing approval turnaround from hours to near-instant.",
-        "dataLabel": "Document processed",
+        "action": "Saves the stamped and signed PDF as a finalized document and prepares it for return delivery or filing.",
+        "impact": "Produces a clean, professional, audit-ready signed invoice document that meets vendor requirements without any manual touch.",
+        "dataLabel": "Records updated",
         "chips": [
-          "Stamp Applied",
-          "Signature Applied",
-          "Page Position",
-          "PDF Modified",
-          "Vendor Invoice",
-          "Approval Ready"
-        ]
-      },
-      {
-        "platform": "Python",
-        "role": "Automation Engine",
-        "action": "Orchestrates the full workflow: triggers on new email detection, coordinates PDF stamping, and routes the completed document back out via Outlook.",
-        "impact": "Ties every step into a fully automated, repeatable process that handles any volume of incoming invoices without additional labor, ensuring no PO is delayed due to manual signing backlogs.",
-        "dataLabel": "Workflow executed",
-        "chips": [
-          "Trigger Logic",
-          "File Routing",
-          "Error Handling",
-          "Processing Log",
-          "Output File",
-          "Completion Status"
+          "Signed PDF",
+          "Stamp Confirmed",
+          "Output File Name",
+          "Completion Timestamp",
+          "File Size",
+          "Storage Path"
         ]
       }
     ],
@@ -1162,118 +1185,117 @@
       {
         "platform": "Google Search Console",
         "role": "Analytics",
-        "action": "Tracks and identifies which DFC prospect pages are being visited and by whom, feeding behavioral signals into the workflow.",
-        "impact": "Captures high-intent prospect behavior in real time, ensuring no warm lead goes unnoticed based on page engagement.",
+        "action": "Tracks prospect visits to specific DFC pages and surfaces which pages triggered workflow enrollment across 6 Phase 1 triggers.",
+        "impact": "Identifies high-intent prospects at the moment of engagement, enabling timely follow-up before interest cools.",
         "dataLabel": "Data collected",
         "chips": [
           "Page URL visited",
           "Visit timestamp",
-          "User identity signal",
-          "Search query source",
-          "Session frequency"
+          "Prospect identity",
+          "Trigger type",
+          "Session source"
         ]
       },
       {
-        "platform": "HubSpot API",
+        "platform": "HubSpot",
         "role": "CRM / Automation",
-        "action": "Triggers one of 6 Phase 1 workflow sequences based on which specific prospect page was visited, enrolling the contact and sending a targeted follow-up email.",
-        "impact": "Delivers contextually relevant outreach automatically, replacing manual follow-up and increasing response rates by reaching prospects while intent is highest.",
+        "action": "Enrolls the prospect into the appropriate workflow based on which DFC page was visited and sends a targeted automated email sequence.",
+        "impact": "Delivers personalized outreach at scale without manual SDR effort, increasing response rates by reaching prospects with context-relevant messaging.",
         "dataLabel": "Email contains",
         "chips": [
           "Trigger page matched",
-          "Workflow phase",
-          "Contact enrolled",
-          "Email sequence fired",
-          "Follow-up timing",
-          "Prospect segment"
+          "Contact record",
+          "Email sequence phase",
+          "Workflow branch",
+          "Send timestamp",
+          "Personalization tokens"
         ]
       }
     ],
     "R1 AI Ticketing Automation": [
       {
         "platform": "Support Inbox",
-        "role": "Ticket Source",
-        "action": "Receives incoming customer support requests and queues them for AI triage and classification.",
-        "impact": "Centralizes all inbound support volume so no ticket is missed and every request enters a structured resolution pipeline.",
+        "role": "Intake",
+        "action": "Captures incoming customer support tickets from all channels and queues them for AI classification.",
+        "impact": "Centralizes all support requests into a single pipeline, eliminating missed tickets and reducing manual triage time.",
         "dataLabel": "Data collected",
         "chips": [
           "Customer name",
           "Issue description",
-          "Product referenced",
-          "Ticket priority",
-          "Submission timestamp"
+          "Channel source",
+          "Submission timestamp",
+          "Order reference"
         ]
       },
       {
         "platform": "AI Model",
         "role": "AI Model",
-        "action": "Reads each ticket, classifies the issue type, drafts a resolution response or routes to the appropriate human agent.",
-        "impact": "Cuts average ticket response time dramatically and ensures consistent, accurate first responses without burdening the support team.",
+        "action": "Reads each ticket, classifies the issue type, determines urgency, and drafts an appropriate response or routes to the correct team.",
+        "impact": "Resolves common tickets instantly and ensures complex ones reach the right agent with context already summarized, cutting average handle time significantly.",
         "dataLabel": "Analysis produced",
         "chips": [
           "Issue category",
-          "Suggested resolution",
-          "Confidence score",
-          "Escalation flag",
-          "Draft response",
-          "Routing decision"
+          "Urgency score",
+          "Suggested response",
+          "Routing decision",
+          "Sentiment detected",
+          "Resolution confidence"
         ]
       },
       {
-        "platform": "Ticketing Platform",
-        "role": "CRM / Support",
-        "action": "Updates the ticket record with the AI-generated response or routing action and logs all classification data for reporting.",
-        "impact": "Keeps ticket records complete and auditable while allowing the support team to focus only on escalated or complex cases.",
+        "platform": "Ticketing System",
+        "role": "Support Platform",
+        "action": "Updates the ticket record with the AI classification, posts the drafted response or assignment, and logs resolution status.",
+        "impact": "Keeps support queues organized and auditable while reducing first-response time and freeing agents to focus on escalations.",
         "dataLabel": "Records updated",
         "chips": [
           "Ticket status",
-          "Response sent",
-          "Agent assigned",
-          "Resolution type",
-          "Handle time logged"
+          "Assigned agent",
+          "AI-drafted reply",
+          "Resolution flag",
+          "Response time logged"
         ]
       }
     ],
     "DFC New Arrival Guide (NAG)": [
       {
         "platform": "Microsoft Teams",
-        "role": "File Handoff",
-        "action": "Receives the monthly new arrivals file from Gerrit Young and initiates the upload and campaign creation workflow.",
-        "impact": "Eliminates manual handoff delays by making the file receipt the automatic trigger for all downstream campaign actions.",
+        "role": "Collaboration",
+        "action": "Receives the monthly new arrivals file from Gerrit Young and triggers the automation pipeline to begin content distribution.",
+        "impact": "Eliminates manual handoff delays by using an existing communication channel as the launch point for a multi-platform campaign.",
         "dataLabel": "Data collected",
         "chips": [
           "New parts list",
-          "SKUs included",
-          "File upload date",
-          "Sender confirmed",
-          "Campaign month"
+          "File from Gerrit",
+          "Product details",
+          "Launch date",
+          "Asset file"
         ]
       },
       {
         "platform": "DFC Backend",
         "role": "Product System",
-        "action": "Ingests the new arrivals file and updates the product catalog to reflect the latest parts available for promotion.",
-        "impact": "Ensures email and SMS content references live, accurate inventory so customers are never directed to unavailable products.",
+        "action": "Uploads the new arrival parts data to the DFC backend to ensure product information is live and accurate before campaign sends.",
+        "impact": "Ensures customers clicking through from emails or SMS land on accurate, live product pages, reducing bounce and support inquiries.",
         "dataLabel": "Records updated",
         "chips": [
-          "Parts catalog updated",
-          "SKU availability",
+          "Part numbers",
           "Product descriptions",
-          "Image assets",
-          "Category tags"
+          "Inventory status",
+          "Page URLs",
+          "Upload confirmation"
         ]
       },
       {
         "platform": "HubSpot",
         "role": "Email Platform",
-        "action": "Clones the previous month's NAG email template and populates it with the new arrivals data, ready for review and send.",
-        "impact": "Saves hours of email build time each month by reusing proven templates while keeping content fresh and product-accurate.",
+        "action": "Clones the existing NAG email template, populates it with the new arrival content, and schedules the monthly send to the DFC email list.",
+        "impact": "Saves hours of manual email building each month while maintaining brand consistency across every campaign.",
         "dataLabel": "Email contains",
         "chips": [
           "Cloned template",
           "New parts featured",
-          "Product images",
-          "CTA links",
+          "Product links",
           "Send schedule",
           "Audience segment"
         ]
@@ -1281,15 +1303,15 @@
       {
         "platform": "Attentive",
         "role": "SMS Platform",
-        "action": "Clones the prior month's SMS campaign and updates the messaging with current new arrival highlights for subscriber send.",
-        "impact": "Extends reach to SMS subscribers simultaneously with no additional manual effort, maximizing new arrival announcement coverage.",
+        "action": "Clones the existing SMS template, inserts new arrival highlights, and schedules the coordinated SMS blast to DFC subscribers.",
+        "impact": "Reaches mobile customers with a synchronized multichannel message, maximizing campaign reach without duplicating creative effort.",
         "dataLabel": "SMS contains",
         "chips": [
-          "Cloned SMS template",
-          "New arrival teaser",
+          "SMS copy",
           "Short link",
-          "Subscriber list",
-          "Send timestamp"
+          "New arrival highlight",
+          "Send timestamp",
+          "Subscriber list"
         ]
       }
     ],
@@ -1297,124 +1319,122 @@
       {
         "platform": "HubSpot",
         "role": "CRM / Automation",
-        "action": "Identifies and enrolls prospective shipping carriers as contacts, then triggers an automated RFQ outreach email sequence.",
-        "impact": "Scales carrier prospecting without manual research or outreach effort, ensuring a consistent pipeline of new carrier candidates.",
+        "action": "Identifies and enrolls prospective shipping carriers into an outreach sequence, automatically sending RFQ emails with relevant shipping requirements.",
+        "impact": "Scales carrier prospecting without manual outreach effort, ensuring a consistent pipeline of new carrier candidates is always being evaluated.",
         "dataLabel": "Email contains",
         "chips": [
-          "Carrier contact details",
-          "RFQ template sent",
-          "Shipment lane info",
-          "Volume estimates",
+          "Carrier contact info",
+          "RFQ details",
+          "Shipping lanes",
+          "Volume requirements",
           "Response deadline"
         ]
       },
       {
         "platform": "HubSpot",
-        "role": "CRM / Qualification",
-        "action": "Evaluates carrier responses against cost threshold (within 5% of current rates) and lead time benchmarks, then auto-qualifies or disqualifies each prospect.",
-        "impact": "Removes hours of manual bid comparison by instantly flagging viable carriers, so the logistics team only reviews pre-qualified candidates.",
+        "role": "CRM / Automation",
+        "action": "Evaluates carrier responses against qualification thresholds \u2014 cost within 5% of current carriers and acceptable lead times \u2014 and auto-qualifies or disqualifies each prospect.",
+        "impact": "Removes subjective manual review from carrier selection, ensuring only cost-competitive and reliable carriers advance, and saving procurement hours per cycle.",
         "dataLabel": "Analysis produced",
         "chips": [
-          "Quoted rate",
-          "Cost delta %",
-          "Lead time comparison",
+          "Quoted cost",
+          "Cost variance %",
+          "Lead time",
           "Qualification status",
           "Current carrier benchmark",
-          "Auto-tag applied"
+          "Decision flag"
         ]
       }
     ],
     "Weekly Checkup Bot": [
       {
         "platform": "Meta / TikTok / Google Ads",
-        "role": "Ad Platform",
-        "action": "Pulls current week performance data from all three paid channels including spend, impressions, clicks, and conversions.",
-        "impact": "Consolidates multi-platform data in seconds, eliminating the need to manually export reports from three separate ad platforms each week.",
+        "role": "Ad Platforms",
+        "action": "Pulls current week performance data and the previous month's daily data from all three paid channels simultaneously.",
+        "impact": "Aggregates cross-platform data in seconds, replacing what would otherwise take an analyst 30\u201360 minutes of manual exports each week.",
         "dataLabel": "Data collected",
         "chips": [
-          "Weekly spend",
+          "Spend",
           "Impressions",
-          "Click-through rate",
-          "Conversions",
+          "CTR",
           "ROAS",
-          "Platform breakdown"
+          "Conversions",
+          "CPA"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Compares this week's performance to the previous month's average across all channels and generates a plain-English performance summary with notable trends.",
-        "impact": "Transforms raw ad data into actionable insight in minutes, giving the media team a clear view of what is trending up or down without manual analysis.",
+        "action": "Compares current week metrics against the prior month's average, identifies significant variances, and writes a plain-English performance summary with highlights and concerns.",
+        "impact": "Transforms raw numbers into actionable insight instantly, so the team understands what changed and why without manual analysis.",
         "dataLabel": "Analysis produced",
         "chips": [
-          "vs. prior month avg",
-          "Channel performance delta",
-          "Top performer flagged",
+          "Week vs. month avg",
+          "Channel variances",
+          "Top performer",
           "Underperformer flagged",
           "Trend narrative",
-          "Spend efficiency score"
+          "Recommended focus"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Delivers the formatted weekly performance checkup report to the relevant team members on a recurring schedule.",
-        "impact": "Ensures every stakeholder starts the week with consistent, up-to-date paid channel visibility without any manual report preparation.",
+        "action": "Sends the formatted weekly checkup report to the relevant team members every week on schedule.",
+        "impact": "Keeps the entire paid media team aligned on performance without requiring anyone to pull or compile data manually.",
         "dataLabel": "Email contains",
         "chips": [
-          "Weekly summary",
-          "Channel comparisons",
-          "Performance deltas",
-          "Key callouts",
-          "Recipient list",
-          "Send timestamp"
+          "Performance summary",
+          "Channel breakdown",
+          "Variance callouts",
+          "Week-over-month delta",
+          "Key recommendations"
         ]
       }
     ],
     "Monthly Report Builder": [
       {
         "platform": "Meta / TikTok / Google Ads",
-        "role": "Ad Platform",
-        "action": "Aggregates the full month's performance data across all paid channels, pulling all key metrics needed for end-of-month reporting.",
-        "impact": "Replaces hours of manual data pulling and formatting by automatically consolidating a complete month of cross-platform ad data.",
+        "role": "Ad Platforms",
+        "action": "Pulls full-month performance data across all paid channels at month's end for consolidation into the report.",
+        "impact": "Eliminates manual data pulls from three separate platforms, saving hours of export and formatting work before reporting deadlines.",
         "dataLabel": "Data collected",
         "chips": [
           "Monthly spend",
-          "Total impressions",
+          "Impressions",
+          "ROAS",
           "Conversions",
-          "ROAS by channel",
-          "CPM",
-          "CTR"
+          "CPA",
+          "CTR by channel"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Structures and formats the monthly data into slide-ready narrative sections with performance summaries, highlights, and commentary.",
-        "impact": "Produces presentation-ready content in minutes instead of hours, allowing the media team to focus on strategy rather than formatting.",
+        "action": "Synthesizes all channel data into a structured monthly narrative formatted to match the end-of-month slide deck layout, including key wins, misses, and recommendations.",
+        "impact": "Produces slide-ready content in minutes rather than hours, allowing the team to focus on strategy discussion rather than slide assembly.",
         "dataLabel": "Analysis produced",
         "chips": [
-          "Month-over-month delta",
-          "Channel highlights",
-          "Budget pacing",
-          "Top campaigns",
-          "Slide-ready narrative",
-          "Executive summary"
+          "Monthly summary",
+          "Channel performance",
+          "Goal vs. actual",
+          "Key wins",
+          "Areas to improve",
+          "Slide-ready format"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Sends the completed monthly report to stakeholders formatted and ready to drop into end-of-month presentation slides.",
-        "impact": "Delivers a polished, consistent monthly report to leadership without any manual assembly, saving significant time at month-end close.",
+        "action": "Delivers the formatted monthly report to stakeholders, ready to be dropped into the end-of-month presentation.",
+        "impact": "Ensures leadership receives a polished, consistent report every month with zero manual formatting required from the media team.",
         "dataLabel": "Email contains",
         "chips": [
-          "Monthly performance report",
-          "Slide-ready sections",
-          "Channel breakdown",
-          "Key wins",
-          "Areas of concern",
-          "Recipient list"
+          "Monthly report",
+          "Slide-formatted content",
+          "Channel breakdowns",
+          "MoM comparison",
+          "Strategic recommendations"
         ]
       }
     ],
@@ -1422,42 +1442,42 @@
       {
         "platform": "HubSpot",
         "role": "CRM",
-        "action": "Identifies contacts who completed the Amazon flyer warranty registration and flags them for audience sync.",
-        "impact": "Automatically captures high-intent buyers who have already engaged with the brand, ensuring they enter the retargeting funnel without any manual list pulls.",
+        "action": "Detects when a contact completes the Amazon flyer warranty form and tags them as a qualified customer in the CRM.",
+        "impact": "Creates a clean, verified segment of high-intent Amazon buyers who have already engaged with the brand, ready for retargeting.",
         "dataLabel": "Data collected",
         "chips": [
+          "Contact email",
           "Warranty form completed",
-          "Customer email",
-          "Product registered",
-          "Amazon order signal",
-          "Contact record updated"
+          "Amazon order reference",
+          "Submission timestamp",
+          "Customer tag applied"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Validates and prepares the contact data, ensuring it meets Meta's audience matching requirements before syncing.",
-        "impact": "Increases audience match rates on Meta by cleaning and formatting data correctly, maximizing the size and quality of the retargeting pool.",
+        "action": "Validates and normalizes the customer data to ensure it meets Meta's audience matching requirements before syncing.",
+        "impact": "Maximizes audience match rates on Meta by cleaning and formatting data correctly, reducing wasted ad spend on unmatched records.",
         "dataLabel": "Analysis produced",
         "chips": [
-          "Email validated",
-          "Data formatted",
-          "Duplicate check",
+          "Data validation",
+          "Email normalized",
           "Match readiness score",
-          "Audience segment label"
+          "Duplicate check",
+          "Format compliance"
         ]
       },
       {
         "platform": "Meta",
         "role": "Ad Platform",
-        "action": "Receives the validated customer list and adds them to the designated Custom Audience for retargeting campaigns.",
-        "impact": "Turns warranty registrants into a targetable Meta audience automatically, enabling follow-up ad campaigns to warm, already-converted customers.",
+        "action": "Adds the validated customer records to the designated Meta Custom Audience, making them immediately available for ad targeting.",
+        "impact": "Automatically grows a high-quality retargeting audience of existing customers without any manual audience uploads or CSV exports.",
         "dataLabel": "Records updated",
         "chips": [
-          "Custom Audience updated",
-          "Matched contacts added",
-          "Audience size delta",
-          "Retargeting eligible",
+          "Audience updated",
+          "Matched profiles",
+          "Customer list size",
+          "Targeting eligible",
           "Sync timestamp"
         ]
       }
@@ -1465,47 +1485,46 @@
     "Paid Social Copy Audit": [
       {
         "platform": "Meta / TikTok",
-        "role": "Ad Platform",
-        "action": "Exports active ad copy and performance metrics from all running paid social campaigns across both platforms.",
-        "impact": "Eliminates manual ad-by-ad review by automatically surfacing which copy is live and how each piece is performing.",
+        "role": "Ad Platforms",
+        "action": "Pulls active ad creative copy, performance metrics, and spend data from both Meta and TikTok ad accounts for audit.",
+        "impact": "Surfaces all live ad copy alongside real performance data in one pass, enabling a comprehensive audit that would otherwise require manual platform-by-platform review.",
         "dataLabel": "Data collected",
         "chips": [
           "Ad copy text",
-          "CTR by ad",
-          "Engagement rate",
-          "Spend per ad",
+          "CTR",
           "Conversion rate",
-          "Platform source"
+          "Spend",
+          "ROAS",
+          "Ad ID"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Analyzes ad copy performance, identifies underperforming creatives, and generates specific improvement recommendations for each flagged ad.",
-        "impact": "Provides expert-level copy critique at scale in minutes, giving the media team prioritized, actionable recommendations instead of raw data to interpret.",
+        "action": "Analyzes underperforming ads against top performers, identifies weak copy patterns, and generates specific rewrite recommendations for each flagged ad.",
+        "impact": "Provides data-backed creative direction instantly, helping the team prioritize copy improvements that are most likely to lift performance.",
         "dataLabel": "Analysis produced",
         "chips": [
-          "Underperformer flagged",
-          "Performance threshold",
+          "Underperformer flags",
           "Copy weakness identified",
-          "Recommended revision",
-          "Priority score",
+          "Recommended rewrites",
+          "Performance benchmark",
+          "Priority ranking",
           "Improvement rationale"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Delivers the full copy audit report with flagged ads and recommended rewrites to the media team for review and action.",
-        "impact": "Puts copy improvement opportunities directly in front of the right people in a readable format, shortening the feedback loop between data and creative iteration.",
+        "action": "Sends a structured audit report to the paid social team listing flagged ads, diagnosed issues, and recommended copy improvements.",
+        "impact": "Delivers actionable copy recommendations directly to the team on a regular cadence, reducing time spent manually reviewing ad creative.",
         "dataLabel": "Email contains",
         "chips": [
-          "Audit summary",
-          "Flagged ad list",
-          "Current copy",
-          "Recommended copy",
-          "Performance context",
-          "Action priority"
+          "Flagged ads list",
+          "Performance data",
+          "Copy diagnosis",
+          "Rewrite suggestions",
+          "Priority actions"
         ]
       }
     ],
@@ -1513,105 +1532,102 @@
       {
         "platform": "Asana",
         "role": "Project Management",
-        "action": "Monitors project tasks, deadlines, and status updates across active Asana boards and flags items needing attention.",
-        "impact": "Provides automated visibility into project health without requiring manual status checks, keeping work moving on schedule.",
+        "action": "Monitors Asana for task updates, new assignments, blockers, or overdue items across active projects.",
+        "impact": "Keeps a live pulse on project status without requiring manual check-ins, ensuring nothing falls through the cracks.",
         "dataLabel": "Data collected",
         "chips": [
           "Task status",
           "Due dates",
           "Assignees",
-          "Overdue flags",
-          "Project board",
-          "Priority level"
+          "Blockers",
+          "Project name",
+          "Completion %"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Interprets the Asana data and composes a concise, prioritized summary of outstanding tasks, blockers, and upcoming deadlines.",
-        "impact": "Converts raw project data into a clear, human-readable briefing that helps managers make faster decisions about resource and priority.",
+        "action": "Summarizes task activity, flags overdue or at-risk items, and drafts a prioritized status update for the team.",
+        "impact": "Converts raw task data into a clear, prioritized summary that helps teams stay focused on what matters most each day.",
         "dataLabel": "Analysis produced",
         "chips": [
-          "Overdue summary",
-          "Upcoming deadlines",
-          "Blockers identified",
-          "Owner accountability",
+          "Overdue tasks",
+          "At-risk items",
           "Priority ranking",
-          "Action items"
+          "Completion summary",
+          "Recommended actions"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Sends the compiled Asana project status digest to relevant stakeholders on a scheduled or triggered basis.",
-        "impact": "Keeps the team aligned on project status automatically, replacing recurring manual check-in meetings or status pings.",
+        "action": "Sends the Asana project summary and flagged items to relevant team members or stakeholders via email.",
+        "impact": "Keeps stakeholders informed of project health without requiring them to log into Asana, improving visibility and accountability.",
         "dataLabel": "Email contains",
         "chips": [
-          "Task digest",
-          "Overdue items",
-          "Next deadlines",
-          "Owner names",
-          "Project name",
-          "Send schedule"
+          "Task summary",
+          "Overdue alerts",
+          "Priority items",
+          "Owner callouts",
+          "Project health status"
         ]
       }
     ],
     "Media Meeting Task Agent": [
       {
         "platform": "Microsoft Teams",
-        "role": "Meeting Platform",
-        "action": "Captures the transcript or notes from the weekly media meeting as the source input for task extraction.",
-        "impact": "Ensures nothing discussed in the meeting is lost or forgotten by immediately feeding conversation content into the automation pipeline.",
+        "role": "Collaboration",
+        "action": "Captures the transcript or notes from the weekly media meeting as it concludes in Teams.",
+        "impact": "Preserves every discussed action item and decision without relying on manual note-taking, ensuring nothing discussed is lost.",
         "dataLabel": "Data collected",
         "chips": [
           "Meeting transcript",
           "Action items mentioned",
           "Assignees discussed",
           "Deadlines stated",
-          "Meeting date",
-          "Attendees"
+          "Meeting date"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Receives and routes the meeting notes or transcript to Claude for processing, acting as the handoff layer between Teams and the AI.",
-        "impact": "Creates a reliable, logged transfer of meeting content that ensures the AI receives a clean input without requiring direct Teams integration.",
+        "action": "Forwards the meeting notes or transcript to the Claude processing step as a structured email input for extraction.",
+        "impact": "Creates a reliable handoff point between the meeting capture and AI processing, maintaining a clean audit trail of raw meeting content.",
         "dataLabel": "Email contains",
         "chips": [
-          "Meeting notes forwarded",
-          "Raw transcript",
-          "Date and context",
-          "Source meeting",
-          "Routing label"
+          "Raw meeting notes",
+          "Participant list",
+          "Topics covered",
+          "Flagged follow-ups",
+          "Timestamp"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Reads the meeting notes and extracts discrete tasks, assigns owners, and infers due dates based on context from the discussion.",
-        "impact": "Turns unstructured meeting conversation into structured, assignable tasks in seconds, eliminating the need for a human to manually write up action items after every meeting.",
+        "action": "Reads the meeting notes, extracts discrete tasks, assigns owners and due dates based on context, and structures them as Asana-ready task entries.",
+        "impact": "Eliminates manual task entry after every meeting, turning a 15\u201330 minute administrative chore into an instant automated output.",
         "dataLabel": "Analysis produced",
         "chips": [
           "Tasks extracted",
           "Owner assigned",
           "Due date inferred",
-          "Task priority",
-          "Meeting context",
-          "Task count"
+          "Priority level",
+          "Task description",
+          "Project mapped"
         ]
       },
       {
         "platform": "Asana",
         "role": "Project Management",
-        "action": "Creates new tasks in the appropriate Asana project with all extracted details including owner, due date, and description populated automatically.",
-        "impact": "Ensures every action item from the media meeting is immediately trackable in Asana, closing the gap between discussion and execution without any manual entry.",
+        "action": "Creates the structured tasks in the appropriate Asana projects with owners, due dates, and descriptions populated automatically.",
+        "impact": "Ensures every commitment made in the weekly meeting becomes a tracked, assigned task in Asana within minutes, improving team accountability and follow-through.",
         "dataLabel": "Records updated",
         "chips": [
           "Tasks created",
           "Assignee set",
           "Due date set",
-          "Project board updated",
+          "Project assigned",
           "Task description",
           "Creation timestamp"
         ]
@@ -1621,44 +1637,44 @@
       {
         "platform": "Google Ads",
         "role": "Ad Platform",
-        "action": "Pulls performance data and current ad copy from all active search campaigns, identifying ads that fall below defined performance thresholds.",
-        "impact": "Surfaces underperforming ads automatically so the team spends zero time manually sorting through campaign data to find problem copy.",
+        "action": "Pulls performance data for all active search ads, identifying underperforming ads by key metrics such as CTR, conversion rate, and Quality Score.",
+        "impact": "Automatically surfaces which ads are dragging down campaign performance, eliminating the need to manually comb through dozens of ad variations.",
         "dataLabel": "Data collected",
         "chips": [
-          "Ad Copy Text",
+          "Ad Headlines",
+          "Ad Descriptions",
           "CTR",
           "Conversion Rate",
           "Quality Score",
-          "Campaign Name",
-          "Impressions"
+          "Campaign Name"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Analyzes the underperforming ad copy against performance metrics and generates specific, actionable rewrite recommendations for each flagged ad.",
-        "impact": "Delivers expert-level copy critique and suggested rewrites instantly, replacing the need for a manual copy review and accelerating ad improvement cycles.",
+        "action": "Analyzes the underperforming ad copy against performance benchmarks and generates specific, actionable rewrite recommendations for each flagged ad.",
+        "impact": "Produces expert-level copy feedback in seconds, giving the team clear improvement direction without requiring a dedicated copywriter review cycle.",
         "dataLabel": "Analysis produced",
         "chips": [
-          "Flagged Ads",
-          "Weakness Identified",
-          "Recommended Headlines",
-          "Recommended Descriptions",
-          "Priority Score"
+          "Flagged Ad Copy",
+          "Weakness Summary",
+          "Rewrite Recommendations",
+          "Headline Suggestions",
+          "CTA Improvements"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Sends a formatted audit report email containing each underperforming ad, its performance data, and Claude's recommended copy improvements.",
-        "impact": "Delivers a ready-to-act report directly to the responsible team member, eliminating the need to log into the platform just to identify what needs fixing.",
+        "action": "Sends a formatted audit report to the marketing team listing each underperforming ad alongside Claude's specific copy recommendations.",
+        "impact": "Delivers a ready-to-act improvement plan directly to stakeholders, cutting the feedback loop from days to minutes and keeping ad performance improvements on a consistent cadence.",
         "dataLabel": "Email contains",
         "chips": [
-          "Underperforming Ads List",
-          "Current Copy",
-          "Suggested Copy",
+          "Flagged Ad List",
           "Performance Metrics",
-          "Action Items"
+          "Rewrite Suggestions",
+          "Campaign Context",
+          "Priority Flags"
         ]
       }
     ],
@@ -1666,43 +1682,44 @@
       {
         "platform": "Google Sheets",
         "role": "Spreadsheet",
-        "action": "Reads the Agent Tracker sheet, pulling all agent entries, status fields, owner assignments, and progress notes accumulated during the week.",
-        "impact": "Captures a full snapshot of agent development progress without anyone needing to manually compile or summarize the raw sheet data.",
+        "action": "Reads the current Agent Tracker sheet, pulling all raw agent status data, progress notes, ownership, and update timestamps.",
+        "impact": "Centralizes all agent tracking data in one pull, removing the need for anyone to manually compile or reformat status information before the weekly update.",
         "dataLabel": "Data collected",
         "chips": [
           "Agent Names",
-          "Status Flags",
-          "Owner Names",
+          "Owner",
+          "Status",
+          "Last Updated",
           "Progress Notes",
-          "Last Updated"
+          "Priority Level"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Transforms the raw sheet data into a clean, human-readable weekly update summary organized by status, highlights, and any blockers or next steps.",
-        "impact": "Turns a dense spreadsheet into a polished briefing in seconds, saving whoever writes the weekly update from spending time reformatting raw data into readable prose.",
+        "action": "Transforms the raw sheet data into a cleanly formatted, human-readable weekly update summary organized by status and priority.",
+        "impact": "Converts messy spreadsheet data into a polished stakeholder-ready update in seconds, saving the time it would take to manually write and format a weekly report.",
         "dataLabel": "Summary produced",
         "chips": [
-          "Formatted Summary",
-          "Agents by Status",
-          "Key Highlights",
-          "Blockers",
+          "Formatted Agent List",
+          "Status Groupings",
+          "Weekly Highlights",
+          "Blockers Noted",
           "Next Steps"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Sends the formatted weekly update to the relevant stakeholders as a clean, ready-to-read email digest.",
-        "impact": "Ensures the whole team stays aligned on agent progress without requiring a meeting or manual status report, delivering visibility automatically every week.",
+        "action": "Sends the formatted weekly agent tracker update to the relevant team or leadership distribution list.",
+        "impact": "Ensures consistent, on-time weekly communication about agent progress without requiring anyone to manually write or send the update.",
         "dataLabel": "Email contains",
         "chips": [
-          "Weekly Summary",
-          "Agent Status List",
+          "Agent Status Summary",
+          "Weekly Highlights",
           "Owner Assignments",
-          "Highlights",
-          "Action Items"
+          "Blockers",
+          "Formatted Layout"
         ]
       }
     ],
@@ -1710,57 +1727,57 @@
       {
         "platform": "HubSpot Form",
         "role": "CRM",
-        "action": "Mark submits a vehicle specification \u2014 make, model, year, and any other relevant attributes \u2014 through a HubSpot form to trigger the workflow.",
-        "impact": "Gives Mark a simple, repeatable submission interface that kicks off the entire catalog lookup automatically, with no back-and-forth required.",
+        "action": "Mark submits a vehicle spec form (make, model, year, and other relevant details) which triggers the automation workflow.",
+        "impact": "Gives Mark a simple, repeatable self-serve entry point so he can request catalog lookups on demand without involving the ops or data team.",
         "dataLabel": "Data collected",
         "chips": [
           "Vehicle Make",
           "Vehicle Model",
-          "Vehicle Year",
-          "Submission Timestamp",
-          "Requestor Name"
+          "Year",
+          "Trim/Spec Details",
+          "Submitter Name"
         ]
       },
       {
         "platform": "Dream",
         "role": "Inventory System",
-        "action": "Queries the Dream inventory system using the submitted vehicle spec to retrieve all parts DFC currently stocks that match those vehicles.",
-        "impact": "Pulls live inventory data in seconds rather than requiring someone to manually search the catalog, eliminating lookup time across potentially hundreds of part numbers.",
+        "action": "Queries the Dream ERP system using the submitted vehicle specs to retrieve all matching parts DFC currently stocks and identifies gaps in inventory coverage.",
+        "impact": "Instantly surfaces what DFC has and what's missing for a given vehicle without requiring a manual inventory lookup or warehouse query.",
         "dataLabel": "Inventory data retrieved",
         "chips": [
           "Stocked Part Numbers",
           "Part Descriptions",
           "Inventory Quantities",
-          "Vehicle Fitment",
-          "SKU List"
+          "Missing Parts",
+          "Vehicle Fitment Data"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Cross-references the Dream inventory results against the full vehicle catalog to identify gaps \u2014 parts that should exist for those vehicles but are missing from DFC's inventory.",
-        "impact": "Automatically surfaces inventory gaps that would otherwise require manual comparison work, giving Mark an instant picture of stocking opportunities.",
-        "dataLabel": "Gap analysis produced",
+        "action": "Organizes the Dream inventory results into a structured, formatted Excel-ready layout, clearly separating stocked items from inventory gaps.",
+        "impact": "Produces a clean, presentation-ready catalog file that Mark can use immediately, replacing manual Excel formatting that would otherwise take significant time.",
+        "dataLabel": "Catalog formatted",
         "chips": [
-          "Stocked Parts",
-          "Missing Parts",
-          "Coverage Gaps",
-          "Part Categories",
-          "Fitment Matches"
+          "Stocked Parts Table",
+          "Missing Parts Table",
+          "Part Numbers",
+          "Descriptions",
+          "Formatting Applied"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Emails Mark a formatted Excel file showing what DFC stocks for the submitted vehicles and clearly flagging what is missing from inventory.",
-        "impact": "Delivers a polished, decision-ready catalog file directly to Mark's inbox within minutes of submission, eliminating hours of manual catalog work per request.",
+        "action": "Emails Mark the completed Excel catalog file as an attachment, ready for use in customer or sales conversations.",
+        "impact": "Delivers the finished catalog directly to Mark within minutes of submission, enabling faster customer response and reducing back-and-forth with internal teams.",
         "dataLabel": "Email contains",
         "chips": [
-          "Formatted Excel File",
-          "Stocked Parts List",
-          "Missing Parts List",
+          "Excel Attachment",
           "Vehicle Spec Summary",
-          "Coverage Rate"
+          "Stocked Parts",
+          "Inventory Gaps",
+          "Auto-Generated Message"
         ]
       }
     ],
@@ -1768,89 +1785,104 @@
       {
         "platform": "Dream",
         "role": "Inventory System",
-        "action": "Pulls live inventory status for every part on the weekly backorder report, capturing on-hand quantity, on-order status, and in-transit information.",
-        "impact": "Replaces a dozen people doing independent inventory lookups by centralizing all status data retrieval into a single automated pull, saving hours of redundant manual work each week.",
+        "action": "Pulls live inventory status for every part on the weekly backorder report, including on-hand quantities, on-order status, and in-transit details.",
+        "impact": "Replaces a dozen independent manual lookups with a single automated pull, ensuring all status data is current, consistent, and retrieved in one pass.",
         "dataLabel": "Inventory data retrieved",
         "chips": [
+          "Part Numbers",
           "On-Hand Qty",
           "On-Order Qty",
           "In-Transit Status",
-          "Part Numbers",
-          "Expected Arrival"
+          "Dead-End Flags",
+          "ETA Data"
         ]
       },
       {
         "platform": "Backorder Report",
         "role": "Data Processing",
-        "action": "Enriches the weekly backorder report with the live Dream inventory data and flags any parts that have no on-hand, on-order, or in-transit source \u2014 dead-end parts with no resolution path.",
-        "impact": "Transforms a raw backorder list into an actionable, prioritized report that immediately shows which orders can be fulfilled and which require escalation, with no manual data merging required.",
+        "action": "Merges the live Dream inventory data into the existing backorder report, enriching each line item with current status and flagging parts with no available source.",
+        "impact": "Transforms a static backorder list into a fully enriched, actionable report that shows exactly where each part stands and which ones are dead ends requiring escalation.",
         "dataLabel": "Report enriched",
         "chips": [
           "Enriched Part Status",
           "Dead-End Flags",
-          "Fulfillment ETA",
           "Backorder Line Items",
-          "Priority Flags"
+          "Source Availability",
+          "Status Labels"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Generates and sends draft customer communications for backordered items, pre-populated with the relevant part status and estimated resolution based on the enriched report data.",
-        "impact": "Eliminates the manual work of writing individual customer update emails, ensuring customers receive timely, accurate status communications without burdening the team with repetitive drafting.",
+        "action": "Generates and sends draft customer communications for affected backorder items, pre-populated with the relevant part status and estimated resolution details.",
+        "impact": "Cuts the time spent on customer status updates from hours of individual outreach to a single automated send, improving response speed and customer experience.",
         "dataLabel": "Email contains",
         "chips": [
-          "Customer Name",
-          "Backordered Part",
+          "Draft Customer Message",
+          "Part Number",
           "Current Status",
-          "ETA Update",
+          "ETA if Available",
           "Dead-End Notice",
-          "Draft Communication"
+          "Order Context"
         ]
       }
     ],
     "Two Piece Rotor Catalog Builder": [
       {
         "platform": "Web Scraper",
-        "role": "Scraper",
-        "action": "Scrapes the online catalogs of Gyro Disc, Alcon, and Brembo to collect all available two-piece rotor listings by make, model, and year.",
-        "impact": "Compiles competitor catalog coverage in a fraction of the time it would take manually, giving DFC a complete market picture without hours of browsing vendor websites.",
+        "role": "Data Collection",
+        "action": "Scrapes Gyro Disc, Alcon, and Brembo's online catalogs to extract all available two-piece rotor listings with make, model, year, and part specifications.",
+        "impact": "Aggregates competitor and supplier catalog data automatically, eliminating days of manual catalog review across three separate websites.",
         "dataLabel": "Data collected",
         "chips": [
-          "Vehicle Make",
-          "Vehicle Model",
-          "Year Range",
-          "Part Numbers",
-          "Vendor Source",
-          "Rotor Specs"
+          "Rotor Part Numbers",
+          "Vehicle Make/Model/Year",
+          "Brand Source",
+          "Fitment Specs",
+          "Catalog URLs"
         ]
       },
       {
-        "platform": "Catalog + Google Sheets",
-        "role": "Data Processing",
-        "action": "Cross-references the scraped competitor fitment data against DFC's existing parts catalog and outputs a structured make/model/year reference sheet showing coverage matches and gaps.",
-        "impact": "Instantly identifies where DFC has two-piece rotor coverage and where opportunities exist, giving Dino a formatted reference sheet ready for sourcing decisions without any manual comparison work.",
+        "platform": "DFC Parts Catalog",
+        "role": "Catalog",
+        "action": "Cross-references the scraped rotor listings against DFC's existing parts inventory to identify which vehicles are already covered and which represent gaps or opportunities.",
+        "impact": "Reveals the exact whitespace in DFC's two-piece rotor coverage, giving Dino a prioritized view of where new product development or sourcing attention is needed.",
         "dataLabel": "Cross-reference produced",
         "chips": [
-          "DFC Coverage",
-          "Competitor Coverage",
-          "Gap Identified",
-          "Matched SKUs",
-          "Fitment Table"
+          "DFC Matched Parts",
+          "Coverage Gaps",
+          "Competitor-Only Fitments",
+          "Part Overlap",
+          "Opportunity Flags"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Sends automated outreach emails to customers to gather demand data on two-piece rotor fitments, particularly for gaps identified in DFC's catalog.",
-        "impact": "Proactively collects real customer demand signals to validate which catalog gaps are worth filling, replacing guesswork with data-driven sourcing decisions.",
+        "action": "Sends automated outreach emails to relevant customers to gather demand data for two-piece rotors on specific vehicle fitments identified as gaps.",
+        "impact": "Validates market demand before product decisions are made, turning a passive catalog gap analysis into an active demand signal \u2014 without any manual outreach effort.",
         "dataLabel": "Email contains",
         "chips": [
-          "Vehicle Fitment Request",
-          "Demand Survey",
+          "Vehicle Fitment Listed",
+          "Demand Survey Request",
           "Customer Segment",
-          "Part Gap Listed",
+          "Gap Identified",
           "Response Prompt"
+        ]
+      },
+      {
+        "platform": "Google Sheets",
+        "role": "Spreadsheet",
+        "action": "Compiles all scraped catalog data, DFC cross-reference results, and incoming customer demand responses into a single formatted output sheet for Dino.",
+        "impact": "Gives Dino one clean, always-current reference document to guide two-piece rotor strategy, replacing fragmented data across emails, spreadsheets, and browser tabs.",
+        "dataLabel": "Records updated",
+        "chips": [
+          "Rotor Catalog Table",
+          "DFC Coverage Status",
+          "Demand Responses",
+          "Brand Breakdown",
+          "Gap Summary",
+          "Formatted Output"
         ]
       }
     ],
@@ -1858,46 +1890,46 @@
       {
         "platform": "Meta Ads",
         "role": "Ad Platform",
-        "action": "Scans all active Meta and TikTok ad copy across every campaign and ad set, retrieving the full text of headlines, descriptions, and primary copy fields.",
-        "impact": "Covers the entire active ad library in seconds rather than requiring someone to manually open and read every individual ad across platforms.",
+        "action": "Scans all active Meta and TikTok ad copy across every running campaign, pulling the full text of headlines, descriptions, and body copy for analysis.",
+        "impact": "Instantly surfaces the exact location of flagged language across every live ad, replacing what would otherwise require manually opening and reading each ad one by one.",
         "dataLabel": "Data collected",
         "chips": [
-          "Ad Headline",
-          "Primary Copy",
-          "Description Text",
+          "Ad Headlines",
+          "Ad Body Copy",
+          "Ad Descriptions",
           "Campaign Name",
-          "Ad Set Name",
+          "Ad ID",
           "Platform Source"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Searches all retrieved ad copy for specific flagged phrases and identifies the exact ad, field, and text where each match occurs.",
-        "impact": "Pinpoints every instance of a problematic phrase across hundreds of ads instantly, eliminating the risk of human oversight and removing what would otherwise be an exhaustive manual audit.",
-        "dataLabel": "Matches identified",
+        "action": "Scans all pulled ad copy for specific target phrases, identifies exact matches, and structures the results by ad ID, field type, and the matching text found.",
+        "impact": "Delivers precise, field-level match results in seconds, ensuring no flagged phrase is missed and eliminating the risk of human error in a manual review.",
+        "dataLabel": "Analysis produced",
         "chips": [
-          "Flagged Phrase",
-          "Matched Ad Copy",
-          "Field Location",
-          "Campaign Name",
-          "Platform",
-          "Match Count"
+          "Flagged Phrases",
+          "Match Location",
+          "Field Type",
+          "Ad ID",
+          "Exact Copy Matched",
+          "Platform Tag"
         ]
       },
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Sends a formatted report email listing every flagged ad with the exact field, copy text, and phrase match highlighted for immediate review.",
-        "impact": "Delivers an actionable compliance or quality report directly to the requester's inbox, ready for review and remediation without any additional research needed.",
+        "action": "Emails a formatted report listing every ad where a flagged phrase was found, including the exact field and verbatim copy containing the match.",
+        "impact": "Gets actionable compliance or editorial flags directly to the right person immediately, enabling fast copy corrections before ads accrue more spend or impressions.",
         "dataLabel": "Email contains",
         "chips": [
-          "Flagged Ads List",
-          "Exact Copy Match",
+          "Flagged Ad List",
+          "Match Details",
+          "Exact Copy",
           "Field Name",
-          "Campaign Reference",
-          "Platform Source",
-          "Total Match Count"
+          "Campaign Context",
+          "Platform Source"
         ]
       }
     ],
@@ -1905,30 +1937,30 @@
       {
         "platform": "Meta + TikTok Ads",
         "role": "Ad Platform",
-        "action": "Pulls live campaign data from both Meta and TikTok ad accounts, including performance metrics, audience data, spend, and active ad copy.",
-        "impact": "Gives the chatbot a real-time, unified view of paid performance across both platforms so answers reflect actual current data rather than stale exports.",
+        "action": "Pulls live performance data and ad content from all active Meta and TikTok campaigns, including spend, impressions, CTR, and creative copy.",
+        "impact": "Gives the chatbot a real-time, cross-platform view of paid channel performance so responses are grounded in current data rather than stale exports.",
         "dataLabel": "Data collected",
         "chips": [
-          "Spend",
-          "CTR",
-          "ROAS",
+          "Campaign Names",
+          "Ad Spend",
           "Impressions",
-          "Audience Segments",
-          "Active Ads"
+          "CTR",
+          "Ad Copy",
+          "Platform Source"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Interprets user questions about paid channel performance and generates clear, contextual answers grounded in the live Meta and TikTok data.",
-        "impact": "Lets any team member get instant, accurate answers about paid performance without waiting on a analyst to pull a report or log into the ad platforms themselves.",
+        "action": "Interprets user questions about paid channel performance, analyzes the live Meta and TikTok data in context, and returns clear, conversational answers or summaries.",
+        "impact": "Lets any team member get instant answers about paid performance without needing to pull reports or interpret raw ad platform dashboards.",
         "dataLabel": "Response produced",
         "chips": [
-          "Performance Insight",
-          "Spend Summary",
-          "Campaign Comparison",
+          "Performance Summary",
+          "Campaign Insights",
           "Trend Analysis",
-          "Recommendation"
+          "Creative Observations",
+          "Natural Language Answer"
         ]
       }
     ],
@@ -1936,57 +1968,57 @@
       {
         "platform": "Gmail",
         "role": "Email",
-        "action": "Monitors the jobs@r1concepts.com inbox, ingests each incoming application email, and extracts the attached resume PDF along with the applicant's contact information.",
-        "impact": "Ensures every application is captured and processed immediately upon arrival, eliminating the risk of overlooked emails and removing the need for anyone to manually triage the inbox.",
+        "action": "Monitors the jobs@r1concepts.com inbox for incoming applications, extracts the resume attachment and applicant details, and triggers the review workflow.",
+        "impact": "Ensures every application is captured and processed immediately upon arrival, eliminating the risk of candidates being missed in a high-volume inbox.",
         "dataLabel": "Data collected",
         "chips": [
           "Applicant Name",
           "Email Address",
-          "Resume PDF",
-          "Application Date",
-          "Submission Subject"
+          "Resume Attachment",
+          "Role Applied For",
+          "Submission Timestamp"
         ]
       },
       {
         "platform": "Google Drive",
         "role": "File Storage",
-        "action": "Files each resume PDF into the appropriate organized folder in Google Drive for structured record-keeping and future reference.",
-        "impact": "Keeps all candidate files organized and searchable in a central location without requiring manual uploading or folder sorting by HR staff.",
+        "action": "Saves each resume PDF to an organized Drive folder, filed by applicant name and role for easy retrieval during the hiring process.",
+        "impact": "Maintains a clean, structured resume archive automatically, so the hiring team always knows where to find any candidate's document without digging through email threads.",
         "dataLabel": "Files stored",
         "chips": [
           "Resume PDF",
           "Applicant Name",
-          "Folder Path",
-          "Upload Timestamp",
-          "Role Applied"
+          "Role Folder",
+          "File Timestamp",
+          "Drive Link"
         ]
       },
       {
         "platform": "Claude AI",
         "role": "AI Model",
-        "action": "Scores each resume against the qualifications of open roles, determines whether to advance, deny, or pause the candidate, and drafts the appropriate auto-reply email for each outcome.",
-        "impact": "Replaces hours of initial resume screening with an instant, consistent evaluation that surfaces the strongest candidates and ensures every applicant receives a timely response.",
+        "action": "Scores each resume against the open role requirements, classifies the candidate as approved, denied, or paused, and drafts the appropriate response communication.",
+        "impact": "Delivers consistent, bias-reduced candidate screening at volume, cutting hours of manual resume review down to a fully automated decision with a drafted reply ready to send.",
         "dataLabel": "Analysis produced",
         "chips": [
           "Fit Score",
-          "Role Match",
-          "Decision",
-          "Deny Draft",
-          "Pause Flag",
-          "Advance Recommendation"
+          "Decision Label",
+          "Role Match Reasoning",
+          "Draft Reply",
+          "Paused Flag",
+          "Skills Assessment"
         ]
       },
       {
         "platform": "Google Sheets",
         "role": "Spreadsheet",
-        "action": "Logs every applicant, their score, decision, role matched, and reply status to a Sheets dashboard, with paused-role candidates automatically routed to a dedicated Pending tab.",
-        "impact": "Gives the HR team a real-time, organized view of all applicants and decisions in one place, with paused candidates automatically held for follow-up when roles reopen.",
+        "action": "Logs every applicant's name, role, score, decision, and auto-reply status to a dashboard, with paused-role candidates automatically routed to a dedicated Pending tab.",
+        "impact": "Gives the hiring team a real-time, organized view of every application and its status, replacing a scattered inbox with a single source of truth for the entire pipeline.",
         "dataLabel": "Records updated",
         "chips": [
           "Applicant Name",
-          "Score",
-          "Decision",
           "Role Applied",
+          "Fit Score",
+          "Decision",
           "Reply Sent",
           "Pending Tab Flag"
         ]
@@ -2005,37 +2037,457 @@
         "value": "932,000",
         "total": null,
         "delta": "N/A",
-        "history": null
+        "history": [
+          "932,000"
+        ]
       },
       "Clicks": {
         "value": "4,320",
         "total": null,
         "delta": "N/A",
-        "history": null
+        "history": [
+          "4,320"
+        ]
       },
       "Avg Position": {
         "value": "5.2",
         "total": "5.2",
         "delta": null,
-        "history": null
+        "history": [
+          "5.2"
+        ]
       },
       "CTR": {
         "value": "0.50%",
         "total": "0.50%",
         "delta": null,
-        "history": null
+        "history": [
+          "0.50%"
+        ]
       },
       "Blog Sessions": {
         "value": "7,076",
         "total": null,
         "delta": "N/A",
-        "history": null
+        "history": [
+          "7,076"
+        ]
       },
       "Hours Saved (YTD)": {
         "value": "88",
         "total": "88",
         "delta": null,
         "history": null
+      }
+    },
+    "Shirly PO Workflow Automation": {
+      "Vendors Reached": {
+        "value": "37",
+        "total": "37",
+        "delta": null,
+        "history": null
+      },
+      "Form Responses": {
+        "value": "9",
+        "total": "9",
+        "delta": null,
+        "history": null
+      },
+      "Repeat Responders": {
+        "value": "4",
+        "total": "4",
+        "delta": null,
+        "history": null
+      },
+      "Open Rate (Email 1)": {
+        "value": "89.20%",
+        "total": "89.20%",
+        "delta": null,
+        "history": [
+          "69.70%",
+          "65.52%",
+          "90.00%"
+        ]
+      },
+      "Click-Through Rate (Email 1)": {
+        "value": "48.60%",
+        "total": "48.60%",
+        "delta": null,
+        "history": [
+          "27.27%",
+          "24.14%",
+          "20.00%"
+        ]
+      },
+      "Email 2 Click Rate": {
+        "value": "18.90%",
+        "total": "18.90%",
+        "delta": null,
+        "history": [
+          "9.09%",
+          "7.14%",
+          "15.79%"
+        ]
+      },
+      "Cycles Completed": {
+        "value": "7",
+        "total": "7",
+        "delta": null,
+        "history": null
+      },
+      "Hours Saved (YTD)": {
+        "value": "42 hrs",
+        "total": "42 hrs",
+        "delta": null,
+        "history": [
+          24,
+          42,
+          42
+        ]
+      },
+      "PO Lines Pushed to Dream": {
+        "value": "2,940",
+        "total": "2,940",
+        "delta": null,
+        "history": null
+      },
+      "Contacts Enrolled": {
+        "value": "37",
+        "total": "37",
+        "delta": null,
+        "history": [
+          33,
+          29,
+          20
+        ]
+      },
+      "Email 3 Sent": {
+        "value": "22",
+        "total": "22",
+        "delta": null,
+        "history": null
+      },
+      "Form Submission Rate": {
+        "value": "24.30%",
+        "total": "24.30%",
+        "delta": null,
+        "history": [
+          "12.10%",
+          "17.20%"
+        ]
+      },
+      "April 2026 Cycle Response Rate": {
+        "value": "12.10%",
+        "total": "12.10%",
+        "delta": null,
+        "history": null
+      },
+      "May 2026 Cycle Response Rate": {
+        "value": "17.20%",
+        "total": "17.20%",
+        "delta": null,
+        "history": null
+      },
+      "Total Submissions (Apr\u2013Jun 2026)": {
+        "value": "10",
+        "total": "10",
+        "delta": null,
+        "history": [
+          5,
+          2,
+          3
+        ]
+      },
+      "Eligible Vendor Submissions (Apr\u2013Jun 2026)": {
+        "value": "9",
+        "total": "9",
+        "delta": null,
+        "history": [
+          4,
+          2,
+          3
+        ]
+      },
+      "_table": {
+        "title": "All Submissions",
+        "headers": [
+          "Submitted",
+          "Vendor",
+          "Template Date",
+          "File"
+        ],
+        "rows": [
+          [
+            "2026-06-15",
+            "Sangsin Brake America",
+            "2026-06-10",
+            "DFC_Sangsin_Brake_America_PO_Template_2026-06-10.csv"
+          ],
+          [
+            "2026-06-15",
+            "Danaher Auto Spare Parts Co Ltd",
+            "2026-06-15",
+            "DFC_Danaher_Auto_Spare_Parts_Co_Ltd__PO_Template_2026-06-15.csv"
+          ],
+          [
+            "2026-06-03",
+            "Danaher Auto Spare Parts Co Ltd",
+            "2026-06-03",
+            "DFC_Danaher_Auto_Spare_Parts_Co_Ltd__PO_Template_2026-06-03.csv"
+          ],
+          [
+            "2026-05-26",
+            "Otto Zimmermann GmbH",
+            "",
+            "Mappe1.xlsx"
+          ],
+          [
+            "2026-05-19",
+            "Danaher Auto Spare Parts Co Ltd",
+            "2026-05-19",
+            "DFC_Danaher_Auto_Spare_Parts_Co_Ltd__PO_Template_2026-05-19.csv"
+          ],
+          [
+            "2026-04-30",
+            "Sangsin Brake America",
+            "2026-04-30",
+            "DFC_Sangsin_Brake_America_PO_Template_2026-04-30.csv"
+          ],
+          [
+            "2026-04-29",
+            "Danaher Auto Spare Parts Co Ltd",
+            "2026-04-29",
+            "DFC_Danaher_Auto_Spare_Parts_Co_Ltd__PO_Template_2026-04-29.csv"
+          ],
+          [
+            "2026-04-29",
+            "QI AUTOMOTIVE",
+            "2026-04-29",
+            "DFC_QI_AUTOMOTIVE_PO_Template_2026-04-29.csv"
+          ],
+          [
+            "2026-04-22",
+            "Yantai Hongtian Auto Parts Co Ltd",
+            "2026-04-22",
+            "DFC_Yantai_Hongtian_Auto_Parts_Co_Ltd_PO_Template_2026-04-22.xlsx"
+          ],
+          [
+            "2026-04-22",
+            "YUHUAN BOXING MACHINERY CO LTD",
+            "2026-04-22",
+            "DFC_YUHUAN_BOXING_MACHINERY_CO_LTD_PO_Template_2026-04-22.xlsx"
+          ],
+          [
+            "2026-02-28",
+            "YUHUAN BOXING MACHINERY CO LTD",
+            "2026-02-28",
+            "DFC_YUHUAN_BOXING_MACHINERY_CO_LTD_PO_Template_2026-02-28.xlsx"
+          ],
+          [
+            "2026-02-26",
+            "Master Parts ITM",
+            "2026-02-26",
+            "DFC_Master_Parts_ITM_PO_Template_2026-02-26.xlsx"
+          ],
+          [
+            "2026-02-25",
+            "Danaher - JIANGHONG Caliper Danaher Auto Spare Parts Co Ltd",
+            "2026-02-25",
+            "DFC_Danaher_-_JIANGHONG_Caliper_Danaher_Auto_Spare_Parts_Co_Ltd__PO_Template_2026-02-25.csv"
+          ],
+          [
+            "2026-02-24",
+            "Yantai Hongtian Auto Parts Co Ltd",
+            "2026-02-24",
+            "DFC_Yantai_Hongtian_Auto_Parts_Co_Ltd_PO_Template_2026-02-24.csv"
+          ],
+          [
+            "2026-02-18",
+            "Wenzhou Saibao Auto Parts Co LTD",
+            "2026-02-18",
+            "cd3bab65-9925-479d-aa66-f350f206d265-po_template_upload-DFC_Wenzhou_Saibao_Auto_Parts_Co_LTD_PO_Template_2026-02-18-a2dbd1.xlsx"
+          ],
+          [
+            "2026-02-18",
+            "Wenzhou Saibao Auto Parts Co LTD",
+            "2026-02-18",
+            "DFC_Wenzhou_Saibao_Auto_Parts_Co_LTD_PO_Template_2026-02-18.xlsx"
+          ],
+          [
+            "2025-12-17",
+            "Haining Lapauto Co Ltd",
+            "2025-12-08",
+            "DFC_Haining_Lapauto_Co_Ltd_PO_Template_2025-12-08.xlsx"
+          ],
+          [
+            "2025-12-04",
+            "Newtek Automotive Yantai Co Ltd",
+            "2025-12-02",
+            "DFC_Newtek_Automotive_Yantai_Co_Ltd__PO_Template_2025-12-02.xlsx"
+          ],
+          [
+            "2025-12-03",
+            "Yantai Hongtian Auto Parts Co Ltd",
+            "2025-12-03",
+            "DFC_Yantai_Hongtian_Auto_Parts_Co_Ltd_PO_Template_2025-12-03.csv"
+          ],
+          [
+            "2025-12-02",
+            "LPR s r l",
+            "2025-12-02",
+            "DFC_LPR_s_r_l_PO_Template_2025-12-02.csv"
+          ],
+          [
+            "2025-12-02",
+            "LAIZHOU SHANSITE AUTOMOTIVE PARTS CO LTD",
+            "2025-12-02",
+            "DFC_LAIZHOU_SHANSITE_AUTOMOTIVE_PARTS_CO_LTD_PO_Template_2025-12-02 (1).xlsx"
+          ],
+          [
+            "2025-12-02",
+            "LAIZHOU SHANSITE AUTOMOTIVE PARTS CO LTD",
+            "2025-12-02",
+            "DFC_LAIZHOU_SHANSITE_AUTOMOTIVE_PARTS_CO_LTD_PO_Template_2025-12-02 (2).xlsx"
+          ],
+          [
+            "2025-12-02",
+            "LAIZHOU SHANSITE AUTOMOTIVE PARTS CO LTD",
+            "2025-12-02",
+            "DFC_LAIZHOU_SHANSITE_AUTOMOTIVE_PARTS_CO_LTD_PO_Template_2025-12-02 (3).xlsx"
+          ],
+          [
+            "2025-12-02",
+            "Danaher - JIANGHONG Caliper",
+            "2025-12-02",
+            "DFC_Danaher_-_JIANGHONG_Caliper_PO_Template_2025-12-02.csv"
+          ],
+          [
+            "2025-12-02",
+            "ZHENGDE BRAKE CO LTD",
+            "2025-12-02",
+            "DFC_ZHENGDE_BRAKE_CO_LTD_PO_Template_2025-12-02.csv"
+          ],
+          [
+            "2025-12-02",
+            "Cang Zhou Ka Fei Er Auto Parts Co Ltd",
+            "2025-11-25",
+            "DFC_Cang_Zhou_Ka_Fei_Er_Auto_Parts_Co_Ltd_PO_Template_2025-11-25.xlsx"
+          ],
+          [
+            "2025-12-02",
+            "Cang Zhou Ka Fei Er Auto Parts Co Ltd",
+            "2025-11-25",
+            "DFC_Cang_Zhou_Ka_Fei_Er_Auto_Parts_Co_Ltd_PO_Template_2025-11-25.xlsx"
+          ],
+          [
+            "2025-12-02",
+            "Linyi Heli Electronic Co Ltd",
+            "2025-11-26",
+            "DFC_Linyi_Heli_Electronic_Co_Ltd_PO_Template_2025-11-26.xlsx"
+          ],
+          [
+            "2025-12-02",
+            "Longkou Aoda Auto parts co Ltd",
+            "2025-12-02",
+            "DFC_Longkou_Aoda_Auto_parts_co_Ltd_PO_Template_2025-12-02.csv"
+          ],
+          [
+            "2025-12-02",
+            "Qingdao Sunsong Co Ltd",
+            "2025-12-02",
+            "DFC_Qingdao_Sunsong_Co_Ltd_PO_Template_2025-12-02.csv"
+          ],
+          [
+            "2025-12-02",
+            "Shandong Jinli New Material Tech Co Ltd",
+            "2025-12-02",
+            "DFC_Shandong_Jinli_New_Material_Tech_Co_Ltd__PO_Template_2025-12-02..xlsx"
+          ],
+          [
+            "2025-12-02",
+            "Vendor",
+            "2025-12-02",
+            "DFC_Vendor_PO_Template_2025-12-02.csv"
+          ],
+          [
+            "2025-12-02",
+            "YUHUAN ANLIAN MACHINERY CO LTD",
+            "2025-11-28",
+            "DFC_YUHUAN_ANLIAN_MACHINERY_CO_LTD__PO_Template_2025-11-28.csv"
+          ],
+          [
+            "2025-12-02",
+            "YUHUAN BOXING MACHINERY CO LTD",
+            "2025-11-25",
+            "DFC_YUHUAN_BOXING_MACHINERY_CO_LTD_PO_Template_2025-11-25.xlsx"
+          ],
+          [
+            "2025-11-30",
+            "Taizhou Jsquare Auto Parts Co Ltd",
+            "2025-11-25",
+            "DFC_Taizhou_Jsquare_Auto_Parts_Co_Ltd_PO_Template_2025-11-25.xlsx"
+          ],
+          [
+            "2025-11-28",
+            "Yantai Hongtian Auto Parts Co Ltd",
+            "2025-11-25",
+            "DFC_Yantai_Hongtian_Auto_Parts_Co_Ltd_PO_Template_2025-11-25 (1).csv"
+          ],
+          [
+            "2025-11-25",
+            "LAIZHOU SHANSITE AUTOMOTIVE PARTS CO LTD",
+            "2025-11-25",
+            "DFC_LAIZHOU_SHANSITE_AUTOMOTIVE_PARTS_CO_LTD_PO_Template_2025-11-25.csv"
+          ],
+          [
+            "2025-11-25",
+            "Danaher - JIANGHONG Caliper",
+            "2025-11-25",
+            "DFC_Danaher_-_JIANGHONG_Caliper_PO_Template_2025-11-25.csv"
+          ],
+          [
+            "2025-11-25",
+            "Yantai Bingchen economic and Trade Co Ltd",
+            "2025-11-25",
+            "DFC_Yantai_Bingchen_economic_and_Trade_Co_Ltd__PO_Template_2025-11-25.csv"
+          ],
+          [
+            "2025-11-25",
+            "ZHENGDE BRAKE CO LTD",
+            "2025-11-25",
+            "DFC_ZHENGDE_BRAKE_CO_LTD_PO_Template_2025-11-25.xlsx"
+          ],
+          [
+            "2025-11-25",
+            "Qingdao Sunsong Co Ltd",
+            "2025-11-25",
+            "DFC_Qingdao_Sunsong_Co_Ltd_PO_Template_2025-11-25.csv"
+          ],
+          [
+            "2025-11-25",
+            "YUHUAN BOXING MACHINERY CO LTD",
+            "2025-11-25",
+            "DFC_YUHUAN_BOXING_MACHINERY_CO_LTD_PO_Template_2025-11-25.xlsx"
+          ],
+          [
+            "2025-11-25",
+            "TANAWORKS CORPORATION",
+            "2025-11-25",
+            "DFC_TANAWORKS_CORPORATION_PO_Template_2025-11-25.csv"
+          ],
+          [
+            "2025-11-25",
+            "NINGBO HENGJIN MACHINERY MFG CO LTD",
+            "2025-11-25",
+            "DFC_NINGBO_HENGJIN_MACHINERY_MFG_CO_LTD__PO_Template_2025-11-25.csv"
+          ],
+          [
+            "2025-09-25",
+            "Double Link",
+            "2025-09-25",
+            "DFC_Double_Link_PO_Template_2025-09-25 (3).csv"
+          ]
+        ]
       }
     },
     "DFC SEO Blog System": {
@@ -2049,41 +2501,31 @@
         "value": "21,200",
         "total": null,
         "delta": "N/A",
-        "history": [
-          "21,200"
-        ]
+        "history": null
       },
       "Clicks": {
         "value": "81",
         "total": null,
         "delta": "N/A",
-        "history": [
-          "81"
-        ]
+        "history": null
       },
       "Avg Position": {
         "value": "8.3",
         "total": "8.3",
         "delta": null,
-        "history": [
-          "8.3"
-        ]
+        "history": null
       },
       "CTR": {
         "value": "0.40%",
         "total": "0.40%",
         "delta": null,
-        "history": [
-          "0.40%"
-        ]
+        "history": null
       },
       "Blog Sessions": {
         "value": "518",
         "total": null,
         "delta": "N/A",
-        "history": [
-          "518"
-        ]
+        "history": null
       },
       "Hours Saved (YTD)": {
         "value": "52",
@@ -2095,7 +2537,7 @@
     "Monthly Report Builder": {
       "Meta Ads Checked": {
         "value": "49",
-        "total": "542",
+        "total": null,
         "delta": null,
         "history": [
           404,
@@ -2105,7 +2547,7 @@
       },
       "TikTok Ads Checked": {
         "value": "95",
-        "total": "1,140",
+        "total": null,
         "delta": null,
         "history": [
           855,
@@ -2115,7 +2557,7 @@
       },
       "Google Ads Checked": {
         "value": "129,439",
-        "total": "1,423,260",
+        "total": null,
         "delta": null,
         "history": [
           1164942,
@@ -2125,7 +2567,7 @@
       },
       "Time Saved (Hrs)": {
         "value": "4",
-        "total": "8",
+        "total": null,
         "delta": null,
         "history": [
           4,
@@ -2358,21 +2800,64 @@
             "+8.1%",
             "+7.9%",
             "-0.7%"
+          ],
+          [
+            "September 2026",
+            "Meta",
+            "11,474.94",
+            "1,153,725",
+            "2.77%",
+            "28,659",
+            "0.40",
+            "-5.2%",
+            "-11.1%",
+            "-4.4%",
+            "-13.7%",
+            "+9.9%"
+          ],
+          [
+            "September 2026",
+            "TikTok",
+            "7,080.25",
+            "603,859",
+            "1.89%",
+            "15,648",
+            "0.45",
+            "-2.8%",
+            "-42.7%",
+            "+170.8%",
+            "+57.7%",
+            "-38.4%"
+          ],
+          [
+            "September 2026",
+            "Google",
+            "20,565.56",
+            "1,330,446",
+            "5.93%",
+            "11,380",
+            "1.81",
+            "-0.8%",
+            "+19.9%",
+            "-14.6%",
+            "-17.0%",
+            "+19.5%"
           ]
         ]
       }
     },
     "Amazon Flyer -> Meta Audience Sync": {
       "# Of People Added to Audience": {
-        "value": "398",
-        "total": "1,063",
+        "value": "416",
+        "total": "1,490",
         "delta": null,
         "history": [
           150,
           0,
           189,
           326,
-          398
+          409,
+          416
         ]
       },
       "Time Saved (Hrs)": {
@@ -2409,14 +2894,15 @@
         ]
       },
       "Conversions Gained": {
-        "value": "3,198",
-        "total": "17,883",
+        "value": "355",
+        "total": "18,238",
         "delta": null,
         "history": [
           0,
           1568,
           13117,
-          3198
+          3198,
+          355
         ]
       },
       "Time Saved (Hrs)": {
@@ -2450,10 +2936,10 @@
         ],
         "rows": [
           [
-            "May 2026",
             "Meta",
             "6888339455179",
             "BMW X1 - No Dialogue",
+            "May 2026",
             "2.9337",
             "0.3041",
             "646.45",
@@ -2468,10 +2954,10 @@
             ""
           ],
           [
-            "May 2026",
             "Meta",
             "6888361368179",
             "BMW X1 - No Dialogue - Copy",
+            "May 2026",
             "3.6549",
             "0.263",
             "145.99",
@@ -2486,10 +2972,10 @@
             ""
           ],
           [
-            "May 2026",
             "Meta",
             "6888363627979",
             "BMW X1 - No Dialogue - Copy",
+            "May 2026",
             "3.9443",
             "0.3419",
             "318.69",
@@ -2504,10 +2990,10 @@
             ""
           ],
           [
-            "May 2026",
             "Meta",
             "6911547867779",
             "image C - Copy",
+            "May 2026",
             "3.4229",
             "0.3357",
             "652.32",
@@ -2522,10 +3008,10 @@
             ""
           ],
           [
-            "May 2026",
             "Meta",
             "6914056318779",
             "Ford F-350 - No Dialogue - Copy",
+            "May 2026",
             "2.9626",
             "0.3123",
             "1,004.12",
@@ -2540,10 +3026,10 @@
             ""
           ],
           [
-            "May 2026",
             "Meta",
             "6937420735979",
             "Ford F-350 - No Dialogue - Copy 2",
+            "May 2026",
             "3.0844",
             "0.251",
             "41.16",
@@ -2558,10 +3044,10 @@
             ""
           ],
           [
-            "May 2026",
             "Meta",
             "6937421073379",
             "Ford F-350 - No Dialogue - Copy 2",
+            "May 2026",
             "3.369",
             "0.2869",
             "610.33",
@@ -2582,7 +3068,7 @@
             "May 2026",
             "0.57",
             "0.68",
-            "114.20",
+            "114.2",
             "29,078",
             "167",
             "0",
@@ -2606,7 +3092,7 @@
             "0",
             "0.79",
             "0.61",
-            "52.20",
+            "52.2",
             "10,698",
             "85",
             "0"
@@ -2616,7 +3102,7 @@
             "1853519258652817",
             "Track Car",
             "May 2026",
-            "0.50",
+            "0.5",
             "0.89",
             "67.05",
             "14,943",
@@ -2759,109 +3245,109 @@
             "Meta",
             "6888339455179",
             "BMW X1 - No Dialogue",
-            "July 2026",
-            "2.6764",
-            "0.2939",
-            "1,230.22",
-            "156,407",
-            "4,186",
-            "3,027",
-            "2.748",
-            "0.3208",
-            "1,129.53",
-            "128,129",
-            "3,521",
-            "2,591"
+            "September 2026",
+            "2.9546",
+            "0.3387",
+            "1,108.89",
+            "110,809",
+            "3,274",
+            "2,347",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ],
           [
             "Meta",
             "6888361368179",
             "BMW X1 - No Dialogue - Copy",
-            "July 2026",
-            "3.3937",
-            "0.2741",
-            "165.86",
-            "17,827",
-            "605",
-            "483",
-            "3.5111",
-            "0.2659",
-            "84.55",
-            "9,057",
-            "318",
-            "276"
+            "September 2026",
+            "3.4412",
+            "0.3137",
+            "272.59",
+            "25,253",
+            "869",
+            "617",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ],
           [
             "Meta",
             "6888363627979",
             "BMW X1 - No Dialogue - Copy",
-            "July 2026",
-            "2.8839",
-            "0.4582",
-            "262.54",
-            "19,869",
-            "573",
-            "601",
-            "3.1922",
-            "0.4268",
-            "124.20",
-            "9,116",
-            "291",
-            "287"
+            "September 2026",
+            "3.1112",
+            "0.4707",
+            "135.55",
+            "9,257",
+            "288",
+            "284",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ],
           [
             "Meta",
             "6914056318779",
             "Ford F-350 - No Dialogue - Copy",
-            "July 2026",
-            "3.4613",
-            "0.218",
-            "796.37",
-            "105,539",
-            "3,653",
-            "1,812",
-            "2.8009",
-            "0.3018",
-            "1,070.53",
-            "126,639",
-            "3,547",
-            "2,304"
+            "September 2026",
+            "2.7025",
+            "0.325",
+            "1,219.52",
+            "138,834",
+            "3,752",
+            "2,318",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ],
           [
             "Meta",
             "6937420735979",
             "Ford F-350 - No Dialogue - Copy 2",
-            "May 2026",
-            "3.0844",
-            "0.251",
-            "41.16",
-            "5,317",
-            "164",
-            "93",
-            "2.8365",
-            "0.2513",
-            "11.81",
-            "1,657",
-            "47",
-            "22"
+            "September 2026",
+            "2.3614",
+            "0.4378",
+            "10.07",
+            "974",
+            "23",
+            "17",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ],
           [
             "Meta",
             "6937421073379",
             "Ford F-350 - No Dialogue - Copy 2",
-            "July 2026",
-            "4.0004",
-            "0.2672",
-            "346.85",
-            "32,447",
-            "1,298",
-            "1,045",
-            "3.1356",
-            "0.2957",
-            "862.42",
-            "93,029",
-            "2,917",
-            "2,552"
+            "September 2026",
+            "3.4977",
+            "0.2949",
+            "629.22",
+            "61,012",
+            "2,134",
+            "1,861",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ],
           [
             "TikTok",
@@ -2906,7 +3392,7 @@
             "June 2026",
             "0.49",
             "1.12",
-            "142.20",
+            "142.2",
             "26,184",
             "127",
             "0",
@@ -3056,7 +3542,7 @@
             "60",
             "1.0033",
             "7.3778",
-            "66.40",
+            "66.4",
             "897",
             "9",
             "3"
@@ -3119,37 +3605,37 @@
             "Meta",
             "52541840550583",
             "Hiring Ad - A Image + Text",
-            "July 2026",
-            "4.1472",
-            "0.1651",
-            "1,030.23",
-            "150,463",
-            "6,240",
-            "4,208",
-            "4.2035",
-            "0.1624",
-            "765.50",
-            "112,169",
-            "4,715",
-            "3,114"
+            "September 2026",
+            "4.2236",
+            "0.1942",
+            "856.92",
+            "104,460",
+            "4,412",
+            "2,884",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ],
           [
             "Meta",
             "52541843643783",
             "Hiring Ad - B - Image + Text",
-            "July 2026",
-            "5.2016",
-            "0.151",
-            "30.19",
-            "3,845",
-            "200",
-            "135",
-            "4.2792",
-            "0.1702",
-            "285.94",
-            "39,260",
-            "1,680",
-            "1,256"
+            "September 2026",
+            "4.298",
+            "0.2061",
+            "193.07",
+            "21,801",
+            "937",
+            "663",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
           ]
         ]
       }
@@ -3241,6 +3727,7 @@
           56,
           56,
           56,
+          56,
           56
         ]
       },
@@ -3253,6 +3740,7 @@
           28,
           29,
           29,
+          31,
           31,
           31
         ]
@@ -3267,6 +3755,7 @@
           10,
           10,
           8,
+          8,
           8
         ]
       },
@@ -3280,11 +3769,12 @@
           17,
           17,
           17,
+          17,
           17
         ]
       },
       "# Of Reports Created": {
-        "value": "3",
+        "value": "4",
         "total": null,
         "delta": null,
         "history": [
@@ -3293,7 +3783,7 @@
           30,
           14,
           5,
-          3
+          4
         ]
       }
     },
@@ -3493,40 +3983,44 @@
       "period": "Sep",
       "hours": 422.9,
       "finalized": true
+    },
+    {
+      "period": "Oct",
+      "hours": 456.9
     }
   ],
   "time_saved_per_agent": {
     "R1 Concepts SEO Blog System": 88.0,
+    "Shirly PO Workflow Automation": 42.0,
     "DFC SEO Blog System": 52.0,
     "Monthly Report Builder": 4.0,
     "Amazon Flyer -> Meta Audience Sync": 0.0,
     "Paid Social Copy Audit": 4.6,
     "Media Meeting Task Agent": 3.0,
     "Resume Bot": 2.3,
-    "Email Marketing Agent": 22.0,
-    "DFC Email Marketing Agent": 22.0,
+    "Email Marketing Agent": 20.0,
+    "DFC Email Marketing Agent": 20.0,
     "R1 Support Agent": 30.0,
     "Customer Issues Analyzer": 5.0,
     "DFC Sales Active Customer Alerts": 12.0,
     "Creator Discovery Tool": 18.0,
-    "Creator Qualifier": 14.0,
-    "Creator Outreach": 20.0,
-    "Creator Reponse": 24.0,
+    "Creator Qualifier": 12.0,
+    "Creator Outreach": 15.0,
+    "Creator Reponse": 20.0,
     "Must Have Monday Email Automation": 10.0,
-    "First to Market Email Automation": 10.0,
-    "Marketing Deck Automation": 8.0,
-    "Shirly PO Workflow Automation": 6.0,
-    "DFC Load Sheet Generator": 5.0,
+    "First to Market Email Automation": 8.0,
+    "Marketing Deck Automation": 10.0,
+    "DFC Load Sheet Generator": 6.0,
     "MHM Attentive SMS Automation": 6.0,
     "Super Session Saturday Automation": 8.0,
     "Friction Friday Automation": 14.0,
     "R1 AI Ticketing Automation": 15.0,
-    "Don Carrier Outreach": 6.0,
+    "Don Carrier Outreach": 8.0,
     "Weekly Checkup Bot": 8.0,
     "Agent Tracker Agent": 4.0,
     "Meta Investigation": 5.0,
     "Agent Tracker Agent V2": 3.0,
     "Paid Channel Chat bot": 4.0
   },
-  "summary": "The AI automation pipeline is in strong shape this week, with 31 of 56 total agents completed, 8 actively in progress, and 17 more planned for future development. No new agents were added to the pipeline this week, and no agents changed stages, meaning the team is in a steady execution phase focused on advancing the current in-progress work. While it was a quieter week on the tracker side, the depth and breadth of what's already running \u2014 from daily email campaigns and influencer outreach to support ticketing and paid media audits \u2014 reflects a lot of momentum built over time. We'll keep pushing the in-progress agents forward and look forward to reporting more completions in the weeks ahead!"
+  "summary": "The pipeline is in strong shape with 56 total agents across the team \u2014 31 completed, 8 in progress, and 17 planned. No new agents were added this week, and no agents changed stages, so the pipeline remains steady from last week. The focus continues to be advancing the 8 in-progress agents, including the R1 Customer Agent, DFC Site Visit Automated Emails, and the DFC New Arrival Guide, toward completion. Great momentum overall, and the growing library of completed agents is already delivering real value across email, SEO, paid media, creator outreach, and more \u2014 keep up the excellent work!"
 }
