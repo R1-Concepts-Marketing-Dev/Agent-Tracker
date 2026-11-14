@@ -204,40 +204,40 @@
       
           <div class="workflow-track" id="track">
             
-              <div class="step-box" id="step-0" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(0)">
+              <div class="step-box" id="step-0" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(0)">
                 <div class="step-num">1</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Gmail</div>
-                  <div class="step-role">Email</div>
+                  <div class="step-platform">Gmail + Google Drive</div>
+                  <div class="step-role">Email + Storage</div>
                 </div>
               </div>
               <div class="arrow-wrap" id="arrow-0"><div class="arrow-track">
-                <div class="travel-dot" id="dot-0" style="background:#EA4335;--t-color:#EA4335;"></div>
+                <div class="travel-dot" id="dot-0" style="background:#4285F4;--t-color:#4285F4;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
-              <div class="step-box" id="step-1" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(1)">
+              <div class="step-box" id="step-1" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(1)">
                 <div class="step-num">2</div>
-                <div class="step-inner">
-                  <div class="dot-ring"><div class="dot-core"></div></div>
-                  <div class="step-platform">Google Drive</div>
-                  <div class="step-role">File Storage</div>
-                </div>
-              </div>
-              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
-                <div class="travel-dot" id="dot-1" style="background:#4285F4;--t-color:#4285F4;"></div>
-                <span class="arrow-head">&#8250;</span>
-              </div></div>
-              <div class="step-box" id="step-2" style="--dot-color:#7C3AED;--glow-color:rgba(124,58,237,0.12);" onclick="goToStep(2)">
-                <div class="step-num">3</div>
                 <div class="step-inner">
                   <div class="dot-ring"><div class="dot-core"></div></div>
                   <div class="step-platform">Claude AI</div>
                   <div class="step-role">AI Model</div>
                 </div>
               </div>
+              <div class="arrow-wrap" id="arrow-1"><div class="arrow-track">
+                <div class="travel-dot" id="dot-1" style="background:#7C3AED;--t-color:#7C3AED;"></div>
+                <span class="arrow-head">&#8250;</span>
+              </div></div>
+              <div class="step-box" id="step-2" style="--dot-color:#EA4335;--glow-color:rgba(234,67,53,0.12);" onclick="goToStep(2)">
+                <div class="step-num">3</div>
+                <div class="step-inner">
+                  <div class="dot-ring"><div class="dot-core"></div></div>
+                  <div class="step-platform">Gmail</div>
+                  <div class="step-role">Email</div>
+                </div>
+              </div>
               <div class="arrow-wrap" id="arrow-2"><div class="arrow-track">
-                <div class="travel-dot" id="dot-2" style="background:#7C3AED;--t-color:#7C3AED;"></div>
+                <div class="travel-dot" id="dot-2" style="background:#EA4335;--t-color:#EA4335;"></div>
                 <span class="arrow-head">&#8250;</span>
               </div></div>
               <div class="step-box" id="step-3" style="--dot-color:#4285F4;--glow-color:rgba(66,133,244,0.12);" onclick="goToStep(3)">
@@ -325,7 +325,7 @@
 
   const STEPS = 4, TRAVEL_MS = 700;
   let current = 0, traveling = false;
-  const stepData = [{"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Monitors the jobs@ inbox for incoming applications, extracts resume attachments and email body text, and triggers the screening workflow for each submission.", "impact": "Ensures every application is captured and processed immediately, eliminating the risk of candidates being missed in a busy shared inbox.", "dataLabel": "Data collected", "chips": ["Applicant Name", "Email Address", "Resume Attachment", "Role Applied", "Submission Timestamp"]}, {"name": "Google Drive", "role": "File Storage", "color": "#4285F4", "text": "Saves each resume PDF into an organized Drive folder structure for persistent, accessible record-keeping.", "impact": "Creates a clean, searchable archive of all applicants so hiring managers can retrieve any resume without digging through email threads.", "dataLabel": "Files stored", "chips": ["Resume PDF", "Applicant Name", "Folder Path", "Role Tag", "Upload Date"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Scores each resume against the requirements of open roles, determines a hiring decision category — approved, denied, or paused — and drafts the appropriate auto-reply for denied and no-resume candidates.", "impact": "Replaces hours of manual resume screening with consistent, criteria-based evaluations delivered in seconds, keeping the pipeline moving without recruiter bottlenecks.", "dataLabel": "Analysis produced", "chips": ["Fit Score", "Decision Category", "Role Matched", "Key Qualifications", "Denial Reason", "Draft Reply"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Logs every applicant with their score, decision, role, and status to a dashboard, with paused-role candidates automatically routed to a dedicated Pending tab.", "impact": "Gives the hiring team a live, organized view of all candidates and decisions without any manual data entry, making pipeline reviews instant.", "dataLabel": "Records updated", "chips": ["Applicant Name", "Fit Score", "Decision", "Role", "Status", "Pending Flag"]}];
+  const stepData = [{"name": "Gmail + Google Drive", "role": "Email + Storage", "color": "#4285F4", "text": "Monitors jobs@r1concepts.com for incoming applications, extracts resume attachments, and files each PDF into the appropriate Drive folder organized by role and candidate.", "impact": "Every application is captured and organized automatically the moment it arrives, eliminating manual inbox triage and ensuring no candidate falls through the cracks.", "dataLabel": "Data collected", "chips": ["Resume PDF", "Applicant email", "Role applied", "Submission date", "Drive folder path"]}, {"name": "Claude AI", "role": "AI Model", "color": "#7C3AED", "text": "Reads each resume and scores the candidate against the requirements of the open role, producing a hiring recommendation of approved, denied, or pending based on fit.", "impact": "Recruiters receive a pre-scored candidate queue instead of a raw inbox, dramatically reducing time-to-screen and ensuring evaluation criteria are applied consistently across all applicants.", "dataLabel": "Scoring produced", "chips": ["Fit score", "Hire recommendation", "Role match", "Key qualifications", "Denial reason", "Pending flag"]}, {"name": "Gmail", "role": "Email", "color": "#EA4335", "text": "Sends automated reply emails to denied candidates and those who submitted without a resume, while paused-role candidates receive a holding acknowledgment appropriate to their status.", "impact": "Every applicant gets a timely, professional response without recruiter effort, protecting the employer brand and freeing the HR team from repetitive correspondence.", "dataLabel": "Email contains", "chips": ["Denial notice", "Missing resume prompt", "Paused role message", "Candidate name", "Role reference"]}, {"name": "Google Sheets", "role": "Spreadsheet", "color": "#4285F4", "text": "Logs every applicant decision — approved, denied, or pending — to a structured dashboard with a dedicated Pending tab for candidates held for paused roles.", "impact": "Hiring managers have a live, organized record of all applicants and decisions in one place, making pipeline reviews instant and ensuring paused candidates are re-engaged when roles reopen.", "dataLabel": "Records updated", "chips": ["Applicant name", "Role applied", "Score", "Decision", "Resume link", "Pending tab flag"]}];
 
   function updatePanel(idx) {
     if (!stepData.length) return;
